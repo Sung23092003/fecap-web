@@ -587,30 +587,90 @@ a {
     z-index: 1;
     width: 50px;
     height: 50px;
-    backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     outline: none !important;
     box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .banner_slide .slick-prev:before {
-    font-size: 50px;
-    line-height: 1;
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    border-left: 3px solid var(--mainColor);
+    border-bottom: 3px solid var(--mainColor);
+    transform: translate(-35%, -50%) rotate(45deg);
+    opacity: 1;
 }
 
 .banner_slide .slick-next {
     right: 15px;
     width: 50px;
     height: 50px;
-    backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     outline: none !important;
     box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .banner_slide .slick-next:before {
-    font-size: 50px;
-    line-height: 1;
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    border-top: 3px solid var(--mainColor);
+    border-right: 3px solid var(--mainColor);
+    transform: translate(-65%, -50%) rotate(45deg);
+    opacity: 1;
+}
+
+.banner_slide .slick-prev:hover,
+.banner_slide .slick-prev:focus,
+.banner_slide .slick-next:hover,
+.banner_slide .slick-next:focus {
+    background: var(--mainColor);
+}
+
+.banner_slide .slick-prev:hover:before,
+.banner_slide .slick-prev:focus:before {
+    border-left-color: #fff;
+    border-bottom-color: #fff;
+}
+
+.banner_slide .slick-next:hover:before,
+.banner_slide .slick-next:focus:before {
+    border-top-color: #fff;
+    border-right-color: #fff;
+}
+
+@media (max-width: 768px) {
+    .banner_slide .slick-prev,
+    .banner_slide .slick-next {
+        width: 38px;
+        height: 38px;
+    }
+
+    .banner_slide .slick-prev:before,
+    .banner_slide .slick-next:before {
+        width: 11px;
+        height: 11px;
+        border-width: 2px;
+    }
 }
 
 .banner_slide .slick-dots {
