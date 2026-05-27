@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Mỹ phẩm</title>
+  <meta name="keywords" content="Mỹ phẩm">
+  <meta name="description" content="Mỹ phẩm">
+  <link rel="icon" type="image/x-icon" href="https://we1.io.vn/admin/public/images/footer/17408141534560x60.png">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet" type="text/css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+  <link href="assets/css/fe-header.css" rel="stylesheet" type="text/css">
+</head>
+
+<body style="height: 10000px;">
+  <header class="fe-header w-100" style="background: white;">
+    <div class="header-top d-none d-md-block">
+      <div class="container-fluid px-3 px-sm-5 py-2">
+        <div class="infomation d-flex flex-nowrap justify-content-between gap-2">
+          <div class="d-flex flex-wrap gap-2 infomation-left">
+            <marquee class="marquee">
+              <span>
+                <a href="https://we1.io.vn/dich-vu">
+                  KIỂU 2 📣 SIÊU THỊ IN ẤN: GIẢI PHÁP CHO MỌI THƯƠNG HIỆU 📣
+                </a>
+                <a href="">
+                  Thiết kế đẹp – In ấn chuẩn – Giao hàng nhanh. Hãy bắt đầu cùng chúng tôi ngay hôm nay!
+                </a>
+                <a href="">
+                  Lần đầu ghé thăm? Hãy để chúng tôi biến ý tưởng của bạn thành sản phẩm in ấn hoàn hảo!!!
+                </a>
+                <a href="https://we1.io.vn/">
+                  In số lượng càng nhiều – Giá càng rẻ. Xem bảng giá siêu tiết kiệm ngay
+                </a>
+              </span>
+            </marquee>
+          </div>
+          <div class="social-icons d-flex align-items-center gap-2">
+            <a class="text-dark text-decoration-none" href="#"><i class="fab fa-facebook"></i></a>
+            <a class="text-dark text-decoration-none" href="#"><i class="fab fa-twitter"></i></a>
+            <a class="text-dark text-decoration-none" href="#"><i class="fab fa-instagram"></i></a>
+            <a class="text-dark text-decoration-none" href="#"><i class="fab fa-linkedin"></i></a>
+            <a class="text-dark text-decoration-none" href="#"><i class="fab fa-github"></i></a>
+            <div class="dropdown-language">
+              <p class="d-flex align-items-center justify-content-end gap-1 mb-0"><span>Ngôn ngữ</span><i
+                  class="fa-solid fa-caret-down"></i></p>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Tiếng việt</a></li>
+                <li><a class="dropdown-item" href="#">Tiếng anh</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header-main px-3 d-flex align-items-center justify-content-between" id="header-main"
+      style="background: var(--mainColor); padding-top: 1rem; padding-bottom: 1rem;">
+      <div class="container">
+        <div class="row align-items-center justify-content-between w-100 wrap-menu">
+          <div class="d-md-none col-2 px-0">
+            <div class="toggle-menu d-flex gap-1 justify-content-between align-content-center">
+              <div class="box-icon d-flex justify-content-center gap-2">
+                <div class="icon" style="border-color: white;">
+                  <button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i
+                      class="fa-solid fa-bars text-light fs-5 mt-1"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="wrap-header-logo col-7 col-md-3 col-lg-3 col-xl-2 px-0 d-flex gap-2 align-content-center justify-content-center justify-content-md-start">
+            <div class="d-none d-md-block d-lg-none col-2 px-0 mt-2">
+              <div class="toggle-menu d-flex gap-1 justify-content-between align-content-center">
+                <div class="d-flex justify-content-center gap-2">
+                  <div class="icon" style="border-color: white;">
+                    <button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i
+                        class="fa-solid fa-bars text-light fs-5 mt-1"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo">
+              <a href="./docs"><img class="w-100" src="assets/img/header/logo.png" alt="logo" /></a>
+            </div>
+          </div>
+          <div
+            class="d-none d-md-flex align-content-center gap-2 wrap-header-search px-0 col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4"
+            id="header-search">
+            <div class="header-search d-block w-100">
+              <form class="form-inline" action="tat-ca-san-pham" method="GET">
+                <div class="input-group flex-nowrap">
+                  <input class="form-control" type="text" name="search"
+                    placeholder="Tìm kiếm Sản phẩm &amp; Dịch vụ ?" />
+                  <div class="input-group-append bg-light">
+                    <button class="btn" type="submit" aria-label="Tìm kiếm Sản phẩm &amp; Dịch vụ ?"><i
+                        class="fa fa-search" aria-hidden="true"></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <a class="col-1 d-none d-xl-block" href="#">
+            <div class="d-flex justify-content-center align-items-center gap-1">
+              <div class="box-icon d-flex justify-content-center">
+                <div class="icon" style="border-color: white;">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 0C6.12297 0 2.96875 3.15422 2.96875 7.03125C2.96875 8.34117 3.3316 9.61953 4.01832 10.7286L9.59977 19.723C9.70668 19.8953 9.89504 20 10.0976 20C10.0992 20 10.1007 20 10.1023 20C10.3066 19.9984 10.4954 19.8905 10.6003 19.7152L16.0395 10.6336C16.6883 9.54797 17.0312 8.3023 17.0312 7.03125C17.0312 3.15422 13.877 0 10 0ZM15.0338 10.032L10.0888 18.2885L5.01434 10.1112C4.44273 9.18805 4.13281 8.12305 4.13281 7.03125C4.13281 3.80039 6.76914 1.16406 10 1.16406C13.2309 1.16406 15.8633 3.80039 15.8633 7.03125C15.8633 8.09066 15.5738 9.12844 15.0338 10.032Z" fill="white"></path>
+                    <path d="M10 3.51562C8.06148 3.51562 6.48438 5.09273 6.48438 7.03125C6.48438 8.95738 8.03582 10.5469 10 10.5469C11.9884 10.5469 13.5156 8.93621 13.5156 7.03125C13.5156 5.09273 11.9385 3.51562 10 3.51562ZM10 9.38281C8.7009 9.38281 7.64844 8.32684 7.64844 7.03125C7.64844 5.73891 8.70766 4.67969 10 4.67969C11.2923 4.67969 12.3477 5.73891 12.3477 7.03125C12.3477 8.30793 11.3197 9.38281 10 9.38281Z" fill="white"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="text text-left text-light d-none d-xl-block"><small>Hệ thống cửa hàng<b class="d-block text-left">(45 chi nhánh)</b></small></div>
+            </div>
+          </a>
+          <a class="col-1 d-none d-xl-block" href="#">
+            <div class="d-flex justify-content-center align-items-center gap-1">
+              <div class="box-icon d-flex justify-content-center">
+                <div class="icon" style="border-color: white;">
+                  <svg class="bi bi-heart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="text text-left text-light d-none d-xl-block"><small>Sản phẩm<br /> Yêu thích</small></div>
+            </div>
+          </a>
+          <a class="col-1 d-none d-xl-block" href="./register.html">
+            <div class="d-flex justify-content-center align-items-center gap-1">
+              <div class="box-icon d-flex justify-content-center gap-1 align-items-center">
+                <div class="icon" style="border-color: white;">
+                  <svg width="20" height="20" viewBox="-42 0 512 512.001" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="m210.351562 246.632812c33.882813 0 63.21875-12.152343 87.195313-36.128906 23.96875-23.972656 36.125-53.304687 36.125-87.191406 0-33.875-12.152344-63.210938-36.128906-87.191406-23.976563-23.96875-53.3125-36.121094-87.191407-36.121094-33.886718 0-63.21875 12.152344-87.191406 36.125s-36.128906 53.308594-36.128906 87.1875c0 33.886719 12.15625 63.222656 36.128906 87.195312 23.980469 23.96875 53.316406 36.125 87.191406 36.125zm-65.972656-189.292968c18.394532-18.394532 39.972656-27.335938 65.972656-27.335938 25.996094 0 47.578126 8.941406 65.976563 27.335938 18.394531 18.398437 27.339844 39.980468 27.339844 65.972656 0 26-8.945313 47.578125-27.339844 65.976562-18.398437 18.398438-39.980469 27.339844-65.976563 27.339844-25.992187 0-47.570312-8.945312-65.972656-27.339844-18.398437-18.394531-27.34375-39.976562-27.34375-65.976562 0-25.992188 8.945313-47.574219 27.34375-65.972656zm0 0"></path>
+                    <path d="m426.128906 393.703125c-.691406-9.976563-2.089844-20.859375-4.148437-32.351563-2.078125-11.578124-4.753907-22.523437-7.957031-32.527343-3.3125-10.339844-7.808594-20.550781-13.375-30.335938-5.769532-10.15625-12.550782-19-20.160157-26.277343-7.957031-7.613282-17.699219-13.734376-28.964843-18.199219-11.226563-4.441407-23.667969-6.691407-36.976563-6.691407-5.226563 0-10.28125 2.144532-20.042969 8.5-6.007812 3.917969-13.035156 8.449219-20.878906 13.460938-6.707031 4.273438-15.792969 8.277344-27.015625 11.902344-10.949219 3.542968-22.066406 5.339844-33.042969 5.339844-10.96875 0-22.085937-1.796876-33.042968-5.339844-11.210938-3.621094-20.300782-7.625-26.996094-11.898438-7.769532-4.964844-14.800782-9.496094-20.898438-13.46875-9.753906-6.355468-14.808594-8.5-20.035156-8.5-13.3125 0-25.75 2.253906-36.972656 6.699219-11.257813 4.457031-21.003906 10.578125-28.96875 18.199219-7.609375 7.28125-14.390625 16.121094-20.15625 26.273437-5.558594 9.785157-10.058594 19.992188-13.371094 30.339844-3.199219 10.003906-5.875 20.945313-7.953125 32.523437-2.0625 11.476563-3.457031 22.363282-4.148437 32.363282-.679688 9.777344-1.023438 19.953125-1.023438 30.234375 0 26.726562 8.496094 48.363281 25.25 64.320312 16.546875 15.746094 38.4375 23.730469 65.066406 23.730469h346.53125c26.621094 0 48.511719-7.984375 65.0625-23.730469 16.757813-15.945312 25.253906-37.589843 25.253906-64.324219-.003906-10.316406-.351562-20.492187-1.035156-30.242187zm-44.90625 72.828125c-10.933594 10.40625-25.449218 15.464844-44.378906 15.464844h-246.527344c-18.933594 0-33.449218-5.058594-44.378906-15.460938-10.722656-10.207031-15.933594-24.140625-15.933594-42.585937 0-9.59375.316406-19.066407.949219-28.160157.617187-8.921874 1.878906-18.722656 3.75-29.136718 1.847656-10.285156 4.199219-19.9375 6.996094-28.675782 2.683593-8.378906 6.34375-16.675781 10.882812-24.667968 4.332031-7.617188 9.316407-14.152344 14.816407-19.417969 5.144531-4.925781 11.628906-8.957031 19.269531-11.980469 7.066406-2.796875 14.660156-4.214844 22.566406-4.214844 7.910156 0 15.5 1.417969 22.570312 4.214844 7.640625 3.023438 14.125 7.058594 19.269531 11.984375 5.5 5.261719 10.484375 11.796875 14.816407 19.414063 4.539062 7.992187 8.199219 16.289062 10.882812 24.667968 2.796875 8.738282 5.148437 18.394532 6.996094 28.679688 1.871094 10.410156 3.132812 20.210938 3.75 29.136718.632813 9.089844.949219 18.5625.949219 28.15625 0 18.445313-5.210937 32.378906-15.933594 42.585937z"></path>
+                  </svg>
+                </div>
+                <div class="text text-left text-light d-none d-xl-block"><small>Đăng nhập<br /> Đăng ký</small></div>
+              </div>
+            </div>
+          </a>
+          <a class="col-1 d-none d-xl-block" href="#">
+            <div class="d-flex justify-content-center align-items-center gap-1">
+              <div class="box-icon d-flex justify-content-center gap-1 align-items-center">
+                <div class="icon" style="border-color: white;"><i class="fa-solid fa-cart-shopping text-light fs-4"></i></div>
+              </div>
+              <div class="text text-left text-light d-none d-xl-block"><small class="d-none d-xl-block ml-lg-1">Giỏ
+                  hàng<br /> 111.000 vnd</small></div>
+            </div>
+          </a>
+          <div class="col-2 d-flex justify-content-end gap-2 d-xl-none px-0">
+            <a class="d-none d-md-block" href="#">
+              <div class="d-flex justify-content-center align-items-center gap-1">
+                <div class="box-icon d-flex justify-content-center">
+                  <div class="icon" style="border-color: white;">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="white" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10 0C6.12297 0 2.96875 3.15422 2.96875 7.03125C2.96875 8.34117 3.3316 9.61953 4.01832 10.7286L9.59977 19.723C9.70668 19.8953 9.89504 20 10.0976 20C10.0992 20 10.1007 20 10.1023 20C10.3066 19.9984 10.4954 19.8905 10.6003 19.7152L16.0395 10.6336C16.6883 9.54797 17.0312 8.3023 17.0312 7.03125C17.0312 3.15422 13.877 0 10 0ZM15.0338 10.032L10.0888 18.2885L5.01434 10.1112C4.44273 9.18805 4.13281 8.12305 4.13281 7.03125C4.13281 3.80039 6.76914 1.16406 10 1.16406C13.2309 1.16406 15.8633 3.80039 15.8633 7.03125C15.8633 8.09066 15.5738 9.12844 15.0338 10.032Z" fill="white"></path>
+                      <path d="M10 3.51562C8.06148 3.51562 6.48438 5.09273 6.48438 7.03125C6.48438 8.95738 8.03582 10.5469 10 10.5469C11.9884 10.5469 13.5156 8.93621 13.5156 7.03125C13.5156 5.09273 11.9385 3.51562 10 3.51562ZM10 9.38281C8.7009 9.38281 7.64844 8.32684 7.64844 7.03125C7.64844 5.73891 8.70766 4.67969 10 4.67969C11.2923 4.67969 12.3477 5.73891 12.3477 7.03125C12.3477 8.30793 11.3197 9.38281 10 9.38281Z" fill="white"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <a class="d-none d-md-block" href="#">
+              <div class="d-flex justify-content-center align-items-center gap-1">
+                <div class="box-icon d-flex justify-content-center">
+                  <div class="icon" style="border-color: white;">
+                    <svg class="bi bi-heart" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16">
+                      <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <a class="d-block" href="#">
+              <div class="d-flex justify-content-center align-items-center gap-1">
+                <div class="box-icon d-flex justify-content-center gap-1 align-items-center">
+                  <div class="icon" style="border-color: white;">
+                    <i class="fa-solid fa-cart-shopping text-light"></i>
+                  </div>
+                </div>
+                <div class="text text-left text-light d-none d-xl-block"><small class="d-none d-xl-block ml-lg-1">Giỏ hàng</small></div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="header-sticky">
+      <div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5" style="background: white;">
+        <div class="px-5">
+          <ul class="menu mb-0 d-flex row-gap-2 align-items-center justify-content-center">
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2 d-flex align-items-center gap-1" href="#"><img class="item-img"
+                  src="assets/img/header/cam-nang.png"
+                  alt="alt" /> ẤN PHẨM F&B</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu sub-menu-list mega">
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Danh thiếp - Namecards</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp Giấy mỹ thuật</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Kỹ Thuật Số</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Thông Minh</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Dập Nổi/ Chìm</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Ngọc Trai</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Giấy Nhựa</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Bo Góc Chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông Bo Góc</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Highlight</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Gấp Đôi</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Bao thư - Envelopes</li>
+                    <li class="px-3 py-2 text-dark">Bao thư lấy ngay</li>
+                    <li class="px-3 py-2 text-dark">Bao thư nhỏ</li>
+                    <li class="px-3 py-2 text-dark">Bao thư trung</li>
+                    <li class="px-3 py-2 text-dark">Bao thư lớn</li>
+                    <li class="px-3 py-2 text-dark">Bao thư giấy Kraft</li>
+                    <li class="px-3 py-2 text-dark">Bao thư cửa sổ kính</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Áo thun đồng phục</li>
+                    <li class="px-3 py-2 text-dark">Áo thun đồng phục cổ trụ</li>
+                    <li class="px-3 py-2 text-dark">Áo thun đồng phục cổ tròn</li>
+                    <li class="px-3 py-2 text-dark">Giấy ghi chú - Block notes</li>
+                    <li class="px-3 py-2 text-dark">Giấy ghi chú</li>
+                    <li class="px-3 py-2 text-dark">Giấy tiêu đề - Letterheads</li>
+                    <li class="px-3 py-2 text-dark">Giấy tiêu đề số lượng ít</li>
+                    <li class="px-3 py-2 text-dark">Giấy tiêu đề số lượng lớn</li>
+                    <li class="px-3 py-2 text-dark">Bìa đựng hồ sơ - Folders</li>
+                    <li class="px-3 py-2 text-dark">Bìa đựng hồ sơ 1 tay gấp</li>
+                    <li class="px-3 py-2 text-dark">Bìa đựng hồ sơ 2 tay gấp</li>
+                    <li class="px-3 py-2 text-dark">Bìa đựng hồ sơ cao cấp</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2 d-flex align-items-center gap-1" href="#"><img class="item-img"
+                  src="assets/img/header/cam-nang.png"
+                  alt="alt" /> ẤN PHẨM VĂN PHÒNG</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu sub-menu-list mega">
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Danh thiếp - Namecards</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp Giấy mỹ thuật</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Kỹ Thuật Số</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Thông Minh</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Dập Nổi/ Chìm</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Ngọc Trai</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Giấy Nhựa</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Bo Góc Chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông Bo Góc</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Highlight</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Gấp Đôi</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Danh thiếp - Namecards</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Danh thiếp - Namecards</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp Giấy mỹ thuật</li>
+                    <li class="px-3 py-2 text-dark">Danh thiếp chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Kỹ Thuật Số</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Thông Minh</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Dập Nổi/ Chìm</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Ngọc Trai</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Giấy Nhựa</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Bo Góc Chuẩn</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông Bo Góc</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Highlight</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Gấp Đôi</li>
+                    <li class="px-3 py-2 text-dark">Danh Thiếp Vuông</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Danh thiếp - Namecards</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Bao thư - Envelopes</li>
+                    <li class="px-3 py-2 text-dark">Bao thư lấy ngay</li>
+                    <li class="px-3 py-2 text-dark">Bao thư nhỏ</li>
+                    <li class="px-3 py-2 text-dark">Bao thư trung</li>
+                    <li class="px-3 py-2 text-dark">Bao thư lớn</li>
+                    <li class="px-3 py-2 text-dark">Bao thư giấy Kraft</li>
+                    <li class="px-3 py-2 text-dark">Bao thư cửa sổ kính</li>
+                  </ul>
+                </li>
+                <li class="sub-menu-item">
+                  <ul class="menu-list">
+                    <li class="px-3 py-2 text-dark">Áo thun đồng phục</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2" href="#">ẤN PHẨM TIẾP THỊ</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu">
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2" href="#">ẤN PHẨM BAO BÌ</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu">
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2" href="#">ẤN PHẨM CÁ NHÂN</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu">
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2" href="#">ÁO THUN </a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu">
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2 has-sub-menu">
+              <a class="menu-link py-1 px-2" href="#"> ẤN PHẨM KHÁC</a><i class="fa-solid fa-caret-down"></i>
+              <ul class="sub-menu">
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="about.html">Giới thiệu</a></li>
+                <li class="px-3 py-2 text-dark"><a class="menu-link" href="team.html">Đội ngũ</a></li>
+              </ul>
+            </li>
+            <li class="menu-item d-flex align-items-center py-1 px-2"><a class="menu-link py-1 px-2" href="#"> IN NHANH</a></li>
+            <li class="menu-item d-flex align-items-center py-1 px-2"><a class="menu-link py-1 px-2" href="#"> IN NHANH</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="header-bottom-item header-bottom-2 bg-white-50">
+        <div class="container px-2">
+          <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid align-items-center pr-2">
+              <div class="col-lg-12 lg-flex-1">
+                <button class="btn btn-toggle-menu d-lg-none" type="button" data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i
+                    class="fa-solid fa-bars text-dark fs-4 mt-1"></i></button>
+                <div class="mobile-menu">
+                  <ul
+                    class="navbar-nav me-auto mb-2 mb-lg-0 justify-content-center mobile-align-items-start align-items-center gap-lg-3">
+                    <li class="nav-item active"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"><span class="me-1"><i class="fa-solid fa-house"></i></span><span> Trang Chủ </span></a></li>
+                    <li class="nav-item dropdown"><a
+                        class="nav-link d-flex justify-content-center align-items-center dropdown-toggle text-uppercase"
+                        href="#"><span class="me-1"> </span><span> Nước Giặt Xả </span></a>
+                      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li class="nav-item dropdown"><a class="dropdown-item dropdown-toggle childMenu fw-bold"
+                            href="#">Tonmat cách âm - cách nhiệt</a>
+                          <ul class="dropdown-menu submenu-level-2">
+                            <li class="nav-item"><a class="dropdown-item" href="#">Tonmat SPEC</a></li>
+                            <li class="nav-item"><a class="dropdown-item" href="#">Tonmat APEC</a></li>
+                            <li class="nav-item"><a class="dropdown-item" href="#">Tonmat ECO</a></li>
+                          </ul>
+                        </li>
+                        <li><a class="dropdown-item fw-bold" href="#">Tonmat Panel</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#">Tranmat: Trần - Vách</a></li>
+                        <li class="nav-item dropdown"><a class="dropdown-item fw-bold dropdown-toggle childMenu"
+                            href="#">Gạch mát</a>
+                          <ul class="dropdown-menu submenu-level-2">
+                            <li class="nav-item"><a class="dropdown-item" href="#">Gạch mát</a></li>
+                            <li class="nav-item"><a class="dropdown-item" href="#">Phụ kiện Gạch mát</a></li>
+                          </ul>
+                        </li>
+                        <li><a class="dropdown-item fw-bold" href="#">Tôn công trình</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#">Tôn nhựa</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#">Tấm lợp sinh thái Onduline</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#">Vật liệu chống nóng cách âm cách nhiệt</a></li>
+                      </ul>
+                    </li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Nước Rửa Chén </a></li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Bất động sản </a></li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Nước Lau Sàn </a></li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Giới Thiệu </a></li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Tin tức </a></li>
+                    <li class="nav-item"><a
+                        class="nav-link d-flex justify-content-center align-items-center text-uppercase"
+                        href="#"> Liên Hệ </a></li>
+                  </ul>
+                  <div class="language d-flex flex-column d-lg-none" style="margin: 0 20px;">
+                    <a href="#"><img src="assets/img/header/vi.jpg" alt="VI" width="38" height="25" /></a>
+                    <a href="#"><img src="assets/img/header/en.jpg" alt="EN" width="38" height="25" style="margin-top: 10px;" /></a>
+                    <a href="#"><img src="assets/img/header/ja.jpg" alt="EN" width="38" height="25" style="margin-top: 10px;" /></a>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                      <li class="nav-item d-lg-none"><a class="nav-link btn-dang-nhap-user" href="#"><span>Đăng nhập</span></a></li>
+                      <li class="nav-item d-lg-none"><a class="nav-link" href="#"><span>Đăng ký</span></a></li>
+                    </ul>
+                  </div>
+                  <div class="language header-search d-flex flex-column d-lg-none" style="margin: 0 20px;">
+                    <form class="form-inline" action="#" method="GET">
+                      <div class="input-group">
+                        <input class="form-control" type="text" name="search" placeholder="Tìm sản phẩm?" />
+                        <div class="input-group-append">
+                          <button class="btn" type="submit" aria-label="Tìm sản phẩm"><i class="fa fa-search"
+                              aria-hidden="true"></i></button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="header-logo d-lg-none py-1"><a href="#"><img
+                    src="assets/img/header/logo.png" alt="logo"
+                    style="width: 150px !important; max-height: unset;" /></a></div>
+              <div class="header-card d-lg-none d-flex gap-1">
+                <a class="d-flex" href="#">
+                  <div class="icon"><i class="fa fa-shopping-cart text-dark fs-5" aria-hidden="true"></i></div>
+                </a>
+                <!-- <button class="btn btn-search p-0 border-0" type="button"><i class="fa fa-search text-dark fs-5"
+                    aria-hidden="true"></i></button> -->
+              </div>
+              <div class="header-search col-7 d-lg-none w-100 mb-2 border">
+                <form class="form-inline" action="#" method="GET">
+                  <div class="input-group d-flex">
+                    <input class="form-control" type="text" name="search" placeholder="Tìm sản phẩm?" />
+                    <div class="input-group-append">
+                      <button class="btn" type="submit" aria-label="Tìm sản phẩm"><i class="fa fa-search"
+                          aria-hidden="true"></i></button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <div class="offcanvas offcanvas-start offcanvasExample3" id="offcanvasExample3" data-bs-scroll="false"
+      data-bs-backdrop="true" tabindex="-1" aria-labelledby="offcanvasExampleLabel">
+      <div class="offcanvas-header pb-1 position-relative px-1 pt-2 mx-3">
+        <h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250"
+            src="assets/img/header/logo.png" alt="logo" /></h5>
+        <button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button"
+          data-bs-dismiss="offcanvas" aria-label="Close"><i class="icon-close"></i></button>
+      </div>
+      <div class="px-3 py-2">
+        <div class="header-search d-block w-100">
+          <form class="form-inline" action="#" method="GET">
+            <div class="input-group flex-nowrap">
+              <input class="form-control" type="text" name="search" placeholder="Tìm kiếm Sản phẩm &amp; Dịch vụ ?" />
+              <div class="input-group-append bg-light">
+                <button class="btn" type="submit" aria-label="Tìm kiếm Sản phẩm &amp; Dịch vụ ?"><i class="fa fa-search"
+                    aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column">
+        <ul class="border-top">
+          <li class="menu-item d-flex align-items-center py-2 has-sub-menu toggle-menu-list">
+            <a class="menu-link py-1 d-flex align-items-center gap-1 text-dark text-uppercase" href="#"><img class="item-img"
+                src="assets/img/header/cam-nang.png"
+                alt="alt" /> Ấn phẩm văn phòng</a><i class="fa-solid fa-caret-down text-dark px-1"></i>
+            <ul class="sub-menu sub-menu-list">
+              <li class="sub-menu-item">
+                <ul class="menu-list sub-menu-list-1">
+                  <li class="py-2 text-dark toggle-menu-list-2"><a class="fw-bold text-dark" href="#"> Danh thiếp - Namecards</a><i class="fa-solid fa-caret-down text-dark"></i>
+                    <ul class="sub-menu-list-2">
+                      <li class="px-3 py-2 text-dark">- Danh thiếp Giấy mỹ thuật</li>
+                      <li class="px-3 py-2 text-dark">- Danh thiếp chuẩn</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Kỹ Thuật Số</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Thông Minh</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Dập Nổi/ Chìm</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Ngọc Trai</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Giấy Nhựa</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Bo Góc Chuẩn</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Vuông Bo Góc</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Highlight</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Gấp Đôi</li>
+                      <li class="px-3 py-2 text-dark">- Danh Thiếp Vuông</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="sub-menu-item">
+                <ul class="menu-list sub-menu-list-1">
+                  <li class="py-2 text-dark toggle-menu-list-2"><a class="fw-bold text-dark" href="#"> Bao thư - Envelopes</a><i class="fa-solid fa-caret-down text-dark"></i>
+                    <ul class="sub-menu-list-2">
+                      <li class="px-3 py-2 text-dark">- Bao thư lấy ngay</li>
+                      <li class="px-3 py-2 text-dark">- Bao thư nhỏ</li>
+                      <li class="px-3 py-2 text-dark">- Bao thư trung</li>
+                      <li class="px-3 py-2 text-dark">- Bao thư lớn</li>
+                      <li class="px-3 py-2 text-dark">- Bao thư giấy Kraft</li>
+                      <li class="px-3 py-2 text-dark">- Bao thư cửa sổ kính</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="sub-menu-item">
+                <ul class="menu-list sub-menu-list-1">
+                  <li class="py-2 text-dark toggle-menu-list-2"><a class="fw-bold text-dark" href="#"> Áo thun đồng phục</a><i class="fa-solid fa-caret-down text-dark"></i>
+                    <ul class="sub-menu-list-2">
+                      <li class="px-3 py-2 text-dark">- Áo thun đồng phục cổ trụ</li>
+                      <li class="px-3 py-2 text-dark">- Áo thun đồng phục cổ tròn</li>
+                      <li class="px-3 py-2 text-dark">- Giấy ghi chú - Block notes</li>
+                      <li class="px-3 py-2 text-dark">- Giấy ghi chú</li>
+                      <li class="px-3 py-2 text-dark">- Giấy tiêu đề - Letterheads</li>
+                      <li class="px-3 py-2 text-dark">- Giấy tiêu đề số lượng ít</li>
+                      <li class="px-3 py-2 text-dark">- Giấy tiêu đề số lượng lớn</li>
+                      <li class="px-3 py-2 text-dark">- Bìa đựng hồ sơ - Folders</li>
+                      <li class="px-3 py-2 text-dark">- Bìa đựng hồ sơ 1 tay gấp</li>
+                      <li class="px-3 py-2 text-dark">- Bìa đựng hồ sơ 2 tay gấp</li>
+                      <li class="px-3 py-2 text-dark">- Bìa đựng hồ sơ cao cấp</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="banner_slide banner-full-width">
+      <div><a class="d-block w-100 rounded-10" href="#" title="Banner 1">
+          <picture class="block">
+            <source class="img-cover block" media="(min-width:768px)" srcset="assets/img/banner/banner_pc1.jpg">
+            <img class="img-cover block" src="assets/img/banner/banner_sp1.jpg" alt="Banner 1" style="width:auto;">
+          </picture>
+        </a></div>
+      <div><a class="d-block w-100 rounded-10" href="#" title="Banner 2">
+          <picture class="block">
+            <source class="img-cover" media="(min-width:768px)" srcset="assets/img/banner/banner_pc2.jpg">
+            <img class="img-cover" src="assets/img/banner/banner_sp2.jpg" alt="Banner 2" style="width:auto;">
+          </picture>
+        </a></div>
+    </div>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      function setMainPadding() {
+        if ($(window).width() < 768) {
+          var headerH = $('.fe-header').outerHeight();
+          $('main').css('padding-top', headerH + 'px');
+        } else {
+          $('main').css('padding-top', '');
+        }
+      }
+      setMainPadding();
+      $(window).on('resize', setMainPadding);
+      $(window).on('load', setMainPadding);
+      $('.banner_slide').slick({
+        dots: true,
+        arrows: true,
+        infinite: true,
+        speed: 500,
+        fade: true,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        responsive: [
+          { breakpoint: 768, settings: { dots: false } }
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
