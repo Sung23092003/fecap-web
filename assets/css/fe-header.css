@@ -471,6 +471,91 @@ a {
     width: 0;
 }
 
+.fe-header .mobile-category-menu {
+    margin: 0;
+    padding: 8px 0 0;
+}
+
+.fe-header .mobile-category-menu .mobile-category-item {
+    width: 100%;
+    min-height: auto;
+    align-items: center;
+    justify-content: space-between;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.fe-header .mobile-category-menu .mobile-category-link {
+    flex: 1;
+    color: var(--textColor);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-transform: uppercase;
+    padding: 12px 0;
+}
+
+.fe-header .mobile-category-menu .mobile-category-link img {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+}
+
+.fe-header .mobile-category-menu .mobile-category-caret {
+    color: var(--mainColor);
+    padding: 12px 2px 12px 14px;
+    transition: transform 0.18s ease;
+}
+
+.fe-header .mobile-category-menu .mobile-has-submenu.active > .mobile-category-caret {
+    transform: rotate(180deg);
+}
+
+.fe-header .offcanvas .mobile-category-menu .mobile-sub-menu {
+    display: none;
+    opacity: 1 !important;
+    width: 100%;
+    padding: 2px 0 10px 14px;
+    margin: 0;
+    background: transparent;
+}
+
+.fe-header .mobile-category-menu .sub-menu-item {
+    width: 100%;
+}
+
+.fe-header .mobile-category-menu .menu-list {
+    margin: 0 0 8px;
+    padding: 0 0 0 10px;
+    border-left: 2px solid rgba(2, 130, 165, 0.12);
+}
+
+.fe-header .mobile-category-menu .menu-list li {
+    color: var(--textColor) !important;
+    padding: 7px 0 !important;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.fe-header .mobile-category-menu .menu-list li:first-child {
+    color: var(--mainColor) !important;
+    font-weight: 700 !important;
+}
+
+.fe-header .offcanvas .mobile-category-menu .menu-list li:hover,
+.fe-header .offcanvas .mobile-category-menu .menu-list li:hover a {
+    color: var(--mainColor) !important;
+}
+
+.fe-header .mobile-category-menu .sub-menu > li:not(.sub-menu-item) {
+    padding: 8px 0 !important;
+}
+
+.fe-header .mobile-category-menu .sub-menu > li:not(.sub-menu-item) a {
+    color: var(--textColor);
+}
+
 .offcanvas-start {
     max-width: 88vw;
 }
