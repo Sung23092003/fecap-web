@@ -556,6 +556,59 @@ a {
     color: var(--textColor);
 }
 
+.fe-header .offcanvas .foo_mid {
+    font-size: 14px !important;
+    margin-top: 12px;
+    padding-top: 12px;
+}
+
+.fe-header .offcanvas .btn-hotline {
+    color: #fff;
+    width: 100%;
+    border-radius: 6px;
+    padding: 4px;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-image: linear-gradient(to right, #fb6506, #9b0422);
+}
+
+.fe-header .offcanvas .btn-hotline .text-sub {
+    opacity: 0.8;
+    font-weight: normal;
+    margin-bottom: -4px;
+}
+
+.fe-header .offcanvas .btn-login {
+    background-color: var(--mainColor);
+    color: #fff;
+    padding: 4px 8px;
+    width: calc(50% - 4px);
+    justify-content: center;
+    font-size: 15px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.fe-header .offcanvas .foo_mid a {
+    text-decoration: none;
+}
+
+.fe-header .offcanvas .foo_mid .social img {
+    max-width: 32px;
+    max-height: 32px;
+    border-radius: 50%;
+}
+
+.fe-header .offcanvas .payment-accept {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.fe-header .offcanvas .payment-accept img {
+    max-width: 50px;
+    border-radius: 4px;
+}
+
 .offcanvas-start {
     max-width: 88vw;
 }
