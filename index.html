@@ -66,7 +66,7 @@
               <div class="box-icon d-flex justify-content-center gap-2">
                 <div class="icon icon-light-border">
                   <button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i
+                    data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i
                       class="fa-solid fa-bars text-light fs-5 mt-1"></i></button>
                 </div>
               </div>
@@ -79,7 +79,7 @@
                 <div class="d-flex justify-content-center gap-2">
                   <div class="icon icon-light-border">
                     <button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i
+                      data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i
                         class="fa-solid fa-bars text-light fs-5 mt-1"></i></button>
                   </div>
                 </div>
@@ -356,62 +356,6 @@
           </ul>
         </div>
       </div>
-      <div class="header-bottom-item header-bottom-2 bg-white-50">
-        <div class="container px-2">
-          <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container-fluid align-items-center pr-2">
-              <div class="col-lg-12 lg-flex-1">
-                <button class="btn btn-toggle-menu d-lg-none" type="button" data-bs-toggle="offcanvas"
-                  data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i
-                    class="fa-solid fa-bars text-dark fs-4 mt-1"></i></button>
-                <div class="mobile-menu">
-                  <div class="language mobile-language d-flex flex-column d-lg-none">
-                    <a href="#"><img src="assets/img/header/vi.jpg" alt="VI" width="38" height="25" /></a>
-                    <a class="language-flag-spaced" href="#"><img src="assets/img/header/en.jpg" alt="EN" width="38" height="25" /></a>
-                    <a class="language-flag-spaced" href="#"><img src="assets/img/header/ja.jpg" alt="EN" width="38" height="25" /></a>
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                      <li class="nav-item d-lg-none"><a class="nav-link btn-dang-nhap-user" href="#"><span>Đăng nhập</span></a></li>
-                      <li class="nav-item d-lg-none"><a class="nav-link" href="#"><span>Đăng ký</span></a></li>
-                    </ul>
-                  </div>
-                  <div class="language header-search mobile-language d-flex flex-column d-lg-none">
-                    <form class="form-inline" action="#" method="GET">
-                      <div class="input-group">
-                        <input class="form-control" type="text" name="search" placeholder="Tìm sản phẩm?" />
-                        <div class="input-group-append">
-                          <button class="btn" type="submit" aria-label="Tìm sản phẩm"><i class="fa fa-search"
-                              aria-hidden="true"></i></button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-              <div class="header-logo d-lg-none py-1"><a href="#"><img
-                    src="assets/img/header/logo.png" alt="logo"
-                    class="mobile-header-logo-img" /></a></div>
-              <div class="header-card d-lg-none d-flex gap-1">
-                <a class="d-flex" href="#">
-                  <div class="icon"><i class="fa fa-shopping-cart text-dark fs-5" aria-hidden="true"></i></div>
-                </a>
-                <!-- <button class="btn btn-search p-0 border-0" type="button"><i class="fa fa-search text-dark fs-5"
-                    aria-hidden="true"></i></button> -->
-              </div>
-              <div class="header-search col-7 d-lg-none w-100 mb-2 border">
-                <form class="form-inline" action="#" method="GET">
-                  <div class="input-group d-flex">
-                    <input class="form-control" type="text" name="search" placeholder="Tìm sản phẩm?" />
-                    <div class="input-group-append">
-                      <button class="btn" type="submit" aria-label="Tìm sản phẩm"><i class="fa fa-search"
-                          aria-hidden="true"></i></button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </nav>
-        </div>
-      </div>
     </div>
     <div class="offcanvas offcanvas-start offcanvasExample3" id="offcanvasExample3" data-bs-scroll="false"
       data-bs-backdrop="true" tabindex="-1" aria-labelledby="offcanvasExampleLabel">
@@ -502,7 +446,7 @@
       });
 
       function setMainPadding() {
-        if ($(window).width() < 768) {
+        if (window.matchMedia('(max-width: 768px)').matches) {
           var headerH = $('.fe-header').outerHeight();
           $('main').css('padding-top', headerH + 'px');
         } else {
