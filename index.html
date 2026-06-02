@@ -18,7 +18,7 @@
 </head>
 
 <body class="demo-page-height">
-  <header class="fe-header w-100">
+  <header class="fe-header w-100" data-page-region="header">
     <div class="header-top d-none d-md-block">
       <div class="container-fluid px-3 px-sm-5 py-2">
         <div class="infomation d-flex flex-nowrap justify-content-between gap-2">
@@ -471,17 +471,18 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/fe-page-renderer.js"></script>
   <script>
     $(document).ready(function () {
+      function initHeaderInteractions() {
       function groupSingleItemMenuLists() {
         $('.header-bottom .sub-menu.sub-menu-list').each(function () {
           var $submenu = $(this);
 
-          if ($submenu.hasClass('single-menu-lists-grouped')) {
-            return;
-          }
-
           var $singleItems = $submenu.children('.sub-menu-item').filter(function () {
+            return !$(this).hasClass('sub-menu-item-short-stack');
+          }).filter(function () {
             return $(this).children('.menu-list').first().children('li').length === 1;
           });
 
@@ -501,6 +502,7 @@
             $item.remove();
           });
 
+          $submenu.children('.sub-menu-item-short-stack').remove();
           $submenu.addClass('single-menu-lists-grouped').append($shortStack);
         });
       }
@@ -536,8 +538,10 @@
         $mobileMenu.empty().append($items);
       }
 
-      groupSingleItemMenuLists();
-      buildMobileCategoryMenu();
+        groupSingleItemMenuLists();
+        buildMobileCategoryMenu();
+        setMainPadding();
+      }
 
       $('#mobile-category-menu').on('click', '.mobile-has-submenu > .mobile-category-link, .mobile-has-submenu > .mobile-category-caret', function (event) {
         event.preventDefault();
@@ -555,9 +559,10 @@
           $('main').css('padding-top', '');
         }
       }
-      setMainPadding();
+      initHeaderInteractions();
       $(window).on('resize', setMainPadding);
       $(window).on('load', setMainPadding);
+      window.addEventListener('fe:page-rendered', initHeaderInteractions);
       $('.banner_slide').slick({
         dots: true,
         arrows: true,
