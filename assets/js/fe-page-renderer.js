@@ -281,6 +281,7 @@
     html += renderOffcanvas(header);
     root.innerHTML = html;
     root.dataset.headerStyle = String(header.style);
+    root.dataset.renderState = "ready";
     applyMeta(header);
     window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header } }));
   }
@@ -289,6 +290,8 @@
     try {
       renderPageHeader(await loadHeader());
     } catch (err) {
+      var root = document.querySelector('[data-page-region="header"]');
+      if (root) root.dataset.renderState = "ready";
       window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", fallback: true } }));
       if (window.console) console.warn("Use static header fallback:", err.message || err);
     }

@@ -12,6 +12,10 @@ body {
     font-family: 'Roboto', sans-serif !important;
 }
 
+.fe-header[data-render-state="loading"] {
+    visibility: hidden;
+}
+
 .border-none {
     border: none !important;
     border-radius: 0 !important;
