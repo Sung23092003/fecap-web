@@ -330,11 +330,12 @@
     return firstValue(item.banner_image_mobile, item.image_mobile, item.mobile_image, bannerDesktopImage(item));
   }
 
-  function renderBannerSlide(item) {
+  function renderBannerSlide(item, index) {
     var title = bannerTitle(item);
     var desktop = safeUrl(bannerDesktopImage(item), "");
     var mobile = safeUrl(bannerMobileImage(item), desktop);
     var href = safeUrl(firstValue(item.banner_url, item.url, item.link), "#");
+    var loading = index === 0 ? "eager" : "lazy";
 
     if (!desktop && !mobile) return "";
 
@@ -343,7 +344,7 @@
         '<a class="d-block w-100 rounded-10" href="' + escapeHtml(href) + '" title="' + escapeHtml(title) + '">' +
           '<picture class="block">' +
             (desktop ? '<source class="img-cover block" media="(min-width:768px)" srcset="' + escapeHtml(desktop) + '">' : "") +
-            '<img class="img-cover block banner-auto-width" src="' + escapeHtml(mobile || desktop) + '" alt="' + escapeHtml(title) + '" loading="eager" decoding="async">' +
+            '<img class="img-cover block banner-auto-width" src="' + escapeHtml(mobile || desktop) + '" alt="' + escapeHtml(title) + '" loading="' + loading + '" decoding="async">' +
           "</picture>" +
         "</a>" +
       "</div>"
@@ -580,6 +581,7 @@
 
     html = renderBanners(banners);
     if (!html) {
+      root.dataset.renderState = "fallback";
       window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
       return;
     }
@@ -635,6 +637,8 @@
     try {
       renderPageBanners(await loadBanners());
     } catch (bannerErr) {
+      var bannerRoot = document.querySelector(".banner_slide");
+      if (bannerRoot) bannerRoot.dataset.renderState = "fallback";
       window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
       if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
     }

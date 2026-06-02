@@ -453,17 +453,17 @@
     </div>
   </header>
   <main>
-    <div class="banner_slide banner-full-width">
+    <div class="banner_slide banner-full-width" data-render-state="loading">
       <div><a class="d-block w-100 rounded-10" href="#" title="Banner 1">
           <picture class="block">
             <source class="img-cover block" media="(min-width:768px)" srcset="assets/img/banner/banner_pc1.jpg">
-            <img class="img-cover block banner-auto-width" src="assets/img/banner/banner_sp1.jpg" alt="Banner 1">
+            <img class="img-cover block banner-auto-width" src="assets/img/banner/banner_sp1.jpg" alt="Banner 1" loading="eager" decoding="async">
           </picture>
         </a></div>
       <div><a class="d-block w-100 rounded-10" href="#" title="Banner 2">
           <picture class="block">
             <source class="img-cover" media="(min-width:768px)" srcset="assets/img/banner/banner_pc2.jpg">
-            <img class="img-cover banner-auto-width" src="assets/img/banner/banner_sp2.jpg" alt="Banner 2">
+            <img class="img-cover banner-auto-width" src="assets/img/banner/banner_sp2.jpg" alt="Banner 2" loading="lazy" decoding="async">
           </picture>
         </a></div>
     </div>
@@ -567,6 +567,7 @@
       function initBannerSlider() {
         var $banner = $('.banner_slide');
         if (!$banner.length || !$.fn.slick) return;
+        if ($banner.attr('data-render-state') === 'loading') return;
         if ($banner.hasClass('slick-initialized')) {
           $banner.slick('unslick');
         }
