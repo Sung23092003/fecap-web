@@ -124,21 +124,35 @@
     };
   }
 
-  function iconHtml(item) {
-    var image = item.image || item.img || "";
-    var icon = item.icon || "";
+  function normalizeIconClass(icon) {
+    var value = firstValue(icon).trim();
+    var match;
+    if (!value) return "";
+
+    match = value.match(/class\s*=\s*["']([^"']+)["']/i);
+    if (match && match[1]) value = match[1];
+
+    return /^[a-z0-9_\-:\s]+$/i.test(value) ? value : "";
+  }
+
+  function renderMainItemMedia(item) {
+    var image = firstValue(item.image, item.img);
+    var iconClass = normalizeIconClass(item.icon);
+
     if (image) {
-      return '<img src="' + escapeHtml(safeUrl(image, "")) + '" alt="" loading="lazy" decoding="async">';
+      return '<div class="box-image d-flex justify-content-center"><img class="header-action-image" src="' + escapeHtml(safeUrl(image, "")) + '" alt="" loading="lazy" decoding="async"></div>';
     }
-    if (/^fa[srb]?\s|^fa-|^bi\s|^bi-|^ri-|^bx\s|^bx-/i.test(icon)) {
-      return '<i class="' + escapeHtml(icon) + '"></i>';
+
+    if (iconClass) {
+      return '<div class="box-icon d-flex justify-content-center"><div class="icon icon-light-border"><i class="' + escapeHtml(iconClass) + '"></i></div></div>';
     }
-    return '<i class="fa-solid fa-circle-info"></i>';
+
+    return "";
   }
 
   function renderTopLink(item) {
     var name = firstValue(item.name, item.label);
-    var icon = firstValue(item.icon);
+    var icon = normalizeIconClass(item.icon);
     var iconPart = icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "";
     return '<a style="color:inherit;display:inline-flex;align-items:center;gap:6px" href="' + escapeHtml(safeUrl(firstValue(item.link, item.url), "#")) + '">' + iconPart + '<span>' + escapeHtml(name) + "</span></a>";
   }
@@ -176,26 +190,17 @@
     var title = firstValue(item.name, item.label);
     var content = firstValue(item.content, item.description);
     return (
-      '<a class="header-action col-' + columns + visibleClass + '" style="color:inherit" href="' + escapeHtml(href) + '">' +
+      '<a class="header-action' + visibleClass + '" style="color:inherit;--header-action-columns:' + columns + '" href="' + escapeHtml(href) + '">' +
         '<div class="d-flex justify-content-center align-items-center gap-1">' +
-          '<div class="box-icon d-flex justify-content-center"><div class="icon icon-light-border">' + iconHtml(item) + "</div></div>" +
+          renderMainItemMedia(item) +
           '<div class="text text-left d-none d-xl-block"><small>' + escapeHtml(title) + (content ? '<b class="d-block text-left">' + escapeHtml(content) + "</b>" : "") + "</small></div>" +
         "</div>" +
       "</a>"
     );
   }
 
-  function defaultMainItems() {
-    return [
-      { name: "He thong cua hang", content: "(45 chi nhanh)", icon: "fa-solid fa-location-dot" },
-      { name: "San pham", content: "Yeu thich", icon: "fa-regular fa-heart" },
-      { name: "Dang nhap", content: "Dang ky", icon: "fa-regular fa-user", link: "./register.html" },
-      { name: "Gio hang", content: "0 vnd", icon: "fa-solid fa-cart-shopping" }
-    ];
-  }
-
   function renderHeaderMain(main, extraClass) {
-    var items = (main.items.length ? main.items : defaultMainItems())
+    var items = main.items
       .filter(function (item) {
         return isEnabled(firstValue(item.show_desktop, item.showDesktop), true) || isEnabled(firstValue(item.show_mobile, item.showMobile), true);
       })
@@ -210,8 +215,9 @@
             '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
           (main.searchShow ? '<div class="d-none d-md-flex align-content-center gap-2 wrap-header-search px-0 col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tim kiem San pham & Dich vu ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
-          items.map(renderMainItem).join("") +
-          '<div class="col-2 d-flex justify-content-end gap-2 d-xl-none px-0"><a class="d-block" href="#"><div class="d-flex justify-content-center align-items-center gap-1"><div class="box-icon d-flex justify-content-center gap-1 align-items-center"><div class="icon icon-light-border"><i class="fa-solid fa-cart-shopping text-light"></i></div></div></div></a></div>' +
+          '<div class="header-actions-list d-flex align-items-center justify-content-end gap-2 ms-auto px-0">' +
+            items.map(renderMainItem).join("") +
+          "</div>" +
         "</div></div>" +
       "</div>"
     );
