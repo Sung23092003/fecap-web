@@ -281,12 +281,7 @@
 
   function sortCategories(items) {
     return normalizeList(items)
-      .filter(isCategoryVisible)
-      .sort(function (a, b) {
-        var orderDiff = categoryOrder(a) - categoryOrder(b);
-        if (orderDiff) return orderDiff;
-        return String(categoryTitle(a)).localeCompare(String(categoryTitle(b)), "vi");
-      });
+      .filter(isCategoryVisible);
   }
 
   function renderCategoryIcon(item) {
