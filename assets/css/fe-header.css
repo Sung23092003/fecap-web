@@ -13,7 +13,40 @@ body {
 }
 
 .fe-header[data-render-state="loading"] {
+    min-height: 132px;
+    background: #fff;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.fe-header[data-render-state="loading"] > * {
     visibility: hidden;
+}
+
+.fe-header[data-render-state="loading"]::before {
+    content: "";
+    display: block;
+    height: 132px;
+    background:
+        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent) -45% 0 / 42% 100% no-repeat,
+        linear-gradient(#f1f5f9, #f1f5f9) 40px 18px / 34% 14px no-repeat,
+        linear-gradient(#e2e8f0, #e2e8f0) 40px 56px / 160px 44px no-repeat,
+        linear-gradient(#f1f5f9, #f1f5f9) center 62px / 32% 34px no-repeat,
+        linear-gradient(#f1f5f9, #f1f5f9) calc(100% - 40px) 60px / 260px 38px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 0 114px / 100% 18px no-repeat;
+    animation: fe-header-loading 1.15s ease-in-out infinite;
+}
+
+@keyframes fe-header-loading {
+    to {
+        background-position:
+            145% 0,
+            40px 18px,
+            40px 56px,
+            center 62px,
+            calc(100% - 40px) 60px,
+            0 114px;
+    }
 }
 
 .border-none {

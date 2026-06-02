@@ -128,7 +128,7 @@
     var image = item.image || item.img || "";
     var icon = item.icon || "";
     if (image) {
-      return '<img src="' + escapeHtml(safeUrl(image, "")) + '" alt="">';
+      return '<img src="' + escapeHtml(safeUrl(image, "")) + '" alt="" loading="lazy" decoding="async">';
     }
     if (/^fa[srb]?\s|^fa-|^bi\s|^bi-|^ri-|^bx\s|^bx-/i.test(icon)) {
       return '<i class="' + escapeHtml(icon) + '"></i>';
@@ -207,7 +207,7 @@
           '<div class="d-md-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
           '<div class="wrap-header-logo col-7 col-md-3 col-lg-3 col-xl-2 px-0 d-flex gap-2 align-content-center justify-content-center justify-content-md-start">' +
             '<div class="d-none d-md-block d-lg-none col-2 px-0 mt-2"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
-            '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo"></a></div>' +
+            '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
           (main.searchShow ? '<div class="d-none d-md-flex align-content-center gap-2 wrap-header-search px-0 col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tim kiem San pham & Dich vu ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
           items.map(renderMainItem).join("") +
@@ -232,7 +232,7 @@
     return (
       '<div class="offcanvas offcanvas-start offcanvasExample3" id="offcanvasExample3" data-bs-scroll="false" data-bs-backdrop="true" tabindex="-1" aria-labelledby="offcanvasExampleLabel">' +
         '<div class="offcanvas-header pb-1 position-relative px-1 pt-2 mx-3">' +
-          '<h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250" src="' + escapeHtml(logo) + '" alt="logo"></h5>' +
+          '<h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250" src="' + escapeHtml(logo) + '" alt="logo" loading="lazy" decoding="async"></h5>' +
           '<button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>' +
         "</div>" +
         '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tim kiem San pham & Dich vu ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
