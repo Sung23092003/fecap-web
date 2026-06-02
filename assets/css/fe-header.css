@@ -1138,11 +1138,13 @@ a {
 
 .fe-header .header-bottom .sub-menu.sub-menu-list.single-menu-lists-grouped {
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) minmax(172px, 0.78fr);
+    grid-auto-rows: max-content;
+    align-items: start;
 }
 
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack {
     grid-column: -2 / -1;
-    grid-row: 1 / span 12;
+    grid-row: 1;
     align-self: start;
     height: fit-content;
     background: #fff;
