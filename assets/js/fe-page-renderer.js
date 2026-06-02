@@ -220,6 +220,15 @@
     );
   }
 
+  function unwrapListPayload(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    if (raw.data && Array.isArray(raw.data.data)) return raw.data.data;
+    if (raw.data && raw.data.data && Array.isArray(raw.data.data.data)) return raw.data.data.data;
+    if (raw.data && Array.isArray(raw.data)) return raw.data;
+    return [];
+  }
+
   function isCategoryVisible(item) {
     var value = firstValue(item.category_status, item.status, 1);
     return value === 1 || value === "1" || value === true || value === "true";
@@ -298,6 +307,56 @@
         "</li>"
       );
     }).join("") + "</ul>";
+  }
+
+  function isBannerVisible(item) {
+    var value = firstValue(item.banner_status, item.status, 1);
+    return value === 1 || value === "1" || value === true || value === "show";
+  }
+
+  function bannerOrder(item) {
+    return numberValue(firstValue(item.banner_order_no, item.order_no, item.position, item.order), 0);
+  }
+
+  function bannerTitle(item) {
+    return firstValue(item.banner_title, item.title, "Banner");
+  }
+
+  function bannerDesktopImage(item) {
+    return firstValue(item.banner_image_desktop, item.image_desktop, item.desktop_image, item.image, item.banner_image);
+  }
+
+  function bannerMobileImage(item) {
+    return firstValue(item.banner_image_mobile, item.image_mobile, item.mobile_image, bannerDesktopImage(item));
+  }
+
+  function renderBannerSlide(item) {
+    var title = bannerTitle(item);
+    var desktop = safeUrl(bannerDesktopImage(item), "");
+    var mobile = safeUrl(bannerMobileImage(item), desktop);
+    var href = safeUrl(firstValue(item.banner_url, item.url, item.link), "#");
+
+    if (!desktop && !mobile) return "";
+
+    return (
+      '<div>' +
+        '<a class="d-block w-100 rounded-10" href="' + escapeHtml(href) + '" title="' + escapeHtml(title) + '">' +
+          '<picture class="block">' +
+            (desktop ? '<source class="img-cover block" media="(min-width:768px)" srcset="' + escapeHtml(desktop) + '">' : "") +
+            '<img class="img-cover block banner-auto-width" src="' + escapeHtml(mobile || desktop) + '" alt="' + escapeHtml(title) + '" loading="eager" decoding="async">' +
+          "</picture>" +
+        "</a>" +
+      "</div>"
+    );
+  }
+
+  function renderBanners(items) {
+    return normalizeList(items)
+      .filter(isBannerVisible)
+      .sort(function (a, b) { return bannerOrder(a) - bannerOrder(b); })
+      .map(renderBannerSlide)
+      .filter(Boolean)
+      .join("");
   }
 
   function normalizeIconClass(icon) {
@@ -490,6 +549,50 @@
     return renderCategoryMenu(normalizeCategoryItems(allCategories));
   }
 
+  async function loadBanners() {
+    var params = new URLSearchParams();
+    var response;
+    var json;
+
+    params.set("limit", "20");
+    params.set("page", "1");
+    params.set("banner_status", "1");
+    params.set("banner_type", "-1");
+    params.set("sort_order", "asc");
+
+    response = await fetch(getBaseUrl() + "/admin/banner?" + params.toString(), {
+      method: "GET",
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) throw new Error("Banner API " + response.status);
+    json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Banner API error");
+
+    return unwrapListPayload(json);
+  }
+
+  function renderPageBanners(banners) {
+    var root = document.querySelector(".banner_slide");
+    var html;
+
+    if (!root) return;
+
+    html = renderBanners(banners);
+    if (!html) {
+      window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
+      return;
+    }
+
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.slick && window.jQuery(root).hasClass("slick-initialized")) {
+      window.jQuery(root).slick("unslick");
+    }
+
+    root.innerHTML = html;
+    root.dataset.renderState = "ready";
+    window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", data: banners } }));
+  }
+
   function renderPageHeader(header, apiMenuHtml) {
     var root = document.querySelector('[data-page-region="header"]');
     if (!root) return;
@@ -527,6 +630,13 @@
       if (root) root.dataset.renderState = "ready";
       window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", fallback: true } }));
       if (window.console) console.warn("Use static header fallback:", err.message || err);
+    }
+
+    try {
+      renderPageBanners(await loadBanners());
+    } catch (bannerErr) {
+      window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
+      if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
     }
   }
 

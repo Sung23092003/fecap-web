@@ -552,8 +552,9 @@
       });
 
       function setMainPadding() {
+        var headerH = $('.fe-header').outerHeight() || 0;
+        document.documentElement.style.setProperty('--fe-header-height', headerH + 'px');
         if (window.matchMedia('(max-width: 768px)').matches) {
-          var headerH = $('.fe-header').outerHeight();
           $('main').css('padding-top', headerH + 'px');
         } else {
           $('main').css('padding-top', '');
@@ -563,18 +564,29 @@
       $(window).on('resize', setMainPadding);
       $(window).on('load', setMainPadding);
       window.addEventListener('fe:page-rendered', initHeaderInteractions);
-      $('.banner_slide').slick({
-        dots: true,
-        arrows: true,
-        infinite: true,
-        speed: 500,
-        fade: true,
-        autoplay: true,
-        autoplaySpeed: 3000,
-        responsive: [
-          { breakpoint: 768, settings: { dots: false } }
-        ]
-      });
+      function initBannerSlider() {
+        var $banner = $('.banner_slide');
+        if (!$banner.length || !$.fn.slick) return;
+        if ($banner.hasClass('slick-initialized')) {
+          $banner.slick('unslick');
+        }
+        if ($banner.children().length <= 1) return;
+        $banner.slick({
+          dots: true,
+          arrows: true,
+          infinite: true,
+          speed: 500,
+          fade: true,
+          autoplay: true,
+          autoplaySpeed: 3000,
+          responsive: [
+            { breakpoint: 768, settings: { dots: false } }
+          ]
+        });
+      }
+
+      initBannerSlider();
+      window.addEventListener('fe:banner-rendered', initBannerSlider);
     });
   </script>
 </body>

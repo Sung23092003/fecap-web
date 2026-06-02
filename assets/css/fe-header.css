@@ -853,7 +853,17 @@ a {
 /* Banner */
 .banner_slide .img-cover {
     width: 100%;
+    max-height: calc(100dvh - var(--fe-header-height, 0px));
     object-fit: cover;
+}
+
+.banner_slide,
+.banner_slide .slick-list,
+.banner_slide .slick-track,
+.banner_slide .slick-slide,
+.banner_slide picture,
+.banner_slide img {
+    max-height: calc(100dvh - var(--fe-header-height, 0px));
 }
 
 .banner_slide .slick-prev {
@@ -984,6 +994,7 @@ a {
 
 .banner-full-width .slick-slide img {
     width: 100%;
+    max-height: calc(100dvh - var(--fe-header-height, 0px));
     object-fit: cover;
     border-radius: 0;
 }
@@ -1021,6 +1032,7 @@ a {
 
 .banner_slide img.banner-auto-width {
     width: 100%;
+    max-height: calc(100dvh - var(--fe-header-height, 0px));
 }
 
 @media (max-width: 768px) {
