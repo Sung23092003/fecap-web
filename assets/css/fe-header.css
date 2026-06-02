@@ -1140,7 +1140,6 @@ a {
     gap: 6px;
     width: 100%;
     max-width: 100%;
-    justify-content: flex-start !important;
     overflow: visible;
     padding: 8px 4px;
     scrollbar-width: thin;

@@ -45,6 +45,13 @@
     return fallback || "#";
   }
 
+  function categoryUrl(value) {
+    var url = String(value || "").trim();
+    if (!url) return "#";
+    if (/^(https?:|mailto:|tel:|\/|\.\/|\.\.\/|#)/i.test(url)) return url;
+    return "/" + url.replace(/^\/+/, "");
+  }
+
   function normalizeList(value) {
     if (Array.isArray(value)) return value;
     if (typeof value === "string") {
@@ -122,6 +129,175 @@
         items: normalizeList(headerMain.item_list || headerMain.itemList)
       }
     };
+  }
+
+  function unwrapCategoryPayload(raw) {
+    if (!raw) return null;
+    if (raw.data && raw.data.data != null) return raw.data.data;
+    if (raw.data != null) return raw.data;
+    return raw;
+  }
+
+  function normalizeCategoryItems(data) {
+    var itemById = new Map();
+    var items = [];
+
+    function cloneItem(item, parentTitle) {
+      var cloned = Object.assign({}, item || {});
+      cloned._children = [];
+      cloned._parentTitle = parentTitle || "";
+      return cloned;
+    }
+
+    if (Array.isArray(data)) {
+      items = data.map(function (item) { return cloneItem(item); });
+    } else if (data && typeof data === "object") {
+      Object.keys(data).forEach(function (key) {
+        var entry = data[key];
+        var parent = entry && (entry.parent || entry);
+        var parentItem;
+        if (!parent || parent.category_id == null) return;
+
+        parentItem = cloneItem(parent);
+        items.push(parentItem);
+
+        normalizeList(entry.sub).forEach(function (sub) {
+          items.push(cloneItem(sub, parentItem.category_title));
+        });
+      });
+    }
+
+    items = items.filter(function (item) {
+      var id = firstValue(item.category_id, item.id);
+      if (!id || itemById.has(String(id))) return false;
+      itemById.set(String(id), item);
+      return true;
+    });
+
+    itemById.clear();
+
+    items.forEach(function (item) {
+      itemById.set(String(firstValue(item.category_id, item.id)), item);
+    });
+
+    items.forEach(function (item) {
+      var parentId = firstValue(item.category_parent_id, item.parent_id);
+      var parent = parentId !== "" ? itemById.get(String(parentId)) : null;
+      if (parent && parent !== item) {
+        item._parentTitle = parent.category_title || parent.title || "";
+        parent._children.push(item);
+      }
+    });
+
+    return items.filter(function (item) {
+      var parentId = firstValue(item.category_parent_id, item.parent_id);
+      return parentId === "" || Number(parentId) === 0 || !itemById.has(String(parentId));
+    });
+  }
+
+  function flattenCategories(items) {
+    var flat = [];
+
+    normalizeList(items).forEach(function walk(item) {
+      var cloned = Object.assign({}, item);
+      var children = normalizeList(cloned._children);
+      delete cloned._children;
+      flat.push(cloned);
+      children.forEach(walk);
+    });
+
+    return flat;
+  }
+
+  function categoryTotalPage(raw) {
+    return numberValue(
+      firstValue(
+        raw && raw.data && raw.data.pagination && raw.data.pagination.total_page,
+        raw && raw.data && raw.data.total_page,
+        raw && raw.total_page
+      ),
+      1
+    );
+  }
+
+  function isCategoryVisible(item) {
+    var value = firstValue(item.category_status, item.status, 1);
+    return value === 1 || value === "1" || value === true || value === "true";
+  }
+
+  function categoryTitle(item) {
+    return firstValue(item.category_title, item.title, item.name);
+  }
+
+  function categoryAlias(item) {
+    return firstValue(item.category_alias, item.alias, item.slug, item.link, item.url);
+  }
+
+  function categoryOrder(item) {
+    return numberValue(firstValue(item.category_order_no, item.order_no, item.position, item.order), 0);
+  }
+
+  function sortCategories(items) {
+    return normalizeList(items)
+      .filter(isCategoryVisible)
+      .sort(function (a, b) {
+        var orderDiff = categoryOrder(a) - categoryOrder(b);
+        if (orderDiff) return orderDiff;
+        return String(categoryTitle(a)).localeCompare(String(categoryTitle(b)), "vi");
+      });
+  }
+
+  function renderCategoryIcon(item) {
+    var image = firstValue(item.category_image, item.image, item.icon_image);
+    var icon = normalizeIconClass(firstValue(item.category_icon, item.icon));
+    if (image) return '<img src="' + escapeHtml(safeUrl(image, "")) + '" alt="" loading="lazy" decoding="async">';
+    if (icon) return '<i class="' + escapeHtml(icon) + '"></i>';
+    return "";
+  }
+
+  function renderCategoryLink(item, className) {
+    var icon = renderCategoryIcon(item);
+    var title = categoryTitle(item);
+    return '<a class="' + className + '" href="' + escapeHtml(categoryUrl(categoryAlias(item))) + '">' + icon + '<span>' + escapeHtml(title) + "</span></a>";
+  }
+
+  function renderCategorySubMenu(children) {
+    var visibleChildren = sortCategories(children);
+    var hasGrandChildren = visibleChildren.some(function (item) {
+      return sortCategories(item._children).length > 0;
+    });
+
+    if (!visibleChildren.length) return "";
+
+    if (!hasGrandChildren && visibleChildren.length <= 8) {
+      return '<ul class="sub-menu">' + visibleChildren.map(function (item) {
+        return '<li>' + renderCategoryLink(item, "menu-link py-2 px-3 d-flex align-items-center gap-2") + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    return '<ul class="sub-menu sub-menu-list">' + visibleChildren.map(function (item) {
+      var grandChildren = sortCategories(item._children);
+      var rows = '<li>' + renderCategoryLink(item, "menu-link d-flex align-items-center gap-2") + "</li>";
+      rows += grandChildren.map(function (child) {
+        return '<li>' + renderCategoryLink(child, "menu-link d-flex align-items-center gap-2") + "</li>";
+      }).join("");
+      return '<li class="sub-menu-item"><ul class="menu-list">' + rows + "</ul></li>";
+    }).join("") + "</ul>";
+  }
+
+  function renderCategoryMenu(categories) {
+    var roots = sortCategories(categories);
+    if (!roots.length) return "";
+
+    return '<ul class="menu mb-0 d-flex row-gap-2 align-items-center justify-content-center">' + roots.map(function (item) {
+      var children = sortCategories(item._children);
+      return (
+        '<li class="menu-item d-flex align-items-center py-1 px-2' + (children.length ? " has-sub-menu" : "") + '">' +
+          renderCategoryLink(item, "menu-link py-1 px-2 d-flex align-items-center gap-1") +
+          (children.length ? '<i class="fa-solid fa-caret-down"></i>' + renderCategorySubMenu(children) : "") +
+        "</li>"
+      );
+    }).join("") + "</ul>";
   }
 
   function normalizeIconClass(icon) {
@@ -273,28 +449,79 @@
     return normalizeHeader(json);
   }
 
-  function renderPageHeader(header) {
+  async function loadCategoryMenu() {
+    var params = new URLSearchParams();
+    var response;
+    var json;
+    var pageCategories;
+    var allCategories = [];
+    var totalPage;
+    var page;
+
+    params.set("page", "1");
+    params.set("category_status", "1");
+
+    response = await fetch(getBaseUrl() + "/admin/category?" + params.toString(), {
+      method: "GET",
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) throw new Error("Category API " + response.status);
+
+    json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Category API error");
+
+    pageCategories = normalizeCategoryItems(unwrapCategoryPayload(json));
+    allCategories = allCategories.concat(flattenCategories(pageCategories));
+    totalPage = Math.min(categoryTotalPage(json), 20);
+
+    for (page = 2; page <= totalPage; page += 1) {
+      params.set("page", String(page));
+      response = await fetch(getBaseUrl() + "/admin/category?" + params.toString(), {
+        method: "GET",
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) break;
+      json = await response.json();
+      if (!json || json.success === false) break;
+      allCategories = allCategories.concat(flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json))));
+    }
+
+    return renderCategoryMenu(normalizeCategoryItems(allCategories));
+  }
+
+  function renderPageHeader(header, apiMenuHtml) {
     var root = document.querySelector('[data-page-region="header"]');
     if (!root) return;
     var menu = root.querySelector(".header-bottom .menu");
     var fallbackMenuHtml = menu ? '<ul class="menu mb-0 d-flex row-gap-2 align-items-center justify-content-center">' + menu.innerHTML + "</ul>" : '<ul class="menu mb-0 d-flex row-gap-2 align-items-center justify-content-center"></ul>';
+    var menuHtml = apiMenuHtml || fallbackMenuHtml;
     var sections = layoutSections[header.style] || layoutSections[3];
     var html = "";
     if (sections.top) html += renderHeaderTop(header.top);
     if (sections.main) html += renderHeaderMain(header.main);
     if (!sections.main && sections.menu) html += renderHeaderMain(header.main, " d-lg-none");
-    if (sections.menu) html += renderMenu(fallbackMenuHtml);
+    if (sections.menu) html += renderMenu(menuHtml);
     html += renderOffcanvas(header);
     root.innerHTML = html;
     root.dataset.headerStyle = String(header.style);
     root.dataset.renderState = "ready";
     applyMeta(header);
-    window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header } }));
+    window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header, menuFromApi: Boolean(apiMenuHtml) } }));
   }
 
   async function init() {
+    var header;
+    var menuHtml = "";
+
     try {
-      renderPageHeader(await loadHeader());
+      header = await loadHeader();
+      try {
+        menuHtml = await loadCategoryMenu();
+      } catch (menuErr) {
+        if (window.console) console.warn("Use static menu fallback:", menuErr.message || menuErr);
+      }
+      renderPageHeader(header, menuHtml);
     } catch (err) {
       var root = document.querySelector('[data-page-region="header"]');
       if (root) root.dataset.renderState = "ready";
