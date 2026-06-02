@@ -79,6 +79,20 @@
     return payload || {};
   }
 
+  function unwrapConfigPayload(raw) {
+    var payload = raw;
+
+    if (payload && payload.success === true && payload.data != null) {
+      payload = payload.data;
+    }
+
+    if (payload && payload.data != null && typeof payload.data === "object") {
+      payload = payload.data;
+    }
+
+    return payload || {};
+  }
+
   function firstValue() {
     for (var i = 0; i < arguments.length; i += 1) {
       if (arguments[i] !== null && arguments[i] !== undefined && arguments[i] !== "") {
@@ -91,6 +105,25 @@
   function numberValue(value, fallback) {
     var number = Number(value);
     return Number.isFinite(number) ? number : fallback;
+  }
+
+  function hexToRgba(hex, opacity) {
+    var value = String(hex || "").replace("#", "").trim();
+    var alpha = Math.max(0, Math.min(100, numberValue(opacity, 100))) / 100;
+    var r;
+    var g;
+    var b;
+
+    if (value.length === 3) {
+      value = value.split("").map(function (char) { return char + char; }).join("");
+    }
+
+    if (!/^[0-9a-f]{6}$/i.test(value)) return hex || "transparent";
+
+    r = parseInt(value.slice(0, 2), 16);
+    g = parseInt(value.slice(2, 4), 16);
+    b = parseInt(value.slice(4, 6), 16);
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
   }
 
   function isEnabled(value, fallback) {
@@ -360,6 +393,145 @@
       .join("");
   }
 
+  function footerLinkTitle(item) {
+    return firstValue(item.name, item.title, item.label, item.content);
+  }
+
+  function renderFooterLink(item, iconClass) {
+    var title = footerLinkTitle(item);
+    var href = safeUrl(firstValue(item.link, item.url, item.href), "#");
+    var icon = normalizeIconClass(firstValue(item.icon, iconClass));
+    var iconFile = safeUrl(firstValue(item.icon_file, item.iconFile), "");
+    if (!title) return "";
+    return '<li><a href="' + escapeHtml(href) + '">' + (iconFile ? '<img class="fe-footer-link-icon" src="' + escapeHtml(iconFile) + '" alt="" loading="lazy" decoding="async">' : (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "")) + '<span>' + escapeHtml(title) + "</span></a></li>";
+  }
+
+  function renderFooterColumnLinks(column, fallbackTitle, iconClass) {
+    var links = normalizeList(column && column.link_list);
+    var title = firstValue(column && column.title, fallbackTitle);
+    if (!title && !links.length) return "";
+    return (
+      '<div class="fe-footer-block">' +
+        (title ? '<h4 class="fe-footer-title">' + escapeHtml(title) + "</h4>" : "") +
+        '<ul class="fe-footer-links">' + links.map(function (item) { return renderFooterLink(item, iconClass); }).join("") + "</ul>" +
+      "</div>"
+    );
+  }
+
+  function renderFooterContact(footer) {
+    var col = footer.col_1 || {};
+    var phones = normalizeList(col.phone_list);
+    var emails = normalizeList(col.email_list);
+    var rows = [];
+
+    phones.forEach(function (item) {
+      var phone = firstValue(item.phone, item.content);
+      var name = firstValue(item.name, "Hotline");
+      if (!phone) return;
+      rows.push('<li><i class="fa-solid fa-phone"></i><span><strong>' + escapeHtml(name) + ': </strong><a href="tel:' + escapeHtml(phone) + '">' + escapeHtml(phone) + "</a></span></li>");
+    });
+
+    emails.forEach(function (item) {
+      var email = firstValue(item.email, item.content);
+      if (!email) return;
+      rows.push('<li><i class="fa-solid fa-envelope"></i><span><strong>Email: </strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + "</a></span></li>");
+    });
+
+    return rows.length ? '<ul class="fe-footer-contact">' + rows.join("") + "</ul>" : "";
+  }
+
+  function renderFooterColumnOne(footer) {
+    var col = footer.col_1 || {};
+    var bootstrap = footer.bootstrap_size || col.bootstrap_size || {};
+    var logo = safeUrl(firstValue(col.logo), "");
+    var company = firstValue(col.company_name);
+    var desc = firstValue(col.short_description);
+
+    return (
+      '<div class="' + escapeHtml(firstValue(bootstrap.col_1_class, "col-12 col-xl-4")) + '">' +
+        (logo ? '<img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async">' : "") +
+        (company ? '<h4 class="fe-footer-title">' + escapeHtml(company) + "</h4>" : "") +
+        (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
+        renderFooterContact(footer) +
+      "</div>"
+    );
+  }
+
+  function renderFooterImageList(items) {
+    return normalizeList(items).map(function (item) {
+      var image = safeUrl(firstValue(item.file, item.image, item.url, item.src, item.content), "");
+      var href = safeUrl(firstValue(item.link, item.href), "#");
+      var title = firstValue(item.name, item.title, "payment");
+      if (!image) return "";
+      return '<a href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="lazy" decoding="async"></a>';
+    }).join("");
+  }
+
+  function renderFooterEmbed(raw) {
+    var iframe = firstValue(raw);
+    if (!iframe) return "";
+    return '<div class="fe-footer-embed">' + iframe + "</div>";
+  }
+
+  function visitorCount() {
+    var key = "fe_footer_visit_count";
+    var count = numberValue(localStorage.getItem(key), 0) + 1;
+    try {
+      localStorage.setItem(key, String(count));
+    } catch (e) {}
+    return count;
+  }
+
+  function renderFooterAccess(access) {
+    var parts = [];
+    var now = new Date();
+    if (!access || (!isEnabled(access.show_time, false) && !isEnabled(access.show_visitor_count, false) && !access.text)) return "";
+    if (access.text) parts.push(escapeHtml(access.text));
+    if (isEnabled(access.show_time, false)) parts.push('<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(now.toLocaleString("vi-VN")) + "</span>");
+    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lượt truy cập</span>");
+    return '<div class="fe-footer-access" style="background:' + escapeHtml(firstValue(access.bg_color, "#111827")) + ';color:' + escapeHtml(firstValue(access.text_color, "#ffffff")) + '"><div class="container d-flex flex-wrap justify-content-center gap-3">' + parts.join("") + "</div></div>";
+  }
+
+  function renderFooter(footer) {
+    var col1 = footer.col_1 || {};
+    var colors = footer.colors || col1.colors || {};
+    var bootstrap = footer.bootstrap_size || col1.bootstrap_size || {};
+    var col4 = footer.col_4 || {};
+    var bg = hexToRgba(firstValue(colors.bg_color, "#0f2742"), firstValue(colors.bg_opacity, 100));
+    var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
+    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(firstValue(colors.text_color, "#ffffff")) + ";--fe-footer-short-border:" + escapeHtml(firstValue(colors.short_border_color, "#9ee7e8")) + ";--fe-footer-long-border:" + escapeHtml(firstValue(colors.long_border_color, "rgba(255,255,255,.16)")) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
+    var payment = col4.payment_method || {};
+    var map = col4.map || {};
+    var fanpage = col4.fanpage || {};
+    var rightBlocks = "";
+
+    rightBlocks += renderFooterColumnLinks(col4, firstValue(col4.title, "Thông tin"), "fa-solid fa-arrow-up-right-from-square");
+    if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
+      rightBlocks += '<div class="mt-4"><h4 class="fe-footer-title">Hình thức thanh toán</h4><div class="fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>";
+    }
+    if (col4.bct_notice && col4.bct_notice.content) {
+      rightBlocks += '<div class="mt-4">' + col4.bct_notice.content + "</div>";
+    }
+    if (isEnabled(map.show, false) && map.iframe) {
+      rightBlocks += '<div class="mt-4">' + renderFooterEmbed(map.iframe) + "</div>";
+    }
+    if (isEnabled(fanpage.show, false) && fanpage.iframe) {
+      rightBlocks += '<div class="mt-4">' + renderFooterEmbed(fanpage.iframe) + "</div>";
+    }
+
+    return (
+      '<div class="fe-footer-shell footer-style-' + escapeHtml(firstValue(footer.style, 3)) + '" style="' + styleVars + '">' +
+        '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
+          renderFooterColumnOne(footer) +
+          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-12 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
+          '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-12 col-xl-5")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "Chính sách", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
+        "</div></div></div>" +
+        renderFooterAccess(footer.access_time) +
+        '<div class="fe-footer-copyright"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
+      "</div>"
+    );
+  }
+
   function normalizeIconClass(icon) {
     var value = firstValue(icon).trim();
     var match;
@@ -573,6 +745,20 @@
     return unwrapListPayload(json);
   }
 
+  async function loadFooter() {
+    var response = await fetch(getBaseUrl() + "/admin/config/footer", {
+      method: "GET",
+      headers: getAuthHeaders()
+    });
+    var json;
+
+    if (!response.ok) throw new Error("Footer API " + response.status);
+    json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Footer API error");
+
+    return unwrapConfigPayload(json);
+  }
+
   function renderPageBanners(banners) {
     var root = document.querySelector(".banner_slide");
     var html;
@@ -593,6 +779,14 @@
     root.innerHTML = html;
     root.dataset.renderState = "ready";
     window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", data: banners } }));
+  }
+
+  function renderPageFooter(footer) {
+    var root = document.querySelector('[data-page-region="footer"]');
+    if (!root) return;
+    root.innerHTML = renderFooter(footer);
+    root.dataset.renderState = "ready";
+    window.dispatchEvent(new CustomEvent("fe:footer-rendered", { detail: { region: "footer", data: footer } }));
   }
 
   function renderPageHeader(header, apiMenuHtml) {
@@ -641,6 +835,15 @@
       if (bannerRoot) bannerRoot.dataset.renderState = "fallback";
       window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
       if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
+    }
+
+    try {
+      renderPageFooter(await loadFooter());
+    } catch (footerErr) {
+      var footerRoot = document.querySelector('[data-page-region="footer"]');
+      if (footerRoot) footerRoot.dataset.renderState = "fallback";
+      window.dispatchEvent(new CustomEvent("fe:footer-rendered", { detail: { region: "footer", fallback: true } }));
+      if (window.console) console.warn("Use empty footer fallback:", footerErr.message || footerErr);
     }
   }
 
