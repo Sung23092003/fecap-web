@@ -147,6 +147,9 @@
       top: {
         bgColor: firstValue(headerTop.bg_color, headerTop.bgColor, "#ffffff"),
         textColor: firstValue(headerTop.text_color, headerTop.textColor, "#212529"),
+        hoverBgColor: firstValue(headerTop.hover_bg_color, headerTop.hoverBgColor, "rgba(255,255,255,0.12)"),
+        activeBgColor: firstValue(headerTop.active_bg_color, headerTop.activeBgColor, "rgba(255,255,255,0.18)"),
+        activeTextColor: firstValue(headerTop.active_text_color, headerTop.activeTextColor, headerTop.text_color, headerTop.textColor, "#212529"),
         borderColor: firstValue(headerTop.border_color, headerTop.borderColor, "#0282a5"),
         borderWidth: numberValue(firstValue(headerTop.border_thickness, headerTop.borderThickness), 1),
         leftLinks: normalizeList(headerTop.left_links || headerTop.leftLinks),
@@ -155,6 +158,9 @@
       main: {
         bgColor: firstValue(headerMain.bg_color, headerMain.bgColor, "#0282a5"),
         textColor: firstValue(headerMain.text_color, headerMain.textColor, "#ffffff"),
+        hoverBgColor: firstValue(headerMain.hover_bg_color, headerMain.hoverBgColor, "rgba(255,255,255,0.12)"),
+        activeBgColor: firstValue(headerMain.active_bg_color, headerMain.activeBgColor, "rgba(255,255,255,0.18)"),
+        activeTextColor: firstValue(headerMain.active_text_color, headerMain.activeTextColor, headerMain.text_color, headerMain.textColor, "#ffffff"),
         borderColor: firstValue(headerMain.border_color, headerMain.borderColor, "transparent"),
         borderWidth: numberValue(firstValue(headerMain.border_thickness, headerMain.borderThickness), 0),
         logo: firstValue(headerMain.logo, logo.logo_main, logo.logoMain, FALLBACKS.logo),
@@ -573,7 +579,7 @@
     var leftGapClass = topLinksGapClass(top.leftLinks);
     var rightGapClass = topLinksGapClass(top.rightLinks);
     return (
-      '<div class="header-top d-none d-md-block" style="background:' + escapeHtml(top.bgColor) + ';color:' + escapeHtml(top.textColor) + ';border-bottom:' + Number(top.borderWidth || 0) + 'px solid ' + escapeHtml(top.borderColor) + '">' +
+      '<div class="header-top d-none d-md-block" style="background:' + escapeHtml(top.bgColor) + ';color:' + escapeHtml(top.textColor) + ';border-bottom:' + Number(top.borderWidth || 0) + 'px solid ' + escapeHtml(top.borderColor) + ';--header-top-hover-bg:' + escapeHtml(top.hoverBgColor) + ';--header-top-active-bg:' + escapeHtml(top.activeBgColor) + ';--header-top-active-text:' + escapeHtml(top.activeTextColor) + '">' +
         '<div class="container-fluid px-3 px-sm-5 py-2">' +
           '<div class="infomation d-flex flex-nowrap justify-content-between gap-2">' +
             '<div class="d-flex flex-wrap ' + leftGapClass + ' infomation-left">' + left + "</div>" +
@@ -610,7 +616,7 @@
       .sort(function (a, b) { return Number(a.position || 0) - Number(b.position || 0); });
     var logo = safeUrl(main.logo, FALLBACKS.logo);
     return (
-      '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + '">' +
+      '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-active-bg:' + escapeHtml(main.activeBgColor) + ';--header-main-active-text:' + escapeHtml(main.activeTextColor) + '">' +
         '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
           '<div class="d-md-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
           '<div class="wrap-header-logo col-7 col-md-3 col-lg-3 col-xl-2 px-0 d-flex gap-2 align-content-center justify-content-center justify-content-md-start">' +

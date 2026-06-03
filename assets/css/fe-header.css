@@ -152,6 +152,41 @@ body {
     font-size: 1.1rem;
 }
 
+.fe-header .header-top a {
+    border-radius: 4px;
+    padding: 2px 4px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.fe-header .header-top a:hover {
+    background: var(--header-top-hover-bg, rgba(255, 255, 255, 0.12));
+}
+
+.fe-header .header-top a.active,
+.fe-header .header-top a[aria-current="page"] {
+    background: var(--header-top-active-bg, rgba(255, 255, 255, 0.18));
+    color: var(--header-top-active-text, inherit) !important;
+}
+
+.fe-header .header-main .header-action,
+.fe-header .header-main .menu-link {
+    border-radius: 4px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.fe-header .header-main .header-action:hover,
+.fe-header .header-main .menu-link:hover {
+    background: var(--header-main-hover-bg, rgba(255, 255, 255, 0.12));
+}
+
+.fe-header .header-main .header-action.active,
+.fe-header .header-main .header-action[aria-current="page"],
+.fe-header .header-main .menu-link.active,
+.fe-header .header-main .menu-link[aria-current="page"] {
+    background: var(--header-main-active-bg, rgba(255, 255, 255, 0.18));
+    color: var(--header-main-active-text, inherit) !important;
+}
+
 .fe-header .header-bottom {
     border-top: 1px solid #0282a5;
     background: var(--navColor);
