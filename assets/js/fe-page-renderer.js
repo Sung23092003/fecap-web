@@ -813,25 +813,46 @@
     };
   }
 
+  function footerVisibleColumns(style) {
+    var layouts = {
+      1: [1, 2],
+      2: [1, 2, 3],
+      3: [1, 2, 3, 4],
+      4: [1, 2],
+      5: [1, 2, 3]
+    };
+
+    return layouts[numberValue(style, 3)] || layouts[3];
+  }
+
   function renderFooter(footer) {
     var col1 = footer.col_1 || {};
     var colors = normalizeFooterColors(footer || {});
     var bootstrap = footer.bootstrap_size || col1.bootstrap_size || {};
     var col4 = footer.col_4 || {};
+    var style = numberValue(firstValue(footer.style, footer.footer_layout, footer.footerLayout), 3);
+    var visibleColumns = footerVisibleColumns(style);
+    var rightColumns = [];
     var bg = hexToRgba(colors.bg, colors.bgOpacity);
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
     var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
 
+    if (visibleColumns.indexOf(2) !== -1) {
+      rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>");
+    }
+    if (visibleColumns.indexOf(3) !== -1) {
+      rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-7 col-md-4 col-xl-4")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + "</div>");
+    }
+    if (visibleColumns.indexOf(4) !== -1) {
+      rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_4_class, "col-12 col-md-4 col-xl-5")) + '">' + renderFooterColumnFour(col4) + "</div>");
+    }
+
     return (
-      '<div class="fe-footer-shell footer-style-' + escapeHtml(firstValue(footer.style, 3)) + '" style="' + styleVars + '">' +
+      '<div class="fe-footer-shell footer-style-' + escapeHtml(style) + '" style="' + styleVars + '">' +
         '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
           renderFooterColumnOne(footer) +
-          '<div class="' + escapeHtml(firstValue(bootstrap.right_group_class, "col-12 col-lg-12 col-xl-8")) + '"><div class="row g-4">' +
-            '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
-            '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-7 col-md-4 col-xl-4")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + "</div>" +
-            '<div class="' + escapeHtml(firstValue(bootstrap.col_4_class, "col-12 col-md-4 col-xl-5")) + '">' + renderFooterColumnFour(col4) + "</div>" +
-          "</div></div>" +
+          rightColumns.join("") +
         "</div></div></div>" +
         renderFooterAccess(footer.access_time || footer.accessTime) +
         '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
