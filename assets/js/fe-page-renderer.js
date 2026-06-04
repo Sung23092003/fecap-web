@@ -684,6 +684,29 @@
     }).join("");
   }
 
+  function renderFooterColumnFour(col4) {
+    var payment = col4.payment_method || {};
+    var map = col4.map || {};
+    var fanpage = col4.fanpage || {};
+    var html = "";
+
+    html += renderFooterColumnLinks(col4, "", "fa-solid fa-arrow-up-right-from-square");
+    if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
+      html += '<div class="fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>";
+    }
+    if (col4.bct_notice && col4.bct_notice.content) {
+      html += '<div class="fe-footer-bct-content">' + col4.bct_notice.content + "</div>";
+    }
+    if (isEnabled(map.show, false) && map.iframe) {
+      html += '<div class="map-wrapper fe-footer-map-block"><h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + '</span></h4>' + renderFooterEmbed(map.iframe) + "</div>";
+    }
+    if (isEnabled(fanpage.show, false) && fanpage.iframe) {
+      html += '<div class="fe-footer-fanpage-block">' + renderFooterEmbed(fanpage.iframe) + "</div>";
+    }
+
+    return html;
+  }
+
   function renderFooterEmbed(raw) {
     var iframe = firstValue(raw);
     if (!iframe) return "";
@@ -740,31 +763,16 @@
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
     var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
-    var payment = col4.payment_method || {};
-    var map = col4.map || {};
-    var fanpage = col4.fanpage || {};
-    var rightBlocks = "";
-
-    rightBlocks += renderFooterColumnLinks(col4, "", "fa-solid fa-arrow-up-right-from-square");
-    if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
-      rightBlocks += '<div class="mt-4"><h4 class="fe-footer-title">Hình thức thanh toán</h4><div class="fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>";
-    }
-    if (col4.bct_notice && col4.bct_notice.content) {
-      rightBlocks += '<div class="mt-4">' + col4.bct_notice.content + "</div>";
-    }
-    if (isEnabled(map.show, false) && map.iframe) {
-      rightBlocks += '<div class="mt-4">' + renderFooterEmbed(map.iframe) + "</div>";
-    }
-    if (isEnabled(fanpage.show, false) && fanpage.iframe) {
-      rightBlocks += '<div class="mt-4">' + renderFooterEmbed(fanpage.iframe) + "</div>";
-    }
 
     return (
       '<div class="fe-footer-shell footer-style-' + escapeHtml(firstValue(footer.style, 3)) + '" style="' + styleVars + '">' +
         '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
           renderFooterColumnOne(footer) +
-          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
-          '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
+          '<div class="' + escapeHtml(firstValue(bootstrap.right_group_class, "col-12 col-lg-12 col-xl-8")) + '"><div class="row g-4">' +
+            '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
+            '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-7 col-md-4 col-xl-4")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + "</div>" +
+            '<div class="' + escapeHtml(firstValue(bootstrap.col_4_class, "col-12 col-md-4 col-xl-5")) + '">' + renderFooterColumnFour(col4) + "</div>" +
+          "</div></div>" +
         "</div></div></div>" +
         renderFooterAccess(footer.access_time || footer.accessTime) +
         '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +

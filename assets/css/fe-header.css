@@ -1342,6 +1342,20 @@ a {
     gap: 8px;
 }
 
+.fe-footer-payment-block,
+.fe-footer-map-block,
+.fe-footer-fanpage-block,
+.fe-footer-bct-content {
+    margin-top: 24px;
+}
+
+.fe-footer-payment-block:first-child,
+.fe-footer-map-block:first-child,
+.fe-footer-fanpage-block:first-child,
+.fe-footer-bct-content:first-child {
+    margin-top: 0;
+}
+
 .fe-footer-payment img {
     width: 52px;
     height: 34px;
@@ -1356,6 +1370,16 @@ a {
     min-height: 210px;
     border: 0;
     border-radius: 8px;
+}
+
+.fe-footer-map-block .fe-footer-embed {
+    margin-top: 24px;
+}
+
+.fe-footer-map-block .fe-footer-embed iframe {
+    min-height: 250px;
+    border: 10px solid #000;
+    border-radius: 0;
 }
 
 .fe-footer-access {
