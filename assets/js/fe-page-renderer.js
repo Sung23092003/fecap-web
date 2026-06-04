@@ -634,6 +634,8 @@
     var col = footer.col_1 || {};
     var phones = normalizeList(col.phone_list);
     var emails = normalizeList(col.email_list);
+    var taxCode = firstValue(col.tax_code, col.taxCode, col.mst, col.tax);
+    var address = firstValue(col.address, col.company_address, col.companyAddress);
     var rows = [];
 
     phones.forEach(function (item) {
@@ -648,6 +650,16 @@
       if (!email) return;
       rows.push('<li><i class="fa-solid fa-envelope"></i><p><strong>Email: </strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + "</a></p></li>");
     });
+
+    
+    if (taxCode) {
+      rows.push('<li><i class="fa-solid fa-file-invoice"></i><p><strong>MST: </strong>' + escapeHtml(taxCode) + "</p></li>");
+    }
+
+    if (address) {
+      rows.push('<li><i class="fa-solid fa-location-dot"></i><p><strong>Địa chỉ: </strong>' + escapeHtml(address) + "</p></li>");
+    }
+
 
     return rows.length ? '<ul class="list-contact fe-footer-contact fe-footer-contact-v2">' + rows.join("") + "</ul>" : "";
   }
