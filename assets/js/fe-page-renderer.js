@@ -19,14 +19,101 @@
     return (window.ENV && window.ENV.BASE_URL) || "https://capi.id.vn";
   }
 
-  function getAuthHeaders() {
-    var headers = { "Content-Type": "application/json" };
+  var AUTO_LOGIN = (typeof ENV !== "undefined" && ENV.AUTO_LOGIN) ||
+    (window.ENV && window.ENV.AUTO_LOGIN) ||
+    {
+      username: "admin",
+      password: "123987"
+    };
+  var authPromise = null;
+
+  function getStoredAuth() {
     try {
       var raw = localStorage.getItem("cms_auth");
-      var auth = raw ? JSON.parse(raw) : null;
-      if (auth && auth.token) headers.Authorization = "Bearer " + auth.token;
-    } catch (e) {}
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      localStorage.removeItem("cms_auth");
+      return null;
+    }
+  }
+
+  function setStoredAuth(token, user) {
+    localStorage.setItem("cms_auth", JSON.stringify({
+      token: token,
+      user: user || { name: AUTO_LOGIN.username },
+      saved_at: Date.now()
+    }));
+  }
+
+  function getStoredToken() {
+    var auth = getStoredAuth();
+    return auth && auth.token ? auth.token : "";
+  }
+
+  function extractToken(result) {
+    if (!result) return "";
+    if (result.token) return result.token;
+    if (result.access_token) return result.access_token;
+    if (result.data && result.data.token) return result.data.token;
+    if (result.data && result.data.access_token) return result.data.access_token;
+    return "";
+  }
+
+  async function autoLogin(force) {
+    var existingToken = getStoredToken();
+    if (!force && existingToken) return existingToken;
+    if (authPromise && !force) return authPromise;
+
+    authPromise = fetch(getBaseUrl() + "/cms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: AUTO_LOGIN.username,
+        password: AUTO_LOGIN.password
+      })
+    })
+      .then(function (response) {
+        if (!response.ok && response.status !== 400) {
+          throw new Error("Login API " + response.status);
+        }
+        return response.json();
+      })
+      .then(function (result) {
+        var token = extractToken(result);
+        if (!result || result.success === false || !token) {
+          throw new Error(result && result.message ? result.message : "Login API error");
+        }
+        setStoredAuth(token, result.data && result.data.user);
+        return token;
+      })
+      .finally(function () {
+        authPromise = null;
+      });
+
+    return authPromise;
+  }
+
+  function getAuthHeaders() {
+    var headers = { "Content-Type": "application/json" };
+    var token = getStoredToken();
+    if (token) headers.Authorization = "Bearer " + token;
     return headers;
+  }
+
+  async function fetchWithAuth(url, options, didRetry) {
+    options = options || {};
+    await autoLogin(false);
+    options.headers = Object.assign({}, options.headers || {}, getAuthHeaders());
+
+    var response = await fetch(url, options);
+    if (response.status === 401 && !didRetry) {
+      localStorage.removeItem("cms_auth");
+      await autoLogin(true);
+      options.headers = Object.assign({}, options.headers || {}, getAuthHeaders());
+      response = await fetchWithAuth(url, options, true);
+    }
+
+    return response;
   }
 
   function escapeHtml(value) {
@@ -147,9 +234,8 @@
       top: {
         bgColor: firstValue(headerTop.bg_color, headerTop.bgColor, "#ffffff"),
         textColor: firstValue(headerTop.text_color, headerTop.textColor, "#212529"),
-        hoverBgColor: firstValue(headerTop.hover_bg_color, headerTop.hoverBgColor, "rgba(255,255,255,0.12)"),
-        activeBgColor: firstValue(headerTop.active_bg_color, headerTop.activeBgColor, "rgba(255,255,255,0.18)"),
-        activeTextColor: firstValue(headerTop.active_text_color, headerTop.activeTextColor, headerTop.text_color, headerTop.textColor, "#212529"),
+        hoverTextColor: firstValue(headerTop.hover_text_color, headerTop.hoverTextColor, headerTop.text_hover_color, headerTop.textHoverColor, headerTop.text_color_hover, headerTop.textColorHover, headerTop.hover_color, headerTop.hoverColor, headerTop.hover_text, headerTop.hoverText, headerTop.text_color, headerTop.textColor, "#212529"),
+        hoverBgColor: firstValue(headerTop.hover_bg_color, headerTop.hoverBgColor, headerTop.bg_hover_color, headerTop.bgHoverColor, headerTop.background_hover_color, headerTop.backgroundHoverColor, headerTop.hover_background_color, headerTop.hoverBackgroundColor, headerTop.background_color_hover, headerTop.backgroundColorHover, headerTop.hover_background, headerTop.hoverBackground, "transparent"),
         borderColor: firstValue(headerTop.border_color, headerTop.borderColor, "#0282a5"),
         borderWidth: numberValue(firstValue(headerTop.border_thickness, headerTop.borderThickness), 1),
         leftLinks: normalizeList(headerTop.left_links || headerTop.leftLinks),
@@ -158,9 +244,8 @@
       main: {
         bgColor: firstValue(headerMain.bg_color, headerMain.bgColor, "#0282a5"),
         textColor: firstValue(headerMain.text_color, headerMain.textColor, "#ffffff"),
-        hoverBgColor: firstValue(headerMain.hover_bg_color, headerMain.hoverBgColor, "rgba(255,255,255,0.12)"),
-        activeBgColor: firstValue(headerMain.active_bg_color, headerMain.activeBgColor, "rgba(255,255,255,0.18)"),
-        activeTextColor: firstValue(headerMain.active_text_color, headerMain.activeTextColor, headerMain.text_color, headerMain.textColor, "#ffffff"),
+        hoverTextColor: firstValue(headerMain.hover_text_color, headerMain.hoverTextColor, headerMain.text_hover_color, headerMain.textHoverColor, headerMain.text_color_hover, headerMain.textColorHover, headerMain.hover_color, headerMain.hoverColor, headerMain.hover_text, headerMain.hoverText, headerMain.text_color, headerMain.textColor, "#ffffff"),
+        hoverBgColor: firstValue(headerMain.hover_bg_color, headerMain.hoverBgColor, headerMain.bg_hover_color, headerMain.bgHoverColor, headerMain.background_hover_color, headerMain.backgroundHoverColor, headerMain.hover_background_color, headerMain.hoverBackgroundColor, headerMain.background_color_hover, headerMain.backgroundColorHover, headerMain.hover_background, headerMain.hoverBackground, "transparent"),
         borderColor: firstValue(headerMain.border_color, headerMain.borderColor, "transparent"),
         borderWidth: numberValue(firstValue(headerMain.border_thickness, headerMain.borderThickness), 0),
         logo: firstValue(headerMain.logo, logo.logo_main, logo.logoMain, FALLBACKS.logo),
@@ -579,7 +664,7 @@
     var leftGapClass = topLinksGapClass(top.leftLinks);
     var rightGapClass = topLinksGapClass(top.rightLinks);
     return (
-      '<div class="header-top d-none d-md-block" style="background:' + escapeHtml(top.bgColor) + ';color:' + escapeHtml(top.textColor) + ';border-bottom:' + Number(top.borderWidth || 0) + 'px solid ' + escapeHtml(top.borderColor) + ';--header-top-hover-bg:' + escapeHtml(top.hoverBgColor) + ';--header-top-active-bg:' + escapeHtml(top.activeBgColor) + ';--header-top-active-text:' + escapeHtml(top.activeTextColor) + '">' +
+      '<div class="header-top d-none d-md-block" style="background:' + escapeHtml(top.bgColor) + ';color:' + escapeHtml(top.textColor) + ';border-bottom:' + Number(top.borderWidth || 0) + 'px solid ' + escapeHtml(top.borderColor) + ';--header-top-hover-bg:' + escapeHtml(top.hoverBgColor) + ';--header-top-hover-text:' + escapeHtml(top.hoverTextColor) + '">' +
         '<div class="container-fluid px-3 px-sm-5 py-2">' +
           '<div class="infomation d-flex flex-nowrap justify-content-between gap-2">' +
             '<div class="d-flex flex-wrap ' + leftGapClass + ' infomation-left">' + left + "</div>" +
@@ -616,7 +701,7 @@
       .sort(function (a, b) { return Number(a.position || 0) - Number(b.position || 0); });
     var logo = safeUrl(main.logo, FALLBACKS.logo);
     return (
-      '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-active-bg:' + escapeHtml(main.activeBgColor) + ';--header-main-active-text:' + escapeHtml(main.activeTextColor) + '">' +
+      '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-hover-text:' + escapeHtml(main.hoverTextColor) + '">' +
         '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
           '<div class="d-md-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
           '<div class="wrap-header-logo col-7 col-md-3 col-lg-3 col-xl-2 px-0 d-flex gap-2 align-content-center justify-content-center justify-content-md-start">' +
@@ -672,7 +757,7 @@
   }
 
   async function loadHeader() {
-    var response = await fetch(getBaseUrl() + "/admin/config/header", {
+    var response = await fetchWithAuth(getBaseUrl() + "/admin/config/header", {
       method: "GET",
       headers: getAuthHeaders()
     });
@@ -694,7 +779,7 @@
     params.set("page", "1");
     params.set("category_status", "1");
 
-    response = await fetch(getBaseUrl() + "/admin/category?" + params.toString(), {
+    response = await fetchWithAuth(getBaseUrl() + "/admin/category?" + params.toString(), {
       method: "GET",
       headers: getAuthHeaders()
     });
@@ -710,7 +795,7 @@
 
     for (page = 2; page <= totalPage; page += 1) {
       params.set("page", String(page));
-      response = await fetch(getBaseUrl() + "/admin/category?" + params.toString(), {
+      response = await fetchWithAuth(getBaseUrl() + "/admin/category?" + params.toString(), {
         method: "GET",
         headers: getAuthHeaders()
       });
@@ -734,7 +819,7 @@
     params.set("banner_type", "-1");
     params.set("sort_order", "asc");
 
-    response = await fetch(getBaseUrl() + "/admin/banner?" + params.toString(), {
+    response = await fetchWithAuth(getBaseUrl() + "/admin/banner?" + params.toString(), {
       method: "GET",
       headers: getAuthHeaders()
     });
@@ -747,7 +832,7 @@
   }
 
   async function loadFooter() {
-    var response = await fetch(getBaseUrl() + "/admin/config/footer", {
+    var response = await fetchWithAuth(getBaseUrl() + "/admin/config/footer", {
       method: "GET",
       headers: getAuthHeaders()
     });

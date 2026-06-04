@@ -160,12 +160,7 @@ body {
 
 .fe-header .header-top a:hover {
     background: var(--header-top-hover-bg, rgba(255, 255, 255, 0.12));
-}
-
-.fe-header .header-top a.active,
-.fe-header .header-top a[aria-current="page"] {
-    background: var(--header-top-active-bg, rgba(255, 255, 255, 0.18));
-    color: var(--header-top-active-text, inherit) !important;
+    color: var(--header-top-hover-text, inherit) !important;
 }
 
 .fe-header .header-main .header-action,
@@ -177,14 +172,7 @@ body {
 .fe-header .header-main .header-action:hover,
 .fe-header .header-main .menu-link:hover {
     background: var(--header-main-hover-bg, rgba(255, 255, 255, 0.12));
-}
-
-.fe-header .header-main .header-action.active,
-.fe-header .header-main .header-action[aria-current="page"],
-.fe-header .header-main .menu-link.active,
-.fe-header .header-main .menu-link[aria-current="page"] {
-    background: var(--header-main-active-bg, rgba(255, 255, 255, 0.18));
-    color: var(--header-main-active-text, inherit) !important;
+    color: var(--header-main-hover-text, inherit) !important;
 }
 
 .fe-header .header-bottom {
