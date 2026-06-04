@@ -720,8 +720,12 @@
   }
 
   function renderFooterSocial(footer) {
-    var col = footer.col_1 || {};
+    var col = footer.col_4 || {};
+    var fallbackCol = footer.col_1 || {};
     var items = normalizeList(col.social_list || col.socialList || col.socials);
+    if (!items.length) {
+      items = normalizeList(fallbackCol.social_list || fallbackCol.socialList || fallbackCol.socials);
+    }
     var title = firstValue(col.social_title, col.socialTitle, "Mạng xã hội");
 
     if (!items.length) {
@@ -736,8 +740,9 @@
   }
 
   function renderFooterBct(footer) {
-    var col = footer.col_1 || {};
-    var bct = col.bct_notice || col.bctNotice || {};
+    var col = footer.col_4 || {};
+    var fallbackCol = footer.col_1 || {};
+    var bct = col.bct_notice || col.bctNotice || fallbackCol.bct_notice || fallbackCol.bctNotice || {};
     var image = safeImageUrl(firstValue(bct.image, bct.file, bct.icon_file, bct.iconFile), "https://we1.io.vn/public/assets/images/bct.png");
     var title = firstValue(bct.title, "Bộ công thương");
     var href = safeUrl(firstValue(bct.link, bct.url), "#");
@@ -764,8 +769,6 @@
         (logo ? '<div class="logo-f fe-footer-logo-wrap"><img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async"></div>' : "") +
         (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
         renderFooterContact(footer) +
-        renderFooterSocial(footer) +
-        renderFooterBct(footer) +
       "</div>"
     );
   }
@@ -780,7 +783,8 @@
     }).join("");
   }
 
-  function renderFooterColumnFour(col4) {
+  function renderFooterColumnFour(footer) {
+    var col4 = footer.col_4 || {};
     var payment = col4.payment_method || {};
     var map = col4.map || {};
     var fanpage = col4.fanpage || {};
@@ -789,11 +793,16 @@
     var mapAddressTitle = firstValue(map.address_title, map.addressTitle, map.company_name, map.companyName);
     var mapAddressText = firstValue(map.address, map.map_address, map.mapAddress);
 
-    if (linksBlock) {
-      blocks.push('<div class="col-12">' + linksBlock + "</div>");
-    }
+    blocks.push('<div class="col-12">' + renderFooterSocial(footer) + "</div>");
     if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
       blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
+    }
+    var bctBlock = renderFooterBct(footer);
+    if (bctBlock) {
+      blocks.push('<div class="col-12">' + bctBlock + "</div>");
+    }
+    if (linksBlock) {
+      blocks.push('<div class="col-12">' + linksBlock + "</div>");
     }
     if (col4.bct_notice && col4.bct_notice.content) {
       blocks.push('<div class="col-7 col-md-12 fe-footer-bct-content"><div class="max-sm:pl-24">' + col4.bct_notice.content + "</div></div>");
@@ -895,7 +904,7 @@
       rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-7 col-md-4 col-xl-4")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + "</div>");
     }
     if (visibleColumns.indexOf(4) !== -1) {
-      rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_4_class, "col-12 col-md-4 col-xl-5")) + '">' + renderFooterColumnFour(col4) + "</div>");
+      rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_4_class, "col-12 col-md-4 col-xl-5")) + '">' + renderFooterColumnFour(footer) + "</div>");
     }
 
     return (
