@@ -240,7 +240,45 @@
     var d = unwrapHeaderPayload(raw);
     var headerTop = d.header_top || d.headerTop || {};
     var headerMain = d.header_main || d.headerMain || {};
+    var headerNewsRaw =
+      headerTop.news_list ||
+      headerTop.newsList ||
+      headerTop.news_items ||
+      headerTop.newsItems ||
+      headerTop.news ||
+      d.header_news ||
+      d.headerNews ||
+      d.news_tab ||
+      d.newsTab ||
+      d.news ||
+      {};
+    var headerNews = Array.isArray(headerNewsRaw) ? {} : headerNewsRaw;
+    var newsItems = Array.isArray(headerNewsRaw)
+      ? normalizeList(headerNewsRaw)
+      : normalizeList(
+        headerNews.items ||
+        headerNews.item_list ||
+        headerNews.itemList ||
+        headerNews.news_list ||
+        headerNews.newsList ||
+        headerNews.list ||
+        headerTop.news_list ||
+        headerTop.newsList ||
+        headerTop.news_items ||
+        headerTop.newsItems ||
+        d.header_news_items ||
+        d.headerNewsItems ||
+        d.news_items ||
+        d.newsItems
+      );
     var logo = d.logo || {};
+
+    if (!newsItems.length && firstValue(headerNews.text, headerNews.title, headerNews.name, headerNews.content)) {
+      newsItems = [{
+        text: firstValue(headerNews.text, headerNews.title, headerNews.name, headerNews.content),
+        link: firstValue(headerNews.link, headerNews.url, headerNews.href)
+      }];
+    }
 
     return {
       style: numberValue(firstValue(d.style, d.header_layout, d.headerLayout), 3),
@@ -272,6 +310,14 @@
         searchCol: normalizeBootstrapColClass(firstValue(headerMain.search_col, headerMain.searchCol, headerMain.search_column, headerMain.searchColumn), "col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4"),
         searchPlaceholder: firstValue(headerMain.search_placeholder, headerMain.searchPlaceholder, "Tim kiem San pham & Dich vu ?"),
         items: normalizeList(headerMain.item_list || headerMain.itemList)
+      },
+      news: {
+        text: firstValue(headerNews.text, headerNews.title, headerNews.name, headerNews.content),
+        link: firstValue(headerNews.link, headerNews.url, headerNews.href),
+        items: newsItems,
+        bgColor: firstValue(headerTop.news_bg_color, headerTop.newsBgColor, headerNews.bg_color, headerNews.bgColor, headerNews.background_color, headerNews.backgroundColor),
+        textColor: firstValue(headerTop.news_text_color, headerTop.newsTextColor, headerNews.text_color, headerNews.textColor),
+        hoverTextColor: firstValue(headerTop.news_hover_text_color, headerTop.newsHoverTextColor, headerNews.hover_text_color, headerNews.hoverTextColor, headerNews.text_hover_color, headerNews.textHoverColor)
       }
     };
   }
@@ -630,7 +676,9 @@
     var items = normalizeList(col.social_list || col.socialList || col.socials);
     var title = firstValue(col.social_title, col.socialTitle, "Mạng xã hội");
 
-    if (!items.length) return "";
+    if (!items.length) {
+      items = [{ text: "Tin tuc dang cap nhat", link: "" }];
+    }
     return (
       '<div class="fe-footer-social-block">' +
         '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
@@ -900,6 +948,113 @@
     );
   }
 
+  function renderHeaderNewsMarquee(news) {
+    var items = normalizeList(news && news.items)
+      .map(function (item) {
+        return {
+          text: firstValue(item.text, item.title, item.name, item.content),
+          link: firstValue(item.link, item.url, item.href)
+        };
+      })
+      .filter(function (item) { return item.text; });
+    var content;
+
+    if (!items.length && news && news.text) {
+      items = [{ text: news.text, link: news.link }];
+    }
+
+    if (!items.length) return "";
+
+    content = items.map(function (item) {
+      var href = item.link ? safeUrl(item.link, "#") : "#";
+      var itemHtml = '<span class="fe-header-news-text">' + escapeHtml(item.text) + "</span>";
+      if (href && href !== "#") {
+        itemHtml = '<a class="fe-header-news-link" href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">' + itemHtml + "</a>";
+      }
+      return itemHtml;
+    }).join('<span class="fe-header-news-separator">|</span>');
+
+    return (
+      '<div class="fe-header-news-marquee" style="' +
+        (news && news.bgColor ? '--fe-news-bg:' + escapeHtml(news.bgColor) + ';' : '') +
+        (news && news.textColor ? '--fe-news-text:' + escapeHtml(news.textColor) + ';' : '') +
+        (news && news.hoverTextColor ? '--fe-news-hover-text:' + escapeHtml(news.hoverTextColor) + ';' : '') +
+      '">' +
+        '<div class="container px-3 px-sm-5">' +
+          '<div class="fe-header-news-track" aria-label="Tin tức">' +
+            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tuc</span>' +
+            '<div class="fe-header-news-run"><div class="fe-header-news-content">' +
+              '<span class="fe-header-news-group">' + content + "</span>" +
+            "</div></div>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderMenuStyle5(menuHtml) {
+    return (
+      '<div id="header-sticky" class="header-sticky-style-5" style="' + menuAppearanceStyle() + '">' +
+        '<div class="header-bottom-item header-bottom header-bottom-style-5 d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
+          '<button class="fe-header-vertical-toggle" type="button" data-fe-vertical-toggle aria-expanded="false" aria-controls="fe-header-vertical-menu">' +
+            '<i class="fa-solid fa-bars"></i><span>Menu</span>' +
+          "</button>" +
+          '<div class="header-bottom-layout">' +
+            '<div class="header-bottom-inner fe-style5-main-menu">' + menuHtml + "</div>" +
+            '<aside class="fe-header-vertical-panel" id="fe-header-vertical-menu" aria-hidden="true">' +
+              '<div class="fe-header-vertical-head">' +
+                '<strong>Danh muc</strong>' +
+                '<button class="fe-header-vertical-close" type="button" data-fe-vertical-close aria-label="Dong menu"><i class="fa-solid fa-xmark"></i></button>' +
+              "</div>" +
+              '<nav class="fe-header-vertical-nav">' + menuHtml + "</nav>" +
+            "</aside>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function bindHeaderStyle5(root) {
+    var toggle = root.querySelector("[data-fe-vertical-toggle]");
+    var close = root.querySelector("[data-fe-vertical-close]");
+    var panel = root.querySelector("#fe-header-vertical-menu");
+    var nav = root.querySelector(".fe-header-vertical-nav");
+
+    if (!toggle || !panel) return;
+
+    function setOpen(open) {
+      root.classList.toggle("fe-style5-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+
+    setOpen(false);
+    toggle.addEventListener("click", function () {
+      setOpen(!root.classList.contains("fe-style5-open"));
+    });
+    if (close) {
+      close.addEventListener("click", function () {
+        setOpen(false);
+      });
+    }
+
+    if (nav) {
+      nav.querySelectorAll(".menu-item.has-sub-menu").forEach(function (item) {
+        item.classList.remove("is-open");
+      });
+
+      nav.addEventListener("click", function (event) {
+        var parent = event.target.closest(".menu-item.has-sub-menu");
+
+        if (!parent || !nav.contains(parent)) return;
+        if (event.target.closest(".sub-menu")) return;
+
+        event.preventDefault();
+        parent.classList.toggle("is-open");
+      });
+    }
+  }
+
   function renderOffcanvas(header) {
     var logo = safeUrl(header.main.logo || header.logo.main, FALLBACKS.logo);
     return (
@@ -1060,12 +1215,14 @@
     if (sections.top) html += renderHeaderTop(header.top);
     if (sections.main) html += renderHeaderMain(header.main);
     if (!sections.main && sections.menu) html += renderHeaderMain(header.main, " d-lg-none");
-    if (sections.menu) html += renderMenu(menuHtml);
+    if (sections.menu) html += header.style === 5 ? renderMenuStyle5(menuHtml) : renderMenu(menuHtml);
+    if (header.style === 4) html += renderHeaderNewsMarquee(header.news);
     html += renderOffcanvas(header);
     root.innerHTML = html;
     root.style.cssText += ";" + menuAppearanceStyle();
     root.dataset.headerStyle = String(header.style);
     root.dataset.renderState = "ready";
+    bindHeaderStyle5(root);
     applyMeta(header);
     window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header, menuFromApi: Boolean(apiMenuHtml) } }));
   }
