@@ -627,25 +627,6 @@
     return '<div class="fe-footer-embed">' + iframe + "</div>";
   }
 
-  function visitorCount() {
-    var key = "fe_footer_visit_count";
-    var count = numberValue(localStorage.getItem(key), 0) + 1;
-    try {
-      localStorage.setItem(key, String(count));
-    } catch (e) {}
-    return count;
-  }
-
-  function renderFooterAccess(access) {
-    var parts = [];
-    var now = new Date();
-    if (!access || (!isEnabled(access.show_time, false) && !isEnabled(access.show_visitor_count, false) && !access.text)) return "";
-    if (access.text) parts.push(escapeHtml(access.text));
-    if (isEnabled(access.show_time, false)) parts.push('<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(now.toLocaleString("vi-VN")) + "</span>");
-    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lượt truy cập</span>");
-    return '<div class="fe-footer-access" style="background:' + escapeHtml(firstValue(access.bg_color, "#111827")) + ';color:' + escapeHtml(firstValue(access.text_color, "#ffffff")) + '"><div class="container d-flex flex-wrap justify-content-center gap-3">' + parts.join("") + "</div></div>";
-  }
-
   function renderFooter(footer) {
     var col1 = footer.col_1 || {};
     var colors = footer.colors || col1.colors || {};
@@ -680,7 +661,6 @@
           '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-12 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
           '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-12 col-xl-5")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "Chính sách", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
         "</div></div></div>" +
-        renderFooterAccess(footer.access_time) +
         '<div class="fe-footer-copyright"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
       "</div>"
     );
