@@ -240,6 +240,15 @@
     var d = unwrapHeaderPayload(raw);
     var headerTop = d.header_top || d.headerTop || {};
     var headerMain = d.header_main || d.headerMain || {};
+    var categoryThemeSetting =
+      headerTop.themeSettingCategory ||
+      headerTop.theme_setting_category ||
+      headerTop.themeSettingcategory ||
+      headerTop.theme_settingCategory ||
+      d.themeSettingCategory ||
+      d.theme_setting_category ||
+      d.themeSettingcategory ||
+      d.theme_settingCategory;
     var headerNewsRaw =
       headerTop.news_list ||
       headerTop.newsList ||
@@ -278,6 +287,14 @@
         text: firstValue(headerNews.text, headerNews.title, headerNews.name, headerNews.content),
         link: firstValue(headerNews.link, headerNews.url, headerNews.href)
       }];
+    }
+
+    if (categoryThemeSetting && typeof categoryThemeSetting === "object") {
+      window.FE_MENU_APPEARANCE = categoryThemeSetting;
+      window.FE_MENU_APPEARANCE_SOURCE = "header";
+      try {
+        localStorage.setItem("menu_appearance", JSON.stringify(categoryThemeSetting));
+      } catch (e) {}
     }
 
     return {
@@ -525,15 +542,34 @@
   }
 
   function setMenuAppearanceFromApi(raw) {
+    if (window.FE_MENU_APPEARANCE_SOURCE === "header") return;
+
     var payload = raw && raw.data ? raw.data : raw;
+    var categoryPayload = unwrapCategoryPayload(raw);
+    var normalized;
+    var flattened;
+    var firstItem;
     var themeSetting =
       (payload && payload.themeSetting) ||
       (payload && payload.theme_setting) ||
       (payload && payload.data && payload.data.themeSetting) ||
       (payload && payload.data && payload.data.theme_setting);
 
+    if (!themeSetting && categoryPayload) {
+      normalized = normalizeCategoryItems(categoryPayload);
+      flattened = flattenCategories(normalized);
+      firstItem = flattened && flattened.length ? flattened[0] : null;
+      themeSetting = firstValue(
+        firstItem && firstItem.themeSetting,
+        firstItem && firstItem.theme_setting
+      );
+    }
+
     if (themeSetting && typeof themeSetting === "object") {
       window.FE_MENU_APPEARANCE = themeSetting;
+      try {
+        localStorage.setItem("menu_appearance", JSON.stringify(themeSetting));
+      } catch (e) {}
     }
   }
 

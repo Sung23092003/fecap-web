@@ -256,7 +256,7 @@ body {
 .fe-header .header-bottom .menu-item:focus,
 .fe-header .header-bottom .menu-item:active,
 .fe-header .header-bottom .menu-item.active {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--fe-menu-hover-bg, rgba(0, 0, 0, 0.08));
 }
 
 .fe-header .menu-item:hover .sub-menu {
@@ -268,7 +268,7 @@ body {
 
 .fe-header .menu-item .sub-menu>li:not(.sub-menu-item):hover,
 .fe-header .menu-item .sub-menu .menu-list li:hover {
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: var(--fe-menu-hover-bg, rgba(0, 0, 0, 0.06));
 }
 
 .fe-header .menu-item .sub-menu>li:not(.sub-menu-item):hover a,
@@ -1738,7 +1738,7 @@ a {
 .fe-header .header-bottom .menu-item:focus,
 .fe-header .header-bottom .menu-item:active,
 .fe-header .header-bottom .menu-item.active {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--fe-menu-hover-bg, rgba(0, 0, 0, 0.08));
     border-color: rgba(2, 130, 165, 0.2);
     color: inherit;
     box-shadow: 0 8px 22px rgba(2, 130, 165, 0.18);
@@ -1801,7 +1801,7 @@ a {
 }
 
 .fe-header .header-bottom .sub-menu .menu-list li:hover {
-    background: rgba(0, 0, 0, 0.06) !important;
+    background: var(--fe-menu-hover-bg, rgba(0, 0, 0, 0.06)) !important;
     padding-left: 16px !important;
 }
 
