@@ -1613,6 +1613,104 @@ a {
     margin: 0 auto;
 }
 
+.fe-header .fe-sticky-menu-logo {
+    display: none;
+}
+
+.fe-header .fe-sticky-menu-logo a {
+    display: inline-flex;
+    align-items: center;
+    max-width: min(260px, 100%);
+}
+
+.fe-header .fe-sticky-menu-logo img {
+    display: block;
+    max-width: 100%;
+    max-height: 48px;
+    object-fit: contain;
+}
+
+.fe-header .fe-sticky-menu-list {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 992px) {
+    .fe-header.fe-header-scrolled {
+        top: 0;
+    }
+
+    .fe-header.fe-header-scrolled .header-top,
+    .fe-header.fe-header-scrolled .header-main {
+        display: none !important;
+    }
+
+    .fe-header.fe-header-scrolled .fe-header-news-marquee {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 0;
+        min-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .fe-header.fe-header-scrolled .header-bottom-surface {
+        padding-top: 0;
+        padding-bottom: 0;
+        min-height: 60px;
+        box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12);
+    }
+
+    .fe-header.fe-header-scrolled .header-bottom-inner,
+    .fe-header.fe-header-scrolled[data-header-style="5"] .header-bottom-layout {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+
+    .fe-header.fe-header-scrolled .fe-sticky-menu-logo {
+        flex: 0 0 calc(33.333% - 8px);
+        max-width: calc(33.333% - 8px);
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 6px 0;
+    }
+
+    .fe-header.fe-header-scrolled:not([data-header-style="5"]) .fe-sticky-menu-list,
+    .fe-header.fe-header-scrolled[data-header-style="5"] .fe-style5-main-menu {
+        flex: 0 0 calc(66.667% - 8px);
+        max-width: calc(66.667% - 8px);
+        min-width: 0;
+    }
+
+    .fe-header.fe-header-scrolled[data-header-style="5"] .fe-style5-main-menu .fe-sticky-menu-list {
+        flex: 1 1 auto;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .fe-header.fe-header-scrolled .header-bottom .menu {
+        flex-wrap: nowrap;
+        justify-content: flex-start !important;
+        overflow-x: auto;
+        overflow-y: visible;
+        padding: 8px 0;
+        min-height: 44px;
+    }
+
+    .fe-header.fe-header-scrolled[data-header-style="5"] .fe-header-vertical-toggle,
+    .fe-header.fe-header-scrolled[data-header-style="5"] .fe-header-vertical-panel {
+        display: none !important;
+    }
+}
+
 .fe-header .header-bottom .menu {
     flex-wrap: wrap;
     gap: 6px;

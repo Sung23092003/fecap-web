@@ -938,11 +938,22 @@
     );
   }
 
-  function renderMenu(fallbackMenuHtml) {
+  function renderStickyMenuLogo(logo) {
+    return (
+      '<div class="fe-sticky-menu-logo">' +
+        '<a href="./"><img src="' + escapeHtml(safeUrl(logo, FALLBACKS.logo)) + '" alt="logo" loading="lazy" decoding="async"></a>' +
+      "</div>"
+    );
+  }
+
+  function renderMenu(fallbackMenuHtml, logo) {
     return (
       '<div id="header-sticky" style="' + menuAppearanceStyle() + '">' +
         '<div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
-          '<div class="header-bottom-inner">' + fallbackMenuHtml + "</div>" +
+          '<div class="header-bottom-inner">' +
+            renderStickyMenuLogo(logo) +
+            '<div class="fe-sticky-menu-list">' + fallbackMenuHtml + "</div>" +
+          "</div>" +
         "</div>" +
       "</div>"
     );
@@ -992,7 +1003,7 @@
     );
   }
 
-  function renderMenuStyle5(menuHtml) {
+  function renderMenuStyle5(menuHtml, logo) {
     return (
       '<div id="header-sticky" class="header-sticky-style-5" style="' + menuAppearanceStyle() + '">' +
         '<div class="header-bottom-item header-bottom header-bottom-style-5 d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
@@ -1000,7 +1011,8 @@
             '<i class="fa-solid fa-bars"></i><span>Menu</span>' +
           "</button>" +
           '<div class="header-bottom-layout">' +
-            '<div class="header-bottom-inner fe-style5-main-menu">' + menuHtml + "</div>" +
+            renderStickyMenuLogo(logo) +
+            '<div class="header-bottom-inner fe-style5-main-menu"><div class="fe-sticky-menu-list">' + menuHtml + "</div></div>" +
             '<aside class="fe-header-vertical-panel" id="fe-header-vertical-menu" aria-hidden="true">' +
               '<div class="fe-header-vertical-head">' +
                 '<strong>Danh muc</strong>' +
@@ -1053,6 +1065,44 @@
         parent.classList.toggle("is-open");
       });
     }
+  }
+
+  function bindHeaderScrollState(root) {
+    var isStyle4 = root.dataset.headerStyle === "4";
+    var enterThreshold = isStyle4 ? 220 : 140;
+    var exitThreshold = 40;
+    var ticking = false;
+    var isScrolled = root.classList.contains("fe-header-scrolled");
+
+    if (root._feHeaderScrollCleanup) {
+      root._feHeaderScrollCleanup();
+    }
+
+    function update() {
+      var scrollY = window.scrollY || window.pageYOffset || 0;
+
+      if (!isScrolled && scrollY > enterThreshold) {
+        isScrolled = true;
+        root.classList.add("fe-header-scrolled");
+      } else if (isScrolled && scrollY < exitThreshold) {
+        isScrolled = false;
+        root.classList.remove("fe-header-scrolled");
+      }
+
+      ticking = false;
+    }
+
+    function requestUpdate() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }
+
+    update();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    root._feHeaderScrollCleanup = function () {
+      window.removeEventListener("scroll", requestUpdate);
+    };
   }
 
   function renderOffcanvas(header) {
@@ -1215,7 +1265,7 @@
     if (sections.top) html += renderHeaderTop(header.top);
     if (sections.main) html += renderHeaderMain(header.main);
     if (!sections.main && sections.menu) html += renderHeaderMain(header.main, " d-lg-none");
-    if (sections.menu) html += header.style === 5 ? renderMenuStyle5(menuHtml) : renderMenu(menuHtml);
+    if (sections.menu) html += header.style === 5 ? renderMenuStyle5(menuHtml, header.main.logo || header.logo.main) : renderMenu(menuHtml, header.main.logo || header.logo.main);
     if (header.style === 4) html += renderHeaderNewsMarquee(header.news);
     html += renderOffcanvas(header);
     root.innerHTML = html;
@@ -1223,6 +1273,7 @@
     root.dataset.headerStyle = String(header.style);
     root.dataset.renderState = "ready";
     bindHeaderStyle5(root);
+    bindHeaderScrollState(root);
     applyMeta(header);
     window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header, menuFromApi: Boolean(apiMenuHtml) } }));
   }
