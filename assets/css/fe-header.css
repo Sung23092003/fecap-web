@@ -411,16 +411,17 @@ body {
 }
 
 .fe-header .header-action {
-    flex: 0 0 calc(92px * var(--header-action-columns, 1));
-    max-width: calc(92px * var(--header-action-columns, 1));
+    flex: var(--header-action-columns, 1) 1 0;
+    max-width: none;
     min-width: 58px;
 }
 
 .fe-header .header-actions-list {
     width: auto;
     min-width: 0;
-    flex: 0 1 auto;
-    column-gap: 14px !important;
+    flex: 1 0 0%;
+    max-width: 100%;
+    column-gap: 0 !important;
     row-gap: 8px !important;
     flex-wrap: wrap;
 }

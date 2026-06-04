@@ -218,6 +218,17 @@
     return value !== 0 && value !== "0" && value !== false && value !== "false";
   }
 
+  function normalizeBootstrapColClass(value, fallback) {
+    var allowed = String(value || "")
+      .trim()
+      .split(/\s+/)
+      .filter(function (part) {
+        return /^col(?:-(?:sm|md|lg|xl|xxl))?(?:-(?:[1-9]|1[0-2]|auto))?$/.test(part);
+      });
+
+    return allowed.length ? allowed.join(" ") : fallback;
+  }
+
   function normalizeHeader(raw) {
     var d = unwrapHeaderPayload(raw);
     var headerTop = d.header_top || d.headerTop || {};
@@ -249,7 +260,10 @@
         borderColor: firstValue(headerMain.border_color, headerMain.borderColor, "transparent"),
         borderWidth: numberValue(firstValue(headerMain.border_thickness, headerMain.borderThickness), 0),
         logo: firstValue(headerMain.logo, logo.logo_main, logo.logoMain, FALLBACKS.logo),
+        logoCol: normalizeBootstrapColClass(firstValue(headerMain.logo_col, headerMain.logoCol, headerMain.logo_column, headerMain.logoColumn), "col-7 col-md-3 col-lg-3 col-xl-2"),
         searchShow: isEnabled(firstValue(headerMain.search_show, headerMain.searchShow), true),
+        searchCol: normalizeBootstrapColClass(firstValue(headerMain.search_col, headerMain.searchCol, headerMain.search_column, headerMain.searchColumn), "col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4"),
+        searchPlaceholder: firstValue(headerMain.search_placeholder, headerMain.searchPlaceholder, "Tim kiem San pham & Dich vu ?"),
         items: normalizeList(headerMain.item_list || headerMain.itemList)
       }
     };
@@ -702,14 +716,14 @@
     var logo = safeUrl(main.logo, FALLBACKS.logo);
     return (
       '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-hover-text:' + escapeHtml(main.hoverTextColor) + '">' +
-        '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
+        '<div class="container"><div class="row align-items-center w-100 wrap-menu">' +
           '<div class="d-md-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
-          '<div class="wrap-header-logo col-7 col-md-3 col-lg-3 col-xl-2 px-0 d-flex gap-2 align-content-center justify-content-center justify-content-md-start">' +
+          '<div class="wrap-header-logo ' + escapeHtml(main.logoCol) + ' px-0 d-flex align-content-center justify-content-center justify-content-md-start">' +
             '<div class="d-none d-md-block d-lg-none col-2 px-0 mt-2"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
             '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
-          (main.searchShow ? '<div class="d-none d-md-flex align-content-center gap-2 wrap-header-search px-0 col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tim kiem San pham & Dich vu ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
-          '<div class="header-actions-list d-flex align-items-center justify-content-end gap-2 ms-auto px-0">' +
+          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
+          '<div class="header-actions-list col d-flex align-items-center justify-content-end px-0">' +
             items.map(renderMainItem).join("") +
           "</div>" +
         "</div></div>" +
