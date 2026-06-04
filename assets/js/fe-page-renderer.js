@@ -884,6 +884,8 @@
     var bg = hexToRgba(colors.bg, colors.bgOpacity);
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
+    var copyrightOwner = firstValue(footer.copyright && footer.copyright.text, col1.company_name, "");
+    var copyrightHtml = copyrightOwner ? 'Bản quyền thuộc về "' + escapeHtml(copyrightOwner) + '" | Cung cấp bởi <a href="https://Thietkeweb365.vn" target="_blank" rel="noopener">Thietkeweb365.vn</a>' : "";
     var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
 
     if (visibleColumns.indexOf(2) !== -1) {
@@ -903,7 +905,7 @@
           rightColumns.join("") +
         "</div></div></div>" +
         renderFooterAccess(footer.access_time || footer.accessTime) +
-        '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
+        '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + copyrightHtml + "</div></div>" +
       "</div>"
     );
   }
