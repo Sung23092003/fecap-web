@@ -745,7 +745,7 @@
     var fanpage = col4.fanpage || {};
     var rightBlocks = "";
 
-    rightBlocks += renderFooterColumnLinks(col4, firstValue(col4.title, "Thông tin"), "fa-solid fa-arrow-up-right-from-square");
+    rightBlocks += renderFooterColumnLinks(col4, "", "fa-solid fa-arrow-up-right-from-square");
     if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
       rightBlocks += '<div class="mt-4"><h4 class="fe-footer-title">Hình thức thanh toán</h4><div class="fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>";
     }
@@ -763,8 +763,8 @@
       '<div class="fe-footer-shell footer-style-' + escapeHtml(firstValue(footer.style, 3)) + '" style="' + styleVars + '">' +
         '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
           renderFooterColumnOne(footer) +
-          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
-          '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-12 col-xl-5")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "Chính sách", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
+          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
+          '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
         "</div></div></div>" +
         renderFooterAccess(footer.access_time || footer.accessTime) +
         '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
