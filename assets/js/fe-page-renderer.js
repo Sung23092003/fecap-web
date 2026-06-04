@@ -582,16 +582,16 @@
       var phone = firstValue(item.phone, item.content);
       var name = firstValue(item.name, "Hotline");
       if (!phone) return;
-      rows.push('<li><i class="fa-solid fa-phone"></i><span><strong>' + escapeHtml(name) + ': </strong><a href="tel:' + escapeHtml(phone) + '">' + escapeHtml(phone) + "</a></span></li>");
+      rows.push('<li><i class="fa-solid fa-phone"></i><p><strong>' + escapeHtml(name) + ': </strong><a href="tel:' + escapeHtml(phone) + '">' + escapeHtml(phone) + "</a></p></li>");
     });
 
     emails.forEach(function (item) {
       var email = firstValue(item.email, item.content);
       if (!email) return;
-      rows.push('<li><i class="fa-solid fa-envelope"></i><span><strong>Email: </strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + "</a></span></li>");
+      rows.push('<li><i class="fa-solid fa-envelope"></i><p><strong>Email: </strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + "</a></p></li>");
     });
 
-    return rows.length ? '<ul class="fe-footer-contact">' + rows.join("") + "</ul>" : "";
+    return rows.length ? '<ul class="list-contact fe-footer-contact fe-footer-contact-v2">' + rows.join("") + "</ul>" : "";
   }
 
   function renderFooterColumnOne(footer) {
@@ -602,9 +602,9 @@
     var desc = firstValue(col.short_description);
 
     return (
-      '<div class="' + escapeHtml(firstValue(bootstrap.col_1_class, "col-12 col-xl-4")) + '">' +
-        (logo ? '<img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async">' : "") +
-        (company ? '<h4 class="fe-footer-title">' + escapeHtml(company) + "</h4>" : "") +
+      '<div class="' + escapeHtml(firstValue(bootstrap.col_1_class, "col-12 col-xl-4")) + ' fe-footer-col-one">' +
+        (company ? '<h4 class="ttl-f fe-footer-title text-16">' + escapeHtml(company) + "</h4>" : "") +
+        (logo ? '<div class="logo-f fe-footer-logo-wrap"><img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async"></div>' : "") +
         (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
         renderFooterContact(footer) +
       "</div>"
