@@ -627,14 +627,54 @@
     return '<div class="fe-footer-embed">' + iframe + "</div>";
   }
 
+  function visitorCount() {
+    var key = "fe_footer_visit_count";
+    var count = numberValue(localStorage.getItem(key), 0) + 1;
+    try {
+      localStorage.setItem(key, String(count));
+    } catch (e) {}
+    return count;
+  }
+
+  function renderFooterAccess(access) {
+    var parts = [];
+    var now = new Date();
+
+    if (!access || (!isEnabled(access.show_time, false) && !isEnabled(access.show_visitor_count, false) && !firstValue(access.text))) return "";
+    if (firstValue(access.text)) parts.push(escapeHtml(firstValue(access.text)));
+    if (isEnabled(access.show_time, false)) parts.push('<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(now.toLocaleString("vi-VN")) + "</span>");
+    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lượt truy cập</span>");
+
+    return '<div class="fe-footer-access" style="background:' + escapeHtml(firstValue(access.bg_color, access.bgColor, "#111827")) + ';color:' + escapeHtml(firstValue(access.text_color, access.textColor, "#ffffff")) + '"><div class="container d-flex flex-wrap justify-content-center gap-3">' + parts.join("") + "</div></div>";
+  }
+
+  function normalizeFooterColors(footer) {
+    var col1 = footer.col_1 || footer.col1 || {};
+    var rootColors = footer.colors || footer.color || {};
+    var colColors = col1.colors || col1.color || {};
+    var theme = footer.themeSetting || footer.theme_setting || {};
+    var copyright = footer.copyright || {};
+
+    return {
+      bg: firstValue(colColors.bg_color, colColors.bgColor, rootColors.bg_color, rootColors.bgColor, theme.footer_bg_color, theme.bg_color, footer.bg_color, footer.bgColor, "#0f2742"),
+      text: firstValue(colColors.text_color, colColors.textColor, rootColors.text_color, rootColors.textColor, theme.footer_text_color, theme.text_color, footer.text_color, footer.textColor, "#ffffff"),
+      longBorder: firstValue(colColors.long_border_color, colColors.longBorderColor, rootColors.long_border_color, rootColors.longBorderColor, theme.footer_line_long_color, theme.long_border_color, "rgba(255,255,255,.16)"),
+      shortBorder: firstValue(colColors.short_border_color, colColors.shortBorderColor, rootColors.short_border_color, rootColors.shortBorderColor, theme.footer_line_short_color, theme.short_border_color, "#9ee7e8"),
+      bgOpacity: firstValue(colColors.bg_opacity, colColors.bgOpacity, rootColors.bg_opacity, rootColors.bgOpacity, theme.footer_bg_opacity, theme.bg_opacity, 100),
+      copyrightBg: firstValue(copyright.bg_color, copyright.bgColor, theme.copyright_bg_color, ""),
+      copyrightText: firstValue(copyright.text_color, copyright.textColor, theme.copyright_text_color, "")
+    };
+  }
+
   function renderFooter(footer) {
     var col1 = footer.col_1 || {};
-    var colors = footer.colors || col1.colors || {};
+    var colors = normalizeFooterColors(footer || {});
     var bootstrap = footer.bootstrap_size || col1.bootstrap_size || {};
     var col4 = footer.col_4 || {};
-    var bg = hexToRgba(firstValue(colors.bg_color, "#0f2742"), firstValue(colors.bg_opacity, 100));
+    var bg = hexToRgba(colors.bg, colors.bgOpacity);
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
-    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(firstValue(colors.text_color, "#ffffff")) + ";--fe-footer-short-border:" + escapeHtml(firstValue(colors.short_border_color, "#9ee7e8")) + ";--fe-footer-long-border:" + escapeHtml(firstValue(colors.long_border_color, "rgba(255,255,255,.16)")) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
+    var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
+    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
     var payment = col4.payment_method || {};
     var map = col4.map || {};
     var fanpage = col4.fanpage || {};
@@ -661,7 +701,8 @@
           '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-12 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
           '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-12 col-xl-5")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "Chính sách", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
         "</div></div></div>" +
-        '<div class="fe-footer-copyright"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
+        renderFooterAccess(footer.access_time || footer.accessTime) +
+        '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + escapeHtml(firstValue(footer.copyright && footer.copyright.text, "")) + "</div></div>" +
       "</div>"
     );
   }
