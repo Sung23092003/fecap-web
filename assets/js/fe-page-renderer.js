@@ -561,8 +561,13 @@
   function renderFooterLink(item, iconClass) {
     var title = footerLinkTitle(item);
     var href = safeUrl(firstValue(item.link, item.url, item.href), "#");
-    var icon = normalizeIconClass(firstValue(item.icon, iconClass));
-    var iconFile = safeUrl(firstValue(item.icon_file, item.iconFile), "");
+    var rawIcon = firstValue(item.icon);
+    var icon = normalizeIconClass(firstValue(rawIcon, iconClass));
+    var iconFile = safeImageUrl(firstValue(item.icon_file, item.iconFile, item.favicon, item.favicon_url, item.faviconUrl), "");
+    if (!iconFile && rawIcon && /^(https?:|\/|\.\/|\.\.\/|data:image\/)/i.test(String(rawIcon).trim())) {
+      iconFile = safeImageUrl(rawIcon, "");
+      icon = "";
+    }
     if (!title) return "";
     return '<li><a href="' + escapeHtml(href) + '">' + (iconFile ? '<img class="fe-footer-link-icon" src="' + escapeHtml(iconFile) + '" alt="" loading="lazy" decoding="async">' : (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "")) + '<span>' + escapeHtml(title) + "</span></a></li>";
   }
@@ -573,8 +578,8 @@
     if (!title && !links.length) return "";
     return (
       '<div class="fe-footer-block">' +
-        (title ? '<h4 class="fe-footer-title">' + escapeHtml(title) + "</h4>" : "") +
-        '<ul class="fe-footer-links">' + links.map(function (item) { return renderFooterLink(item, iconClass); }).join("") + "</ul>" +
+        (title ? '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" : "") +
+        '<ul class="menu-f fe-footer-links">' + links.map(function (item) { return renderFooterLink(item, iconClass); }).join("") + "</ul>" +
       "</div>"
     );
   }
@@ -758,7 +763,7 @@
       '<div class="fe-footer-shell footer-style-' + escapeHtml(firstValue(footer.style, 3)) + '" style="' + styleVars + '">' +
         '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
           renderFooterColumnOne(footer) +
-          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-12 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
+          '<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "Giới thiệu", "fa-solid fa-arrow-up-right-from-square") + "</div>" +
           '<div class="' + escapeHtml(firstValue(bootstrap.col_3_class, "col-12 col-xl-5")) + '">' + renderFooterColumnLinks(footer.col_3 || {}, "Chính sách", "fa-solid fa-shield-halved") + rightBlocks + "</div>" +
         "</div></div></div>" +
         renderFooterAccess(footer.access_time || footer.accessTime) +
