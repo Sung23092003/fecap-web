@@ -982,7 +982,7 @@
       '">' +
         '<div class="container px-3 px-sm-5">' +
           '<div class="fe-header-news-track" aria-label="Tin tức">' +
-            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tuc</span>' +
+            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tức</span>' +
             '<div class="fe-header-news-run"><div class="fe-header-news-content">' +
               '<span class="fe-header-news-group">' + content + "</span>" +
             "</div></div>" +
