@@ -177,7 +177,8 @@ body {
 
 .fe-header .header-bottom {
     border-top: 1px solid #0282a5;
-    background: var(--navColor);
+    background: var(--fe-menu-bg, var(--navColor));
+    color: var(--fe-menu-text, var(--textColor));
     max-width: 100%;
 }
 
@@ -236,8 +237,8 @@ body {
 
 .fe-header .header-bottom .menu a {
     display: block;
-    color: var(--textColor);
-    font-weight: 500;
+    color: var(--fe-menu-text, var(--textColor));
+    font-weight: var(--fe-menu-font-weight, 500);
     text-decoration: none;
 }
 
@@ -255,7 +256,7 @@ body {
 .fe-header .header-bottom .menu-item:focus,
 .fe-header .header-bottom .menu-item:active,
 .fe-header .header-bottom .menu-item.active {
-    background: #c9d8dc;
+    background: var(--fe-menu-hover-bg, #c9d8dc);
     color: #fff;
 }
 
@@ -268,13 +269,13 @@ body {
 
 .fe-header .menu-item .sub-menu>li:not(.sub-menu-item):hover,
 .fe-header .menu-item .sub-menu .menu-list li:hover {
-    background-color: #e9ecef;
+    background-color: var(--fe-menu-hover-bg, #e9ecef);
 }
 
 .fe-header .menu-item .sub-menu>li:not(.sub-menu-item):hover a,
 .fe-header .menu-item .sub-menu .menu-list li:hover,
 .fe-header .menu-item .sub-menu .menu-list li:hover a {
-    color: var(--mainColor);
+    color: #fff;
 }
 
 .fe-header .header-bottom .sub-menu {
@@ -573,9 +574,9 @@ a {
 
 .fe-header .mobile-category-menu .mobile-category-link {
     flex: 1;
-    color: var(--textColor);
+    color: var(--fe-menu-text, var(--textColor));
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--fe-menu-font-weight, 600);
     line-height: 1.35;
     text-transform: uppercase;
     padding: 12px 0;
@@ -617,7 +618,7 @@ a {
 }
 
 .fe-header .mobile-category-menu .menu-list li {
-    color: var(--textColor) !important;
+    color: var(--fe-menu-text, var(--textColor)) !important;
     padding: 7px 0 !important;
     font-size: 14px;
     line-height: 1.35;
@@ -630,7 +631,8 @@ a {
 
 .fe-header .offcanvas .mobile-category-menu .menu-list li:hover,
 .fe-header .offcanvas .mobile-category-menu .menu-list li:hover a {
-    color: var(--mainColor) !important;
+    color: #fff !important;
+    background: var(--fe-menu-hover-bg, var(--mainColor));
 }
 
 .fe-header .mobile-category-menu .sub-menu > li:not(.sub-menu-item) {
@@ -638,7 +640,7 @@ a {
 }
 
 .fe-header .mobile-category-menu .sub-menu > li:not(.sub-menu-item) a {
-    color: var(--textColor);
+    color: var(--fe-menu-text, var(--textColor));
 }
 
 .fe-header .offcanvas .foo_mid {
@@ -1056,7 +1058,7 @@ a {
 }
 
 .fe-header .header-bottom-surface {
-    background: #fff;
+    background: var(--fe-menu-bg, #fff);
 }
 
 .mobile-language {
@@ -1356,7 +1358,7 @@ a {
     min-height: 38px;
     border: 1px solid transparent;
     border-radius: 999px;
-    background: rgba(2, 130, 165, 0.06);
+    background: transparent;
 }
 
 .fe-header .header-bottom .menu-link {
@@ -1367,7 +1369,7 @@ a {
 .fe-header .header-bottom .menu-item:focus,
 .fe-header .header-bottom .menu-item:active,
 .fe-header .header-bottom .menu-item.active {
-    background: var(--mainColor);
+    background: var(--fe-menu-hover-bg, var(--mainColor));
     border-color: rgba(2, 130, 165, 0.2);
     color: #fff;
     box-shadow: 0 8px 22px rgba(2, 130, 165, 0.18);
@@ -1424,7 +1426,7 @@ a {
 }
 
 .fe-header .header-bottom .sub-menu .menu-list li:first-child {
-    color: var(--mainColor) !important;
+    color: var(--fe-menu-text, var(--mainColor)) !important;
     background: rgba(2, 130, 165, 0.08);
     border-bottom: 1px solid rgba(2, 130, 165, 0.1);
 }
@@ -1453,25 +1455,25 @@ a {
     display: flex;
     align-items: center;
     min-height: 39px;
-    color: var(--textColor) !important;
+    color: var(--fe-menu-text, var(--textColor)) !important;
     background: #fff !important;
     border-bottom: 1px solid rgba(2, 130, 165, 0.1);
-    font-weight: 600;
+    font-weight: var(--fe-menu-font-weight, 600);
 }
 
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li.active,
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li.single-menu-item-active {
-    color: var(--mainColor) !important;
-    background: rgba(2, 130, 165, 0.08) !important;
+    color: #fff !important;
+    background: var(--fe-menu-hover-bg, rgba(2, 130, 165, 0.08)) !important;
 }
 
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li.active a,
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li.single-menu-item-active a {
-    color: var(--mainColor) !important;
+    color: #fff !important;
 }
 
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li:first-child:not(.active):not(.single-menu-item-active) {
-    color: var(--textColor) !important;
+    color: var(--fe-menu-text, var(--textColor)) !important;
 }
 
 .fe-header .header-bottom .sub-menu.sub-menu-list>.sub-menu-item-short-stack .menu-list li:last-child {

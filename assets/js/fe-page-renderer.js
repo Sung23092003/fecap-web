@@ -442,6 +442,60 @@
     }).join("") + "</ul>";
   }
 
+  function getMenuAppearance() {
+    var defaults = {
+      bgColor: "",
+      hoverBgColor: "",
+      textColor: "",
+      bold: false
+    };
+    var data = null;
+
+    try {
+      if (window.FE_MENU_APPEARANCE && typeof window.FE_MENU_APPEARANCE === "object") {
+        data = window.FE_MENU_APPEARANCE;
+      } else {
+        data = JSON.parse(localStorage.getItem("menu_appearance") || "null");
+      }
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || typeof data !== "object") return defaults;
+
+    return {
+      bgColor: firstValue(data.menu_bg_color, data.bg_color, data.bgColor),
+      hoverBgColor: firstValue(data.menu_hover_bg_color, data.hover_bg_color, data.hoverBgColor),
+      textColor: firstValue(data.menu_text_color, data.text_color, data.textColor),
+      bold: data.menu_bold === true || data.menu_bold === "true" || data.bold === true || data.bold === "true"
+    };
+  }
+
+  function setMenuAppearanceFromApi(raw) {
+    var payload = raw && raw.data ? raw.data : raw;
+    var themeSetting =
+      (payload && payload.themeSetting) ||
+      (payload && payload.theme_setting) ||
+      (payload && payload.data && payload.data.themeSetting) ||
+      (payload && payload.data && payload.data.theme_setting);
+
+    if (themeSetting && typeof themeSetting === "object") {
+      window.FE_MENU_APPEARANCE = themeSetting;
+    }
+  }
+
+  function menuAppearanceStyle() {
+    var appearance = getMenuAppearance();
+    var parts = [];
+
+    if (appearance.bgColor) parts.push("--fe-menu-bg:" + escapeHtml(appearance.bgColor));
+    if (appearance.hoverBgColor) parts.push("--fe-menu-hover-bg:" + escapeHtml(appearance.hoverBgColor));
+    if (appearance.textColor) parts.push("--fe-menu-text:" + escapeHtml(appearance.textColor));
+    parts.push("--fe-menu-font-weight:" + (appearance.bold ? "700" : "500"));
+
+    return parts.join(";") + ";";
+  }
+
   function isBannerVisible(item) {
     var value = firstValue(item.banner_status, item.status, 1);
     return value === 1 || value === "1" || value === true || value === "show";
@@ -723,7 +777,7 @@
             '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
           (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
-          '<div class="header-actions-list col d-flex align-items-center justify-content-end px-0">' +
+          '<div class="header-actions-list col d-flex align-items-center justify-content-end px-1">' +
             items.map(renderMainItem).join("") +
           "</div>" +
         "</div></div>" +
@@ -733,7 +787,7 @@
 
   function renderMenu(fallbackMenuHtml) {
     return (
-      '<div id="header-sticky">' +
+      '<div id="header-sticky" style="' + menuAppearanceStyle() + '">' +
         '<div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
           '<div class="header-bottom-inner">' + fallbackMenuHtml + "</div>" +
         "</div>" +
@@ -802,6 +856,7 @@
 
     json = await response.json();
     if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Category API error");
+    setMenuAppearanceFromApi(json);
 
     pageCategories = normalizeCategoryItems(unwrapCategoryPayload(json));
     allCategories = allCategories.concat(flattenCategories(pageCategories));
@@ -903,6 +958,7 @@
     if (sections.menu) html += renderMenu(menuHtml);
     html += renderOffcanvas(header);
     root.innerHTML = html;
+    root.style.cssText += ";" + menuAppearanceStyle();
     root.dataset.headerStyle = String(header.style);
     root.dataset.renderState = "ready";
     applyMeta(header);
