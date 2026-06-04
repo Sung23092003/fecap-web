@@ -884,7 +884,7 @@
     var bg = hexToRgba(colors.bg, colors.bgOpacity);
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
-    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
+    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
 
     if (visibleColumns.indexOf(2) !== -1) {
       rightColumns.push('<div class="' + escapeHtml(firstValue(bootstrap.col_2_class, "col-5 col-md-4 col-xl-3")) + '">' + renderFooterColumnLinks(footer.col_2 || {}, "", "fa-solid fa-arrow-up-right-from-square") + "</div>");
@@ -1139,9 +1139,10 @@
   function bindHeaderScrollState(root) {
     var isStyle4 = root.dataset.headerStyle === "4";
     var enterThreshold = isStyle4 ? 220 : 140;
-    var exitThreshold = 40;
+    var exitThreshold = 4;
     var ticking = false;
     var isScrolled = root.classList.contains("fe-header-scrolled");
+    var lastScrollY = window.scrollY || window.pageYOffset || 0;
 
     if (root._feHeaderScrollCleanup) {
       root._feHeaderScrollCleanup();
@@ -1149,15 +1150,17 @@
 
     function update() {
       var scrollY = window.scrollY || window.pageYOffset || 0;
+      var isScrollingUp = scrollY < lastScrollY;
 
       if (!isScrolled && scrollY > enterThreshold) {
         isScrolled = true;
         root.classList.add("fe-header-scrolled");
-      } else if (isScrolled && scrollY < exitThreshold) {
+      } else if (isScrolled && isScrollingUp && scrollY <= exitThreshold) {
         isScrolled = false;
         root.classList.remove("fe-header-scrolled");
       }
 
+      lastScrollY = scrollY;
       ticking = false;
     }
 

@@ -1090,7 +1090,7 @@ a {
     position: relative;
     overflow: hidden;
     color: var(--fe-footer-text, #fff);
-    background: var(--fe-footer-bg, #0f2742);
+    background: transparent;
 }
 
 .fe-footer-shell::before {
@@ -1098,14 +1098,28 @@ a {
     position: absolute;
     inset: 0;
     background: var(--fe-footer-image, none) center/cover no-repeat;
-    opacity: var(--fe-footer-bg-opacity, 0);
+    opacity: 1;
+    pointer-events: none;
+}
+
+.fe-footer-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--fe-footer-bg, rgba(15, 39, 66, 1));
     pointer-events: none;
 }
 
 .fe-footer-inner {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     padding: 42px 0 28px;
+}
+
+.fe-footer-access,
+.fe-footer-copyright {
+    position: relative;
+    z-index: 2;
 }
 
 .fe-footer a {
