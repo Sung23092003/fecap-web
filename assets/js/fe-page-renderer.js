@@ -676,7 +676,7 @@
 
   function renderFooterImageList(items) {
     return normalizeList(items).map(function (item) {
-      var image = safeUrl(firstValue(item.file, item.image, item.url, item.src, item.content), "");
+      var image = safeImageUrl(firstValue(item.file, item.image, item.url, item.src, item.content), "");
       var href = safeUrl(firstValue(item.link, item.href), "#");
       var title = firstValue(item.name, item.title, "payment");
       if (!image) return "";
@@ -688,23 +688,34 @@
     var payment = col4.payment_method || {};
     var map = col4.map || {};
     var fanpage = col4.fanpage || {};
-    var html = "";
+    var blocks = [];
+    var linksBlock = renderFooterColumnLinks(col4, "", "fa-solid fa-arrow-up-right-from-square");
+    var mapAddressTitle = firstValue(map.address_title, map.addressTitle, map.company_name, map.companyName);
+    var mapAddressText = firstValue(map.address, map.map_address, map.mapAddress);
 
-    html += renderFooterColumnLinks(col4, "", "fa-solid fa-arrow-up-right-from-square");
+    if (linksBlock) {
+      blocks.push('<div class="col-12">' + linksBlock + "</div>");
+    }
     if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
-      html += '<div class="fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>";
+      blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
     }
     if (col4.bct_notice && col4.bct_notice.content) {
-      html += '<div class="fe-footer-bct-content">' + col4.bct_notice.content + "</div>";
+      blocks.push('<div class="col-7 col-md-12 fe-footer-bct-content"><div class="max-sm:pl-24">' + col4.bct_notice.content + "</div></div>");
     }
     if (isEnabled(map.show, false) && map.iframe) {
-      html += '<div class="map-wrapper fe-footer-map-block"><h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + '</span></h4>' + renderFooterEmbed(map.iframe) + "</div>";
+      blocks.push(
+        '<div class="col-12 fe-footer-map-block"><div class="map-wrapper">' +
+          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + "</span></h4>" +
+          renderFooterEmbed(map.iframe) +
+          ((mapAddressTitle || mapAddressText) ? '<div class="map-address">' + (mapAddressTitle ? '<h5>' + escapeHtml(mapAddressTitle) + "</h5>" : "") + (mapAddressText ? '<p>' + escapeHtml(mapAddressText) + "</p>" : "") + "</div>" : "") +
+        "</div></div>"
+      );
     }
     if (isEnabled(fanpage.show, false) && fanpage.iframe) {
-      html += '<div class="fe-footer-fanpage-block">' + renderFooterEmbed(fanpage.iframe) + "</div>";
+      blocks.push('<div class="col-12 fe-footer-fanpage-block">' + renderFooterEmbed(fanpage.iframe) + "</div>");
     }
 
-    return html;
+    return blocks.length ? '<div class="row gap-y-24 fe-footer-col-four-inner">' + blocks.join("") + "</div>" : "";
   }
 
   function renderFooterEmbed(raw) {
