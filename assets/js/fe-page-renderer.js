@@ -132,6 +132,13 @@
     return fallback || "#";
   }
 
+  function safeImageUrl(value, fallback) {
+    var url = String(value || "").trim();
+    if (!url) return fallback || "";
+    if (/^data:image\//i.test(url)) return url;
+    return safeUrl(url, fallback || "");
+  }
+
   function categoryUrl(value) {
     var url = String(value || "").trim();
     if (!url) return "#";
@@ -594,6 +601,55 @@
     return rows.length ? '<ul class="list-contact fe-footer-contact fe-footer-contact-v2">' + rows.join("") + "</ul>" : "";
   }
 
+  function renderFooterSocialItem(item) {
+    var image = safeImageUrl(firstValue(item.image, item.file, item.icon_file, item.iconFile, item.src), "");
+    var icon = normalizeIconClass(firstValue(item.icon));
+    var text = firstValue(item.text, item.name, item.title, item.label);
+    var href = safeUrl(firstValue(item.link, item.url, item.href), "#");
+    var media = "";
+
+    if (image) {
+      media = '<img class="w-full" src="' + escapeHtml(image) + '" alt="' + escapeHtml(text || "social") + '" loading="lazy" decoding="async">';
+    } else if (icon) {
+      media = '<i class="' + escapeHtml(icon) + '"></i>';
+    } else if (text) {
+      media = '<span>' + escapeHtml(text.slice(0, 1).toUpperCase()) + "</span>";
+    }
+
+    if (!media) return "";
+    return '<li><a class="icon-social" href="' + escapeHtml(href) + '" aria-label="' + escapeHtml(text || "social") + '">' + media + "</a></li>";
+  }
+
+  function renderFooterSocial(footer) {
+    var col = footer.col_1 || {};
+    var items = normalizeList(col.social_list || col.socialList || col.socials);
+    var title = firstValue(col.social_title, col.socialTitle, "Mạng xã hội");
+
+    if (!items.length) return "";
+    return (
+      '<div class="fe-footer-social-block">' +
+        '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
+        '<ul class="list-social fe-footer-social-list">' + items.map(renderFooterSocialItem).join("") + "</ul>" +
+      "</div>"
+    );
+  }
+
+  function renderFooterBct(footer) {
+    var col = footer.col_1 || {};
+    var bct = col.bct_notice || col.bctNotice || {};
+    var image = safeImageUrl(firstValue(bct.image, bct.file, bct.icon_file, bct.iconFile), "https://we1.io.vn/public/assets/images/bct.png");
+    var title = firstValue(bct.title, "Bộ công thương");
+    var href = safeUrl(firstValue(bct.link, bct.url), "#");
+
+    if (!isEnabled(firstValue(bct.show, bct.visible, bct.enabled), false)) return "";
+    return (
+      '<div class="fe-footer-bct-block">' +
+        '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
+        '<a class="images-bct" href="' + escapeHtml(href) + '"><img class="w-full" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="lazy" decoding="async"></a>' +
+      "</div>"
+    );
+  }
+
   function renderFooterColumnOne(footer) {
     var col = footer.col_1 || {};
     var bootstrap = footer.bootstrap_size || col.bootstrap_size || {};
@@ -607,6 +663,8 @@
         (logo ? '<div class="logo-f fe-footer-logo-wrap"><img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async"></div>' : "") +
         (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
         renderFooterContact(footer) +
+        renderFooterSocial(footer) +
+        renderFooterBct(footer) +
       "</div>"
     );
   }
@@ -662,7 +720,9 @@
       shortBorder: firstValue(colColors.short_border_color, colColors.shortBorderColor, rootColors.short_border_color, rootColors.shortBorderColor, theme.footer_line_short_color, theme.short_border_color, "#9ee7e8"),
       bgOpacity: firstValue(colColors.bg_opacity, colColors.bgOpacity, rootColors.bg_opacity, rootColors.bgOpacity, theme.footer_bg_opacity, theme.bg_opacity, 100),
       copyrightBg: firstValue(copyright.bg_color, copyright.bgColor, theme.copyright_bg_color, ""),
-      copyrightText: firstValue(copyright.text_color, copyright.textColor, theme.copyright_text_color, "")
+      copyrightText: firstValue(copyright.text_color, copyright.textColor, theme.copyright_text_color, ""),
+      socialBg: firstValue(colColors.social_icon_bg_color, colColors.socialIconBgColor, rootColors.social_icon_bg_color, rootColors.socialIconBgColor, "#ffffff"),
+      socialIcon: firstValue(colColors.social_icon_color, colColors.socialIconColor, rootColors.social_icon_color, rootColors.socialIconColor, "#0d6efd")
     };
   }
 
@@ -674,7 +734,7 @@
     var bg = hexToRgba(colors.bg, colors.bgOpacity);
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
-    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
+    var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-bg-opacity:" + (image ? "0.18" : "0") + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
     var payment = col4.payment_method || {};
     var map = col4.map || {};
     var fanpage = col4.fanpage || {};
