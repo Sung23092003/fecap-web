@@ -636,6 +636,130 @@
       .join("");
   }
 
+  function parseSectionData(value) {
+    if (!value) return {};
+    if (typeof value === "object") return value;
+    try {
+      var parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function sectionOrder(item) {
+    return numberValue(firstValue(item.section_order_no, item.order_no, item.position, item.order), 0);
+  }
+
+  function isSectionVisible(item) {
+    var value = firstValue(item.section_status, item.status, 1);
+    return value === 1 || value === "1" || value === true || value === "show";
+  }
+
+  function sectionType(item) {
+    return String(firstValue(item.section_type, item.type)).trim();
+  }
+
+  function sectionTitle(section, data) {
+    return firstValue(data.display_name, data.title, data.heading, section.section_name, section.name);
+  }
+
+  function clampColumns(value) {
+    var columns = numberValue(value, 3);
+    if (columns <= 0) return 3;
+    return Math.max(1, Math.min(6, columns));
+  }
+
+  function limitSectionItems(items, data) {
+    var list = normalizeList(items).filter(function (item) {
+      return firstValue(item.image, item.title, item.description, item.url, item.link);
+    });
+    var columns = clampColumns(data.items_per_row);
+    var rows = numberValue(data.row_count, 0);
+    var maxItems = rows > 0 ? columns * Math.max(1, rows) : list.length;
+    return list.slice(0, maxItems);
+  }
+
+  function bodyItemUrl(value) {
+    var url = String(value || "").trim();
+    if (!url) return "#";
+    if (/^(https?:|mailto:|tel:|\/|\.\/|\.\.\/|#)/i.test(url)) return url;
+    return "/" + url.replace(/^\/+/, "");
+  }
+
+  function renderSectionTitle(title) {
+    if (!title) return "";
+    if (/<[a-z][\s\S]*>/i.test(String(title))) {
+      return '<div class="fe-section-title-rich">' + title + "</div>";
+    }
+    return '<h2>' + escapeHtml(title) + "</h2>";
+  }
+
+  function renderRealImageCard(item, index) {
+    var image = safeImageUrl(firstValue(item.image, item.img, item.thumbnail, item.thumb, item.image_url, item.imageUrl), "");
+    var title = firstValue(item.title, item.name, "Du an thuc te");
+    var desc = firstValue(item.description, item.desc, item.summary);
+    var href = bodyItemUrl(firstValue(item.url, item.link, item.href));
+    var bgColor = firstValue(item.bg_color, item.bgColor, item.background_color, item.backgroundColor, "#ffffff");
+    var titleColor = firstValue(item.title_color, item.titleColor, item.text_color, item.textColor, item.color, "#333333");
+    var descColor = firstValue(item.description_color, item.descriptionColor, item.desc_color, item.descColor, item.text_color, item.textColor, item.color, "#333333");
+    var tag = href === "#" ? "div" : "a";
+    var itemStyle = '--fe-real-item-bg:' + escapeHtml(bgColor) + ';--fe-real-item-title:' + escapeHtml(titleColor) + ';--fe-real-item-desc:' + escapeHtml(descColor) + ';';
+    var open = tag === "a" ? '<a class="fe-real-card" href="' + escapeHtml(href) + '" style="' + itemStyle + '">' : '<div class="fe-real-card" style="' + itemStyle + '">';
+    var close = tag === "a" ? "</a>" : "</div>";
+
+    return (
+      open +
+        '<div class="fe-real-media">' +
+          (image
+            ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async">'
+            : '<div class="fe-real-media-placeholder">No image</div>') +
+        "</div>" +
+        '<div class="fe-real-content">' +
+          '<h3 class="fe-real-title">' + escapeHtml(title) + "</h3>" +
+          (desc ? '<p class="fe-real-desc">' + escapeHtml(desc) + "</p>" : "") +
+        "</div>" +
+      close
+    );
+  }
+
+  function renderRealImagesSection(section) {
+    var data = parseSectionData(section.section_data);
+    var title = sectionTitle(section, data);
+    var desc = firstValue(data.description, data.desc);
+    var columns = clampColumns(data.items_per_row);
+    var items = limitSectionItems(data.items, data);
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var titleColor = firstValue(data.title_color, data.titleColor, "#101828");
+    var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
+
+    if (!items.length && !title && !desc) return "";
+
+    return (
+      '<section class="fe-body-section fe-real-images-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-real-columns:' + columns + ';--fe-real-title-color:' + escapeHtml(titleColor) + ';--fe-real-desc-color:' + escapeHtml(descColor) + '">' +
+        '<div class="container">' +
+          ((title || desc)
+            ? '<div class="fe-section-heading">' +
+                renderSectionTitle(title) +
+                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+              "</div>"
+            : "") +
+          (items.length ? '<div class="fe-real-images-grid">' + items.map(renderRealImageCard).join("") + "</div>" : "") +
+        "</div>" +
+      "</section>"
+    );
+  }
+
+  function renderBodySection(section) {
+    var type = sectionType(section);
+
+    if (type === "real_image" || type === "real_images") {
+      return renderRealImagesSection(section);
+    }
+
+    return "";
+  }
+
   function footerLinkTitle(item) {
     return firstValue(item.name, item.title, item.label, item.content);
   }
@@ -1307,6 +1431,28 @@
     return unwrapConfigPayload(json);
   }
 
+  async function loadBodySections() {
+    var params = new URLSearchParams();
+    var response;
+    var json;
+
+    params.set("page", "1");
+    params.set("limit", "100");
+    params.set("section_status", "1");
+    params.set("sort_order", "asc");
+
+    response = await fetchWithAuth(getBaseUrl() + "/admin/page-section?" + params.toString(), {
+      method: "GET",
+      headers: getAuthHeaders()
+    });
+
+    if (!response.ok) throw new Error("Body section API " + response.status);
+    json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Body section API error");
+
+    return unwrapListPayload(json);
+  }
+
   function renderPageBanners(banners) {
     var root = document.querySelector(".banner_slide");
     var html;
@@ -1335,6 +1481,31 @@
     root.innerHTML = renderFooter(footer);
     root.dataset.renderState = "ready";
     window.dispatchEvent(new CustomEvent("fe:footer-rendered", { detail: { region: "footer", data: footer } }));
+  }
+
+  function renderPageBody(sections) {
+    var root = document.querySelector('[data-page-region="body"]');
+    var html;
+
+    if (!root) return;
+
+    html = normalizeList(sections)
+      .filter(isSectionVisible)
+      .sort(function (a, b) { return sectionOrder(a) - sectionOrder(b); })
+      .map(renderBodySection)
+      .filter(Boolean)
+      .join("");
+
+    if (!html) {
+      root.innerHTML = "";
+      root.dataset.renderState = "fallback";
+      window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", fallback: true } }));
+      return;
+    }
+
+    root.innerHTML = html;
+    root.dataset.renderState = "ready";
+    window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", data: sections } }));
   }
 
   function renderPageHeader(header, apiMenuHtml) {
@@ -1387,6 +1558,15 @@
       if (bannerRoot) bannerRoot.dataset.renderState = "fallback";
       window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
       if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
+    }
+
+    try {
+      renderPageBody(await loadBodySections());
+    } catch (bodyErr) {
+      var bodyRoot = document.querySelector('[data-page-region="body"]');
+      if (bodyRoot) bodyRoot.dataset.renderState = "fallback";
+      window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", fallback: true } }));
+      if (window.console) console.warn("Use empty body fallback:", bodyErr.message || bodyErr);
     }
 
     try {

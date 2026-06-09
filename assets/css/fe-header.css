@@ -2141,3 +2141,180 @@ a {
         column-gap: 6px;
     }
 }
+
+.fe-body-sections[data-render-state="loading"] {
+    min-height: 220px;
+    background:
+        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.68), transparent) -45% 0 / 42% 100% no-repeat,
+        linear-gradient(#edf2f7, #edf2f7) center 46px / min(520px, 72%) 32px no-repeat,
+        linear-gradient(#f1f5f9, #f1f5f9) center 98px / min(760px, 86%) 16px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 8% 150px / 14% 120px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 27% 150px / 14% 120px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 46% 150px / 14% 120px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 65% 150px / 14% 120px no-repeat,
+        linear-gradient(#e5e7eb, #e5e7eb) 84% 150px / 14% 120px no-repeat;
+    animation: fe-body-loading 1.15s ease-in-out infinite;
+}
+
+@keyframes fe-body-loading {
+    to {
+        background-position:
+            145% 0,
+            center 46px,
+            center 98px,
+            8% 150px,
+            27% 150px,
+            46% 150px,
+            65% 150px,
+            84% 150px;
+    }
+}
+
+.fe-body-sections[data-render-state="ready"],
+.fe-body-sections[data-render-state="fallback"] {
+    min-height: 0;
+}
+
+.fe-body-section {
+    position: relative;
+    padding: clamp(38px, 5vw, 72px) 0;
+    background: var(--fe-body-bg, #ffffff);
+    color: #111827;
+    overflow: hidden;
+}
+
+.fe-body-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+.fe-section-heading {
+    max-width: 980px;
+    margin: 0 auto clamp(24px, 3vw, 38px);
+    text-align: center;
+}
+
+.fe-section-heading h2 {
+    margin: 0;
+    color: var(--fe-real-title-color, #101828);
+    font-size: clamp(25px, 3vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.fe-section-title-rich,
+.fe-section-title-rich * {
+    color: var(--fe-real-title-color, #101828);
+    font-size: clamp(25px, 3vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.fe-section-title-rich p,
+.fe-section-title-rich h1,
+.fe-section-title-rich h2,
+.fe-section-title-rich h3 {
+    margin: 0;
+}
+
+.fe-section-heading .fe-section-desc {
+    margin: 14px auto 0;
+    max-width: 860px;
+    color: var(--fe-real-desc-color, #344054);
+    font-size: clamp(15px, 1.5vw, 18px);
+    line-height: 1.72;
+}
+
+.fe-section-heading .fe-section-desc p:last-child {
+    margin-bottom: 0;
+}
+
+.fe-real-images-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--fe-real-columns, 3), minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+}
+
+.fe-real-card {
+    display: flex;
+    flex-direction: column;
+    color: var(--fe-real-item-title, #333333);
+    text-decoration: none;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--fe-real-item-bg, #ffffff);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.fe-real-card:hover {
+    color: var(--fe-real-item-title, #333333);
+    transform: translateY(-4px);
+    box-shadow: 0 24px 54px rgba(15, 23, 42, 0.18);
+}
+
+.fe-real-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.fe-real-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.32s ease;
+}
+
+.fe-real-card:hover .fe-real-media img {
+    transform: scale(1.045);
+}
+
+.fe-real-media-placeholder {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: #64748b;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
+.fe-real-content {
+    padding: 16px 18px 18px;
+    text-align: center;
+}
+
+.fe-real-title {
+    margin: 0;
+    color: var(--fe-real-item-title, #333333);
+    font-size: clamp(16px, 1.45vw, 20px);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.fe-real-desc {
+    margin: 8px 0 0;
+    color: var(--fe-real-item-desc, #333333);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+@media (max-width: 991px) {
+    .fe-real-images-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575px) {
+    .fe-body-section {
+        padding: 34px 0;
+    }
+
+    .fe-real-images-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
