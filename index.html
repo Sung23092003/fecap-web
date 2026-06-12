@@ -588,8 +588,59 @@
         });
       }
 
+      function initPagedGridSliders(selector) {
+        if (!$.fn.slick) return;
+
+        $(selector || '.fe-paged-grid-slider').each(function () {
+          var $slider = $(this);
+          var totalPages;
+
+          if ($slider.hasClass('slick-initialized')) {
+            $slider.slick('unslick');
+          }
+
+          totalPages = $slider.children('.fe-real-images-page').length;
+
+          if (totalPages <= 1) {
+            return;
+          }
+
+          $slider.slick({
+            dots: true,
+            arrows: true,
+            infinite: true,
+            speed: 450,
+            autoplay: false,
+            pauseOnHover: true,
+            pauseOnFocus: true,
+            rows: 1,
+            slidesPerRow: 1,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            adaptiveHeight: false,
+            prevArrow: '<button class="fe-real-slider-arrow fe-real-slider-prev" type="button" aria-label="Trang trước"><i class="fa-solid fa-chevron-left"></i></button>',
+            nextArrow: '<button class="fe-real-slider-arrow fe-real-slider-next" type="button" aria-label="Trang sau"><i class="fa-solid fa-chevron-right"></i></button>',
+            customPaging: function (slider, pageIndex) {
+              return '<button type="button" aria-label="Trang ' + (pageIndex + 1) + '">' + (pageIndex + 1) + '</button>';
+            }
+          });
+        });
+      }
+
+      function schedulePagedGridSliders() {
+        window.clearTimeout(window.fePagedGridSliderTimer);
+        window.fePagedGridSliderTimer = window.setTimeout(function () {
+          initPagedGridSliders('.fe-paged-grid-slider');
+        }, 120);
+      }
+
       initBannerSlider();
+      initPagedGridSliders('.fe-paged-grid-slider');
       window.addEventListener('fe:banner-rendered', initBannerSlider);
+      window.addEventListener('fe:body-rendered', function () {
+        initPagedGridSliders('.fe-paged-grid-slider');
+      });
+      $(window).on('resize', schedulePagedGridSliders);
     });
   </script>
 </body>

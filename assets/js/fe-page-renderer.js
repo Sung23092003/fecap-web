@@ -667,17 +667,26 @@
   function clampColumns(value) {
     var columns = numberValue(value, 3);
     if (columns <= 0) return 3;
-    return Math.max(1, Math.min(6, columns));
+    return Math.max(1, columns);
   }
 
-  function limitSectionItems(items, data) {
+  function normalizeSectionItems(items) {
     var list = normalizeList(items).filter(function (item) {
       return firstValue(item.image, item.title, item.description, item.url, item.link);
     });
-    var columns = clampColumns(data.items_per_row);
-    var rows = numberValue(data.row_count, 0);
-    var maxItems = rows > 0 ? columns * Math.max(1, rows) : list.length;
-    return list.slice(0, maxItems);
+    return list;
+  }
+
+  function chunkList(items, size) {
+    var chunks = [];
+    var chunkSize = Math.max(1, size);
+    var i;
+
+    for (i = 0; i < items.length; i += chunkSize) {
+      chunks.push(items.slice(i, i + chunkSize));
+    }
+
+    return chunks;
   }
 
   function bodyItemUrl(value) {
@@ -728,12 +737,28 @@
     var title = sectionTitle(section, data);
     var desc = firstValue(data.description, data.desc);
     var columns = clampColumns(data.items_per_row);
-    var items = limitSectionItems(data.items, data);
+    var rows = 2;
+    var perPage = columns * rows;
+    var items = normalizeSectionItems(data.items);
+    var pages = chunkList(items, perPage);
     var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
     var titleColor = firstValue(data.title_color, data.titleColor, "#101828");
     var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
+    var itemsHtml;
 
     if (!items.length && !title && !desc) return "";
+
+    if (pages.length > 1) {
+      itemsHtml = '<div class="fe-real-images-slider fe-paged-grid-slider" data-slider-columns="' + columns + '" data-slider-rows="' + rows + '">' +
+        pages.map(function (page) {
+          return '<div class="fe-real-images-page"><div class="fe-real-images-page-grid">' + page.map(renderRealImageCard).join("") + "</div></div>";
+        }).join("") +
+      "</div>";
+    } else if (items.length) {
+      itemsHtml = '<div class="fe-real-images-grid">' + items.map(renderRealImageCard).join("") + "</div>";
+    } else {
+      itemsHtml = "";
+    }
 
     return (
       '<section class="fe-body-section fe-real-images-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-real-columns:' + columns + ';--fe-real-title-color:' + escapeHtml(titleColor) + ';--fe-real-desc-color:' + escapeHtml(descColor) + '">' +
@@ -744,7 +769,7 @@
                 (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
               "</div>"
             : "") +
-          (items.length ? '<div class="fe-real-images-grid">' + items.map(renderRealImageCard).join("") + "</div>" : "") +
+          itemsHtml +
         "</div>" +
       "</section>"
     );
