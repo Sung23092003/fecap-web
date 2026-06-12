@@ -660,6 +660,33 @@
     return String(firstValue(item.section_type, item.type)).trim();
   }
 
+  function slugValue(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\u0111/g, "d")
+      .replace(/\u0110/g, "D")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function currentSectionTarget() {
+    var params = new URLSearchParams(window.location.search || "");
+    return slugValue(params.get("section") || params.get("section_url") || params.get("slug") || "");
+  }
+
+  function sectionUrl(section, data) {
+    return slugValue(firstValue(data.url, data.section_url, section.section_url, section.url, section.section_alias, section.alias, section.section_name, section.name));
+  }
+
+  function sectionMoreHref(section, data) {
+    var url = sectionUrl(section, data);
+    if (!url) return "";
+    return window.location.pathname + "?section=" + encodeURIComponent(url);
+  }
+
   function sectionTitle(section, data) {
     return firstValue(data.display_name, data.title, data.heading, section.section_name, section.name);
   }
@@ -744,6 +771,8 @@
     var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
     var titleColor = firstValue(data.title_color, data.titleColor, "#101828");
     var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
+    var moreHref = sectionMoreHref(section, data);
+    var isDetail = currentSectionTarget() === sectionUrl(section, data);
     var itemsHtml;
 
     if (!items.length && !title && !desc) return "";
@@ -770,6 +799,7 @@
               "</div>"
             : "") +
           itemsHtml +
+          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thêm</a></div>' : "") +
         "</div>" +
       "</section>"
     );
@@ -1483,6 +1513,12 @@
     var html;
 
     if (!root) return;
+    if (currentSectionTarget()) {
+      root.innerHTML = "";
+      root.style.display = "none";
+      root.dataset.renderState = "ready";
+      return;
+    }
 
     html = renderBanners(banners);
     if (!html) {
@@ -1511,11 +1547,16 @@
   function renderPageBody(sections) {
     var root = document.querySelector('[data-page-region="body"]');
     var html;
+    var target = currentSectionTarget();
 
     if (!root) return;
 
     html = normalizeList(sections)
       .filter(isSectionVisible)
+      .filter(function (section) {
+        if (!target) return true;
+        return sectionUrl(section, parseSectionData(section.section_data)) === target;
+      })
       .sort(function (a, b) { return sectionOrder(a) - sectionOrder(b); })
       .map(renderBodySection)
       .filter(Boolean)

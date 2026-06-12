@@ -2229,6 +2229,34 @@ a {
     margin-bottom: 0;
 }
 
+.fe-section-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(18px, 2.5vw, 30px);
+}
+
+.fe-section-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 999px;
+    color: #ffffff;
+    background: var(--mainColor, #0282a5);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.fe-section-more:hover,
+.fe-section-more:focus {
+    color: #ffffff;
+    background: #026b88;
+    transform: translateY(-1px);
+}
+
 .fe-real-images-grid,
 .fe-real-images-page-grid {
     display: grid;
