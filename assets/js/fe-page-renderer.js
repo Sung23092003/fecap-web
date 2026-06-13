@@ -1553,8 +1553,7 @@
     params.set("sort_order", "asc");
 
     endpoints = [
-      getBaseUrl() + "/admin/page-section?" + params.toString(),
-      getBaseUrl().replace(/\/$/, "") + "/api/admin/page-section?" + params.toString()
+      getBaseUrl().replace(/\/$/, "") + "/admin/page-section?" + params.toString()
     ];
 
     for (i = 0; i < endpoints.length; i += 1) {
