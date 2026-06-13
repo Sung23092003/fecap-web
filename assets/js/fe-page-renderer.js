@@ -431,8 +431,14 @@
   function unwrapListPayload(raw) {
     if (!raw) return [];
     if (Array.isArray(raw)) return raw;
+    if (raw.sections && Array.isArray(raw.sections)) return raw.sections;
+    if (raw.items && Array.isArray(raw.items)) return raw.items;
+    if (raw.result && Array.isArray(raw.result)) return raw.result;
     if (raw.data && Array.isArray(raw.data.data)) return raw.data.data;
     if (raw.data && raw.data.data && Array.isArray(raw.data.data.data)) return raw.data.data.data;
+    if (raw.data && raw.data.sections && Array.isArray(raw.data.sections)) return raw.data.sections;
+    if (raw.data && raw.data.items && Array.isArray(raw.data.items)) return raw.data.items;
+    if (raw.data && raw.data.result && Array.isArray(raw.data.result)) return raw.data.result;
     if (raw.data && Array.isArray(raw.data)) return raw.data;
     return [];
   }
@@ -647,6 +653,10 @@
     }
   }
 
+  function sectionData(section) {
+    return parseSectionData(firstValue(section.section_data, section.sectionData, section.data, section.config, section.content));
+  }
+
   function sectionOrder(item) {
     return numberValue(firstValue(item.section_order_no, item.order_no, item.position, item.order), 0);
   }
@@ -657,7 +667,7 @@
   }
 
   function sectionType(item) {
-    return String(firstValue(item.section_type, item.type)).trim();
+    return String(firstValue(item.section_type, item.sectionType, item.type)).trim();
   }
 
   function slugValue(value) {
@@ -760,7 +770,7 @@
   }
 
   function renderRealImagesSection(section) {
-    var data = parseSectionData(section.section_data);
+    var data = sectionData(section);
     var title = sectionTitle(section, data);
     var desc = firstValue(data.description, data.desc);
     var columns = clampColumns(data.items_per_row);
@@ -805,11 +815,53 @@
     );
   }
 
+  function renderArticleSection(section) {
+    var data = sectionData(section);
+    var title = sectionTitle(section, data);
+    var desc = firstValue(data.description, data.desc, data.summary);
+    var content = firstValue(data.content, data.body, data.html);
+    var columnClass = normalizeBootstrapColClass(firstValue(data.bootstrap_class, data.bootstrapClass, data.column_class, data.columnClass), "col-12");
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var titleColor = firstValue(data.title_color, data.titleColor, "#101828");
+    var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
+    var button = data.button || {};
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText);
+    var buttonUrl = bodyItemUrl(firstValue(button.url, button.link, button.href, data.button_url, data.buttonUrl));
+    var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#4154f1");
+    var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
+    var hasButton = buttonText && buttonUrl !== "#";
+
+    if (!title && !desc && !content && !hasButton) return "";
+
+    return (
+      '<section class="fe-body-section fe-article-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-article-title-color:' + escapeHtml(titleColor) + ';--fe-article-desc-color:' + escapeHtml(descColor) + ';--fe-article-button-bg:' + escapeHtml(buttonBg) + ';--fe-article-button-color:' + escapeHtml(buttonColor) + '">' +
+        '<div class="container">' +
+          '<div class="row justify-content-center">' +
+            '<div class="' + escapeHtml(columnClass) + '">' +
+              ((title || desc)
+                ? '<div class="fe-section-heading">' +
+                    renderSectionTitle(title) +
+                    (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+                  "</div>"
+                : "") +
+              (content ? '<div class="fe-article-content">' + content + "</div>" : "") +
+              (hasButton ? '<div class="fe-article-actions"><a class="fe-article-button" href="' + escapeHtml(buttonUrl) + '">' + escapeHtml(buttonText) + "</a></div>" : "") +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+      "</section>"
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
     if (type === "real_image" || type === "real_images") {
       return renderRealImagesSection(section);
+    }
+
+    if (type === "article" || type === "articles") {
+      return renderArticleSection(section);
     }
 
     return "";
@@ -1490,22 +1542,40 @@
     var params = new URLSearchParams();
     var response;
     var json;
+    var endpoints;
+    var i;
+    var list;
+    var lastError;
 
     params.set("page", "1");
     params.set("limit", "100");
     params.set("section_status", "1");
     params.set("sort_order", "asc");
 
-    response = await fetchWithAuth(getBaseUrl() + "/admin/page-section?" + params.toString(), {
-      method: "GET",
-      headers: getAuthHeaders()
-    });
+    endpoints = [
+      getBaseUrl() + "/admin/page-section?" + params.toString(),
+      getBaseUrl().replace(/\/$/, "") + "/api/admin/page-section?" + params.toString()
+    ];
 
-    if (!response.ok) throw new Error("Body section API " + response.status);
-    json = await response.json();
-    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Body section API error");
+    for (i = 0; i < endpoints.length; i += 1) {
+      try {
+        response = await fetchWithAuth(endpoints[i], {
+          method: "GET",
+          headers: getAuthHeaders()
+        });
 
-    return unwrapListPayload(json);
+        if (!response.ok) throw new Error("Body section API " + response.status);
+        json = await response.json();
+        if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Body section API error");
+
+        list = unwrapListPayload(json);
+        if (list.length || i === endpoints.length - 1) return list;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+
+    throw lastError || new Error("Body section API error");
   }
 
   function renderPageBanners(banners) {
@@ -1548,15 +1618,18 @@
     var root = document.querySelector('[data-page-region="body"]');
     var html;
     var target = currentSectionTarget();
+    var visibleSections;
 
     if (!root) return;
 
-    html = normalizeList(sections)
+    visibleSections = normalizeList(sections)
       .filter(isSectionVisible)
       .filter(function (section) {
         if (!target) return true;
-        return sectionUrl(section, parseSectionData(section.section_data)) === target;
-      })
+        return sectionUrl(section, sectionData(section)) === target;
+      });
+
+    html = visibleSections
       .sort(function (a, b) { return sectionOrder(a) - sectionOrder(b); })
       .map(renderBodySection)
       .filter(Boolean)
@@ -1566,6 +1639,9 @@
       root.innerHTML = "";
       root.dataset.renderState = "fallback";
       window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", fallback: true } }));
+      if (window.console && visibleSections.length) {
+        console.warn("No supported body sections rendered. Section types:", visibleSections.map(sectionType));
+      }
       return;
     }
 
