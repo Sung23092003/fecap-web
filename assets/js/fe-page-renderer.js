@@ -825,13 +825,21 @@
     var titleColor = firstValue(data.title_color, data.titleColor, "#101828");
     var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
     var button = data.button || {};
-    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText);
-    var buttonUrl = bodyItemUrl(firstValue(button.url, button.link, button.href, data.button_url, data.buttonUrl));
+    var rawButtonUrl = firstValue(button.url, button.link, button.href, data.button_url, data.buttonUrl);
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, rawButtonUrl ? "Xem thêm" : "");
+    var buttonUrl = bodyItemUrl(rawButtonUrl);
     var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#4154f1");
     var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
-    var hasButton = buttonText && buttonUrl !== "#";
+    var hasButton = Boolean(buttonText || rawButtonUrl);
+    var buttonHtml = "";
 
     if (!title && !desc && !content && !hasButton) return "";
+
+    if (hasButton) {
+      buttonHtml = buttonUrl !== "#"
+        ? '<a class="fe-article-button" href="' + escapeHtml(buttonUrl) + '">' + escapeHtml(buttonText) + "</a>"
+        : '<span class="fe-article-button" role="button" aria-disabled="true">' + escapeHtml(buttonText) + "</span>";
+    }
 
     return (
       '<section class="fe-body-section fe-article-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-article-title-color:' + escapeHtml(titleColor) + ';--fe-article-desc-color:' + escapeHtml(descColor) + ';--fe-article-button-bg:' + escapeHtml(buttonBg) + ';--fe-article-button-color:' + escapeHtml(buttonColor) + '">' +
@@ -845,7 +853,7 @@
                   "</div>"
                 : "") +
               (content ? '<div class="fe-article-content">' + content + "</div>" : "") +
-              (hasButton ? '<div class="fe-article-actions"><a class="fe-article-button" href="' + escapeHtml(buttonUrl) + '">' + escapeHtml(buttonText) + "</a></div>" : "") +
+              (hasButton ? '<div class="fe-article-actions">' + buttonHtml + "</div>" : "") +
             "</div>" +
           "</div>" +
         "</div>" +
