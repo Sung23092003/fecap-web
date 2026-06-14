@@ -698,7 +698,7 @@
   }
 
   function sectionTitle(section, data) {
-    return firstValue(data.display_name, data.title, data.heading, section.section_name, section.name);
+    return firstValue(data.display_name, data.title, data.heading);
   }
 
   function clampColumns(value) {
