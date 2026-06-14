@@ -758,7 +758,7 @@
       open +
         '<div class="fe-real-media">' +
           (image
-            ? '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async">'
+            ? '<img class="fe-real-modal-trigger" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async" data-fe-full-image="' + escapeHtml(image) + '" data-fe-image-title="' + escapeHtml(title) + '" data-fe-image-desc="' + escapeHtml(desc) + '">'
             : '<div class="fe-real-media-placeholder">No image</div>') +
         "</div>" +
         '<div class="fe-real-content">' +
