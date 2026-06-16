@@ -861,6 +861,175 @@
     );
   }
 
+  function youtubeEmbedUrl(value) {
+    var raw = String(value || "").trim();
+    var url;
+    var videoId = "";
+
+    if (!raw) return "";
+    if (/youtube\.com\/embed\//i.test(raw)) return safeUrl(raw, "");
+
+    try {
+      url = new URL(raw, window.location.origin);
+      if (/youtu\.be$/i.test(url.hostname)) {
+        videoId = url.pathname.replace(/^\/+/, "").split("/")[0];
+      } else if (/youtube\.com$/i.test(url.hostname) || /youtube-nocookie\.com$/i.test(url.hostname)) {
+        if (url.pathname.indexOf("/watch") === 0) videoId = url.searchParams.get("v") || "";
+        if (!videoId && url.pathname.indexOf("/shorts/") === 0) videoId = url.pathname.split("/")[2] || "";
+        if (!videoId && url.pathname.indexOf("/live/") === 0) videoId = url.pathname.split("/")[2] || "";
+      }
+    } catch (e) {
+      return safeUrl(raw, "");
+    }
+
+    videoId = String(videoId || "").replace(/[^a-zA-Z0-9_-]/g, "");
+    return videoId ? "https://www.youtube.com/embed/" + videoId : safeUrl(raw, "");
+  }
+
+  function renderResponsiveVideo(url, title) {
+    var embedUrl = youtubeEmbedUrl(url);
+    if (!embedUrl) return "";
+    return (
+      '<div class="fe-news-video-frame">' +
+        '<iframe src="' + escapeHtml(embedUrl) + '" title="' + escapeHtml(title || "Video") + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
+      "</div>"
+    );
+  }
+
+  function renderNewsButton(button, className, fallbackText) {
+    var rawUrl;
+    var text;
+    var url;
+    var bg;
+    var color;
+
+    if (!button || button.visible === false || button.visible === "false" || button.visible === "hide" || button.show === false) return "";
+
+    rawUrl = firstValue(button.url, button.link, button.href);
+    text = firstValue(button.text, button.name, button.label, fallbackText);
+    if (!text && !rawUrl) return "";
+
+    url = bodyItemUrl(rawUrl);
+    bg = firstValue(button.bg_color, button.bgColor, "#4154f1");
+    color = firstValue(button.text_color, button.textColor, "#ffffff");
+
+    if (url === "#") {
+      return '<span class="' + className + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiep") + "</span>";
+    }
+
+    return '<a class="' + className + '" href="' + escapeHtml(url) + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiep") + "</a>";
+  }
+
+  function renderImageNewsSection(section) {
+    var data = sectionData(section);
+    var title = sectionTitle(section, data);
+    var content = firstValue(data.content, data.body, data.html, data.description, data.desc);
+    var image = safeImageUrl(firstValue(data.image, data.image_url, data.imageUrl, data.img, data.thumbnail), "");
+    var videoUrl = firstValue(data.video_url, data.videoUrl, data.video, data.youtube_url, data.youtubeUrl);
+    var mediaTitle = firstValue(data.media_title, data.mediaTitle, title, section.section_name, section.name, "Tin anh");
+    var mediaClass = normalizeBootstrapColClass(firstValue(data.bootstrap_class, data.bootstrapClass, data.image_class, data.imageClass), "col-12 col-lg-6");
+    var contentClass = normalizeBootstrapColClass(firstValue(data.content_class, data.contentClass), "col-12 col-lg-6");
+    var position = firstValue(data.image_position, data.imagePosition, data.media_position, data.mediaPosition, "left");
+    var effect = firstValue(data.image_effect, data.imageEffect, "none");
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var leftButton = data.left_button || data.leftButton || {};
+    var rightButton = data.right_button || data.rightButton || {};
+    var mediaHtml = "";
+    var buttonsHtml = [
+      renderNewsButton(leftButton, "fe-image-news-button", firstValue(leftButton.text, "Xem Tiep")),
+      renderNewsButton(rightButton, "fe-image-news-button fe-image-news-button-secondary", firstValue(rightButton.text, "Dang ky"))
+    ].filter(Boolean).join("");
+
+    if (videoUrl) {
+      mediaHtml = renderResponsiveVideo(videoUrl, mediaTitle);
+    } else if (image) {
+      mediaHtml = '<img class="fe-image-news-img' + (effect && effect !== "none" ? " effect-" + escapeHtml(effect) : "") + '" src="' + escapeHtml(image) + '" alt="' + escapeHtml(mediaTitle) + '" loading="lazy" decoding="async">';
+    }
+
+    if (!title && !content && !mediaHtml && !buttonsHtml) return "";
+
+    return (
+      '<section class="fe-body-section fe-image-news-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
+        '<div class="container">' +
+          '<div class="row align-items-center g-4 g-lg-5' + (position === "right" ? " flex-lg-row-reverse" : "") + '">' +
+            '<div class="' + escapeHtml(mediaClass) + '">' +
+              (mediaHtml ? '<div class="fe-image-news-media">' + mediaHtml + "</div>" : "") +
+            "</div>" +
+            '<div class="' + escapeHtml(contentClass) + '">' +
+              '<div class="fe-image-news-content">' +
+                (title ? '<div class="fe-image-news-title">' + renderSectionTitle(title) + "</div>" : "") +
+                (content ? '<div class="fe-image-news-text">' + content + "</div>" : "") +
+                (buttonsHtml ? '<div class="fe-image-news-actions">' + buttonsHtml + "</div>" : "") +
+              "</div>" +
+            "</div>" +
+          "</div>" +
+        "</div>" +
+      "</section>"
+    );
+  }
+
+  function normalizeVideoNewsItems(data) {
+    return normalizeList(firstValue(data.videos, data.items, data.video_list, data.videoList)).filter(function (item) {
+      return firstValue(item.url, item.link, item.video_url, item.videoUrl, item.youtube_url, item.youtubeUrl);
+    });
+  }
+
+  function renderVideoNewsCard(item, index, isMain) {
+    var title = firstValue(item.title, item.name, "Video");
+    var desc = firstValue(item.description, item.desc, item.summary);
+    var url = firstValue(item.url, item.link, item.video_url, item.videoUrl, item.youtube_url, item.youtubeUrl);
+    var video = renderResponsiveVideo(url, title);
+
+    if (!video) return "";
+    return (
+      '<article class="fe-video-news-card' + (isMain ? " fe-video-news-card-main" : "") + '">' +
+        video +
+        ((title || desc)
+          ? '<div class="fe-video-news-content">' +
+              (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
+              (desc ? '<p>' + escapeHtml(desc) + "</p>" : "") +
+            "</div>"
+          : "") +
+      "</article>"
+    );
+  }
+
+  function renderVideoNewsSection(section) {
+    var data = sectionData(section);
+    var title = firstValue(data.title, data.video_title, data.videoTitle, sectionTitle(section, data));
+    var desc = firstValue(data.description, data.video_description, data.videoDescription, data.desc);
+    var itemsPerRow = clampColumns(firstValue(data.items_per_row, data.itemsPerRow, 3));
+    var rows = Math.max(1, numberValue(firstValue(data.row_count, data.rowCount), 1));
+    var layout = firstValue(data.layout_type, data.layoutType, "equal");
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var items = normalizeVideoNewsItems(data).slice(0, rows * itemsPerRow);
+    var itemsHtml = "";
+
+    if (!items.length && !title && !desc) return "";
+
+    if (layout === "main_2" && items.length > 1) {
+      itemsHtml = '<div class="row g-4 align-items-stretch"><div class="col-12 col-lg-8">' + renderVideoNewsCard(items[0], 0, true) + '</div><div class="col-12 col-lg-4"><div class="fe-video-news-stack">' + items.slice(1, 3).map(function (item, index) { return renderVideoNewsCard(item, index + 1, false); }).join("") + "</div></div></div>";
+    } else if (layout === "main_4" && items.length > 1) {
+      itemsHtml = '<div class="row g-4 align-items-stretch"><div class="col-12 col-lg-6">' + renderVideoNewsCard(items[0], 0, true) + '</div><div class="col-12 col-lg-6"><div class="row g-4">' + items.slice(1, 5).map(function (item, index) { return '<div class="col-12 col-sm-6">' + renderVideoNewsCard(item, index + 1, false) + "</div>"; }).join("") + "</div></div></div>";
+    } else {
+      itemsHtml = '<div class="fe-video-news-grid" style="--fe-video-columns:' + itemsPerRow + '">' + items.map(function (item, index) { return renderVideoNewsCard(item, index, false); }).join("") + "</div>";
+    }
+
+    return (
+      '<section class="fe-body-section fe-video-news-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
+        '<div class="container">' +
+          ((title || desc)
+            ? '<div class="fe-section-heading">' +
+                renderSectionTitle(title) +
+                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+              "</div>"
+            : "") +
+          itemsHtml +
+        "</div>" +
+      "</section>"
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -870,6 +1039,14 @@
 
     if (type === "article" || type === "articles") {
       return renderArticleSection(section);
+    }
+
+    if (type === "image_news" || type === "image-news") {
+      return renderImageNewsSection(section);
+    }
+
+    if (type === "video_news" || type === "video-news") {
+      return renderVideoNewsSection(section);
     }
 
     return "";
