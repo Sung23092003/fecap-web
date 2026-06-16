@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   var FALLBACKS = {
@@ -809,7 +809,7 @@
               "</div>"
             : "") +
           itemsHtml +
-          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thêm</a></div>' : "") +
+          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thÃªm</a></div>' : "") +
         "</div>" +
       "</section>"
     );
@@ -826,7 +826,7 @@
     var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
     var button = data.button || {};
     var rawButtonUrl = firstValue(button.url, button.link, button.href, data.button_url, data.buttonUrl);
-    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, rawButtonUrl ? "Xem thêm" : "");
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, rawButtonUrl ? "Xem thÃªm" : "");
     var buttonUrl = bodyItemUrl(rawButtonUrl);
     var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#4154f1");
     var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
@@ -968,6 +968,81 @@
     );
   }
 
+  function renderConsultationMedia(data, title) {
+    var mode = firstValue(data.display_mode, data.displayMode, "image");
+    var imageData = data.image || {};
+    var image = safeImageUrl(firstValue(imageData.url, imageData.data, imageData.src, data.image_url, data.imageUrl, data.image), "");
+    var video = data.video || {};
+    var videoUrl = firstValue(video.url, video.file, data.video_url, data.videoUrl);
+    var mapIframe = firstValue(data.map_iframe, data.mapIframe, data.iframe);
+    var article = firstValue(data.article, data.article_content, data.content, data.html);
+
+    if (mode === "map" && mapIframe) {
+      return '<div class="fe-consult-media fe-consult-map">' + mapIframe + '</div>';
+    }
+
+    if (mode === "video" && videoUrl) {
+      if (/\.(mp4|webm|ogg)(\?|#|$)/i.test(String(videoUrl))) {
+        return '<div class="fe-consult-media fe-consult-video"><video controls src="' + escapeHtml(safeUrl(videoUrl, "")) + '"></video></div>';
+      }
+      return '<div class="fe-consult-media fe-consult-video">' + renderResponsiveVideo(videoUrl, title || "Video") + '</div>';
+    }
+
+    if (mode === "article" && article) {
+      return '<div class="fe-consult-media fe-consult-article">' + article + '</div>';
+    }
+
+    if (image) {
+      return '<div class="fe-consult-media fe-consult-image"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title || "Dat lich tu van") + '" loading="lazy" decoding="async"></div>';
+    }
+
+    return "";
+  }
+
+  function renderConsultationSection(section) {
+    var data = sectionData(section);
+    var title = firstValue(data.display_name, data.title, section.section_name, section.name);
+    var desc = firstValue(data.description, data.desc, data.summary);
+    var bg = firstValue(data.bg_color, data.bgColor, "#fff3b0");
+    var button = data.button || {};
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, "Nhan bao gia ngay");
+    var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#008eb8");
+    var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
+    var icon = normalizeIconClass(firstValue(data.icon));
+    var position = firstValue(data.image && data.image.position, data.image_position, data.imagePosition, "right");
+    var hideImageMobile = isEnabled(firstValue(data.image && data.image.hide_on_mobile, data.hide_image_mobile, data.hideImageMobile), false);
+    var mediaHtml = renderConsultationMedia(data, title);
+    var reverseClass = position === "left" ? " flex-lg-row-reverse" : "";
+    var hideMobileClass = hideImageMobile ? " fe-consult-hide-mobile" : "";
+
+    if (!title && !desc && !buttonText && !mediaHtml) return "";
+
+    return (
+      '<section class="fe-body-section fe-consult-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-consult-button-bg:' + escapeHtml(buttonBg) + ';--fe-consult-button-color:' + escapeHtml(buttonColor) + '">' +
+        '<div class="container">' +
+          '<div class="fe-consult-box">' +
+            '<div class="row g-0 align-items-stretch' + reverseClass + '">' +
+              '<div class="col-12 col-lg-6">' +
+                '<form class="fe-consult-form" data-fe-consult-form="true" onsubmit="return false;">' +
+                  '<div class="fe-consult-heading">' +
+                    (title ? '<div class="fe-consult-title">' + title + '</div>' : "") +
+                    (desc ? '<div class="fe-consult-desc">' + desc + '</div>' : "") +
+                  '</div>' +
+                  '<div class="fe-consult-fields">' +
+                    '<input type="text" name="name" autocomplete="name" placeholder="Ho ten (Bat buoc)" required>' +
+                    '<input type="tel" name="phone" autocomplete="tel" placeholder="Dien thoai (Bat buoc)" required>' +
+                    '<textarea name="content" rows="4" placeholder="Noi dung"></textarea>' +
+                  '</div>' +
+                  '<button type="submit" class="fe-consult-button">' + (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "") + '<span>' + escapeHtml(buttonText) + '</span></button>' +
+                '</form>' +
+              '</div>' +
+              (mediaHtml ? '<div class="col-12 col-lg-6' + hideMobileClass + '">' + mediaHtml + '</div>' : "") +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</section>'
+    );
+  }
   function normalizeVideoNewsItems(data) {
     return normalizeList(firstValue(data.videos, data.items, data.video_list, data.videoList)).filter(function (item) {
       return firstValue(item.url, item.link, item.video_url, item.videoUrl, item.youtube_url, item.youtubeUrl);
@@ -1045,6 +1120,9 @@
       return renderImageNewsSection(section);
     }
 
+    if (type === "consultation" || type === "consultation_booking" || type === "consultation-booking") {
+      return renderConsultationSection(section);
+    }
     if (type === "video_news" || type === "video-news") {
       return renderVideoNewsSection(section);
     }
@@ -1109,7 +1187,7 @@
     }
 
     if (address) {
-      rows.push('<li><i class="fa-solid fa-location-dot"></i><p><strong>Địa chỉ: </strong>' + escapeHtml(address) + "</p></li>");
+      rows.push('<li><i class="fa-solid fa-location-dot"></i><p><strong>Äá»‹a chá»‰: </strong>' + escapeHtml(address) + "</p></li>");
     }
 
 
@@ -1142,7 +1220,7 @@
     if (!items.length) {
       items = normalizeList(fallbackCol.social_list || fallbackCol.socialList || fallbackCol.socials);
     }
-    var title = firstValue(col.social_title, col.socialTitle, "Mạng xã hội");
+    var title = firstValue(col.social_title, col.socialTitle, "Máº¡ng xÃ£ há»™i");
 
     if (!items.length) {
       items = [{ text: "Tin tuc dang cap nhat", link: "" }];
@@ -1160,7 +1238,7 @@
     var fallbackCol = footer.col_1 || {};
     var bct = col.bct_notice || col.bctNotice || fallbackCol.bct_notice || fallbackCol.bctNotice || {};
     var image = safeImageUrl(firstValue(bct.image, bct.file, bct.icon_file, bct.iconFile), "https://we1.io.vn/public/assets/images/bct.png");
-    var title = firstValue(bct.title, "Bộ công thương");
+    var title = firstValue(bct.title, "Bá»™ cÃ´ng thÆ°Æ¡ng");
     var href = safeUrl(firstValue(bct.link, bct.url), "#");
 
     if (!isEnabled(firstValue(bct.show, bct.visible, bct.enabled), false)) return "";
@@ -1211,7 +1289,7 @@
 
     blocks.push('<div class="col-12">' + renderFooterSocial(footer) + "</div>");
     if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
-      blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
+      blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>HÃ¬nh thá»©c thanh toÃ¡n</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
     }
     var bctBlock = renderFooterBct(footer);
     if (bctBlock) {
@@ -1226,7 +1304,7 @@
     if (isEnabled(map.show, false) && map.iframe) {
       blocks.push(
         '<div class="col-12 fe-footer-map-block"><div class="map-wrapper">' +
-          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + "</span></h4>" +
+          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "TÃ¬m ChÃºng TÃ´i TrÃªn Báº£n Äá»“")) + "</span></h4>" +
           renderFooterEmbed(map.iframe) +
           ((mapAddressTitle || mapAddressText) ? '<div class="map-address">' + (mapAddressTitle ? '<h5>' + escapeHtml(mapAddressTitle) + "</h5>" : "") + (mapAddressText ? '<p>' + escapeHtml(mapAddressText) + "</p>" : "") + "</div>" : "") +
         "</div></div>"
@@ -1261,7 +1339,7 @@
     if (!access || (!isEnabled(access.show_time, false) && !isEnabled(access.show_visitor_count, false) && !firstValue(access.text))) return "";
     if (firstValue(access.text)) parts.push(escapeHtml(firstValue(access.text)));
     if (isEnabled(access.show_time, false)) parts.push('<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(now.toLocaleString("vi-VN")) + "</span>");
-    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lượt truy cập</span>");
+    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lÆ°á»£t truy cáº­p</span>");
 
     return '<div class="fe-footer-access" style="background:' + escapeHtml(firstValue(access.bg_color, access.bgColor, "#111827")) + ';color:' + escapeHtml(firstValue(access.text_color, access.textColor, "#ffffff")) + '"><div class="container d-flex flex-wrap justify-content-center gap-3">' + parts.join("") + "</div></div>";
   }
@@ -1310,7 +1388,7 @@
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
     var copyrightOwner = firstValue(footer.copyright && footer.copyright.text, col1.company_name, "");
-    var copyrightHtml = copyrightOwner ? 'Bản quyền thuộc về "' + escapeHtml(copyrightOwner) + '" | Cung cấp bởi <a href="https://Thietkeweb365.vn" target="_blank" rel="noopener">Thietkeweb365.vn</a>' : "";
+    var copyrightHtml = copyrightOwner ? 'Báº£n quyá»n thuá»™c vá» "' + escapeHtml(copyrightOwner) + '" | Cung cáº¥p bá»Ÿi <a href="https://Thietkeweb365.vn" target="_blank" rel="noopener">Thietkeweb365.vn</a>' : "";
     var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
 
     if (visibleColumns.indexOf(2) !== -1) {
@@ -1488,8 +1566,8 @@
         (news && news.hoverTextColor ? '--fe-news-hover-text:' + escapeHtml(news.hoverTextColor) + ';' : '') +
       '">' +
         '<div class="container px-3 px-sm-5">' +
-          '<div class="fe-header-news-track" aria-label="Tin tức">' +
-            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tức</span>' +
+          '<div class="fe-header-news-track" aria-label="Tin tá»©c">' +
+            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tá»©c</span>' +
             '<div class="fe-header-news-run"><div class="fe-header-news-content">' +
               '<span class="fe-header-news-group">' + content + "</span>" +
             "</div></div>" +
@@ -1911,3 +1989,5 @@
     init();
   }
 })();
+
+

@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --mainColor: #0282a5;
     --footerTextHover: #ffab4e;
     --textColor: #212529;
@@ -2452,6 +2452,183 @@ a {
     border: 0;
 }
 
+
+.fe-consult-section {
+    background: var(--fe-body-bg, #fff3b0);
+}
+
+.fe-consult-box {
+    overflow: hidden;
+    border-radius: 2px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.fe-consult-form {
+    height: 100%;
+    min-height: 360px;
+    padding: clamp(22px, 3vw, 34px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+}
+
+.fe-consult-heading {
+    width: 100%;
+    text-align: center;
+    color: #3b3f45;
+}
+
+.fe-consult-title {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    color: #333333;
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.fe-consult-title:before,
+.fe-consult-title:after {
+    content: "";
+    height: 1px;
+    background: #edf1c8;
+}
+
+.fe-consult-title p,
+.fe-consult-desc p {
+    margin: 0;
+}
+
+.fe-consult-desc {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: #4f5965;
+}
+
+.fe-consult-fields {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+}
+
+.fe-consult-fields input,
+.fe-consult-fields textarea {
+    width: 100%;
+    border: 1px solid #d8dde6;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 15px;
+    line-height: 1.4;
+    padding: 11px 13px;
+    outline: none;
+}
+
+.fe-consult-fields input:focus,
+.fe-consult-fields textarea:focus {
+    border-color: var(--fe-consult-button-bg, #008eb8);
+    box-shadow: 0 0 0 3px rgba(0, 142, 184, 0.12);
+}
+
+.fe-consult-fields textarea {
+    grid-column: 1 / -1;
+    min-height: 104px;
+    resize: vertical;
+}
+
+.fe-consult-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--fe-consult-button-bg, #008eb8);
+    color: var(--fe-consult-button-color, #ffffff);
+    min-width: 220px;
+    padding: 13px 24px;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+.fe-consult-button:hover,
+.fe-consult-button:focus {
+    color: var(--fe-consult-button-color, #ffffff);
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+}
+
+.fe-consult-media {
+    height: 100%;
+    min-height: 360px;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.fe-consult-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    display: block;
+    object-fit: cover;
+}
+
+.fe-consult-map iframe,
+.fe-consult-video iframe,
+.fe-consult-video video {
+    width: 100%;
+    height: 100%;
+    min-height: 360px;
+    border: 0;
+    display: block;
+}
+
+.fe-consult-article {
+    padding: clamp(20px, 3vw, 34px);
+    overflow: auto;
+}
+
+@media (max-width: 991px) {
+    .fe-consult-hide-mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 575px) {
+    .fe-consult-form {
+        min-height: 0;
+        padding: 20px 14px;
+    }
+
+    .fe-consult-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .fe-consult-title {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .fe-consult-title:before,
+    .fe-consult-title:after {
+        display: none;
+    }
+
+    .fe-consult-button {
+        width: 100%;
+        min-width: 0;
+    }
+}
 .fe-video-news-section {
     background: var(--fe-body-bg, #ffffff);
 }
@@ -2857,3 +3034,4 @@ body.fe-modal-open {
         grid-column: 2;
     }
 }
+
