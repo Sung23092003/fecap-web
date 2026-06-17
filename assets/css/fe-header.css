@@ -1035,7 +1035,7 @@ a {
     color: #fff;
 }
 
-.banner_slide .slick-dotted.slick-slider {
+.banner_slide.slick-dotted.slick-slider {
     margin-bottom: 0;
 }
 
@@ -2177,7 +2177,7 @@ a {
 
 .fe-body-section {
     position: relative;
-    padding: clamp(38px, 5vw, 72px) 0;
+    padding: clamp(19px, 2.5vw, 36px) 0;
     background: var(--fe-body-bg, #ffffff);
     color: #111827;
     overflow: hidden;
@@ -2888,7 +2888,7 @@ a {
 
 @media (max-width: 575px) {
     .fe-body-section {
-        padding: 34px 0;
+        padding: 17px 0;
     }
 
     .fe-image-news-content {
