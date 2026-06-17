@@ -1220,6 +1220,81 @@
       (products.length ? '<div class="fe-menu-cat-grid">' + products.map(renderMenuCategoryProductCard).join("") + '</div>' : '<div class="fe-menu-cat-empty">Chưa có dữ liệu sản phẩm.</div>') +
       '</div></section>';
   }
+
+  function cssDeclarationValue(value, property, fallback) {
+    var raw = String(value || "").trim();
+    var match;
+
+    if (!raw) return fallback || "";
+    match = raw.match(new RegExp(property + "\\s*:\\s*([^;]+)", "i"));
+    return (match ? match[1] : raw).trim() || fallback || "";
+  }
+
+  function renderServiceCard(item, index, data) {
+    var title = firstValue(item.title, item.name, "Tin dá»‹ch vá»¥");
+    var desc = firstValue(item.description, item.desc, item.summary);
+    var image = safeImageUrl(firstValue(item.image, item.img, item.thumbnail, item.thumb, item.image_url, item.imageUrl), "");
+    var href = bodyItemUrl(firstValue(item.link, item.url, item.href));
+    var textColor = firstValue(item.text_color, item.textColor, item.color, "#012970");
+    var bgColor = firstValue(item.bg_color, item.bgColor, item.background_color, item.backgroundColor, "#ffffff");
+    var tag = href === "#" ? "article" : "a";
+    var imageShape = firstValue(data.image_shape, data.imageShape, "square");
+    var displayType = firstValue(data.display_type, data.displayType, "original");
+    var itemStyle = [
+      "--fe-service-text:" + escapeHtml(textColor),
+      "--fe-service-item-bg:" + escapeHtml(bgColor)
+    ].join(";") + ";";
+    var open = tag === "a"
+      ? '<a class="fe-service-card" href="' + escapeHtml(href) + '" style="' + itemStyle + '">'
+      : '<article class="fe-service-card" style="' + itemStyle + '">';
+    var close = tag === "a" ? "</a>" : "</article>";
+    var mediaClass = "fe-service-media" + (imageShape === "round" ? " is-round" : "") + (imageShape === "original" ? " is-original" : "");
+
+    return (
+      open +
+        (image ? '<div class="' + mediaClass + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></div>' : "") +
+        (displayType === "original" && !title && !desc ? "" :
+          '<div class="fe-service-content">' +
+            (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
+            (desc ? '<div class="fe-service-desc">' + desc + "</div>" : "") +
+          "</div>") +
+      close
+    );
+  }
+
+  function renderServiceSection(section) {
+    var data = sectionData(section);
+    var title = sectionTitle(section, data);
+    var desc = firstValue(data.description, data.desc, data.summary);
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var columns = clampColumns(firstValue(data.items_per_row, data.itemsPerRow, 3));
+    var displayType = firstValue(data.display_type, data.displayType, "original");
+    var layoutType = firstValue(data.layout_type, data.layoutType, "type_1");
+    var centerContent = isEnabled(firstValue(data.center_content, data.centerContent), true);
+    var radius = cssDeclarationValue(firstValue(data.border_radius, data.borderRadius), "border-radius", "8px");
+    var padding = cssDeclarationValue(firstValue(data.item_padding, data.itemPadding), "padding", "0");
+    var items = normalizeSectionItems(firstValue(data.services, data.items));
+    var itemsHtml = items.map(function (item, index) {
+      return renderServiceCard(item, index, data);
+    }).join("");
+
+    if (!items.length && !title && !desc) return "";
+
+    return (
+      '<section class="fe-body-section fe-service-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-service-columns:' + columns + ';--fe-service-radius:' + escapeHtml(radius) + ';--fe-service-padding:' + escapeHtml(padding) + '">' +
+        '<div class="container">' +
+          ((title || desc)
+            ? '<div class="fe-section-heading">' +
+                renderSectionTitle(title) +
+                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+              "</div>"
+            : "") +
+          (itemsHtml ? '<div class="fe-service-grid fe-service-' + escapeHtml(displayType) + ' fe-service-' + escapeHtml(layoutType) + (centerContent ? ' is-centered' : '') + '">' + itemsHtml + "</div>" : "") +
+        "</div>" +
+      "</section>"
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -1233,6 +1308,10 @@
 
     if (type === "menu_category" || type === "menu-category") {
       return renderMenuCategorySection(section);
+    }
+
+    if (type === "service" || type === "services") {
+      return renderServiceSection(section);
     }
 
     if (type === "image_news" || type === "image-news") {
