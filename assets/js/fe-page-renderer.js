@@ -237,6 +237,42 @@
     return allowed.length ? allowed.join(" ") : fallback;
   }
 
+  function complementBootstrapColClass(value, fallback) {
+    var source = normalizeBootstrapColClass(value, "");
+    var parts;
+    var result;
+
+    if (!source) return fallback;
+
+    parts = source.split(/\s+/);
+    result = parts.map(function (part) {
+      var match;
+      var prefix;
+      var number;
+
+      if (part === "col") return "col";
+      if (/^col-(sm|md|lg|xl|xxl)$/.test(part)) return part;
+      match = part.match(/^col(?:-(sm|md|lg|xl|xxl))?-(auto|[1-9]|1[0-2])$/);
+      if (!match) return "";
+
+      if (match[2] === "auto") return match[1] ? "col-" + match[1] : "col";
+
+      number = 12 - Number(match[2]);
+      prefix = match[1] ? "col-" + match[1] + "-" : "col-";
+      return number > 0 ? prefix + number : prefix + "12";
+    }).filter(Boolean);
+
+    return result.length ? result.join(" ") : fallback;
+  }
+
+  function normalizeCssLength(value) {
+    var raw = String(value || "").trim();
+    if (!raw) return "";
+    if (/^\d+(\.\d+)?$/.test(raw)) return raw + "px";
+    if (/^-?\d+(\.\d+)?(px|rem|em|%|vh|vw|vmin|vmax)$/i.test(raw)) return raw;
+    return "";
+  }
+
   function normalizeHeader(raw) {
     var d = unwrapHeaderPayload(raw);
     var headerTop = d.header_top || d.headerTop || {};
@@ -929,9 +965,10 @@
     var videoUrl = firstValue(data.video_url, data.videoUrl, data.video, data.youtube_url, data.youtubeUrl);
     var mediaTitle = firstValue(data.media_title, data.mediaTitle, title, section.section_name, section.name, "Tin ảnh");
     var mediaClass = normalizeBootstrapColClass(firstValue(data.bootstrap_class, data.bootstrapClass, data.image_class, data.imageClass), "col-12 col-lg-6");
-    var contentClass = normalizeBootstrapColClass(firstValue(data.content_class, data.contentClass), "col-12 col-lg-6");
+    var contentClass = complementBootstrapColClass(mediaClass, "col-12 col-lg-6");
     var position = firstValue(data.image_position, data.imagePosition, data.media_position, data.mediaPosition, "left");
     var effect = firstValue(data.image_effect, data.imageEffect, "none");
+    var imageRadius = normalizeCssLength(firstValue(data.image_radius, data.imageRadius, data.border_radius, data.borderRadius));
     var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
     var leftButton = data.left_button || data.leftButton || {};
     var rightButton = data.right_button || data.rightButton || {};
@@ -944,13 +981,13 @@
     if (videoUrl) {
       mediaHtml = renderResponsiveVideo(videoUrl, mediaTitle);
     } else if (image) {
-      mediaHtml = '<img class="fe-image-news-img' + (effect && effect !== "none" ? " effect-" + escapeHtml(effect) : "") + '" src="' + escapeHtml(image) + '" alt="' + escapeHtml(mediaTitle) + '" loading="lazy" decoding="async">';
+      mediaHtml = '<img class="fe-image-news-img img-fluid' + (effect && effect !== "none" ? " effect-" + escapeHtml(effect) : "") + '" src="' + escapeHtml(image) + '" alt="' + escapeHtml(mediaTitle) + '" loading="lazy" decoding="async">';
     }
 
     if (!title && !content && !mediaHtml && !buttonsHtml) return "";
 
     return (
-      '<section class="fe-body-section fe-image-news-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
+      '<section class="fe-body-section fe-image-news-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-image-news-radius:' + escapeHtml(imageRadius || "8px") + '">' +
         '<div class="container">' +
           '<div class="row align-items-center g-4 g-lg-5' + (position === "right" ? " flex-lg-row-reverse" : "") + '">' +
             '<div class="' + escapeHtml(mediaClass) + '">' +
