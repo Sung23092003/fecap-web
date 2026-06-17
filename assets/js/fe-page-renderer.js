@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   var FALLBACKS = {
@@ -26,6 +26,7 @@
       password: "123987"
     };
   var authPromise = null;
+  var bodyCatalogCache = { categories: [], products: [] };
 
   function getStoredAuth() {
     try {
@@ -325,7 +326,7 @@
         logoCol: normalizeBootstrapColClass(firstValue(headerMain.logo_col, headerMain.logoCol, headerMain.logo_column, headerMain.logoColumn), "col-7 col-md-3 col-lg-3 col-xl-2"),
         searchShow: isEnabled(firstValue(headerMain.search_show, headerMain.searchShow), true),
         searchCol: normalizeBootstrapColClass(firstValue(headerMain.search_col, headerMain.searchCol, headerMain.search_column, headerMain.searchColumn), "col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4"),
-        searchPlaceholder: firstValue(headerMain.search_placeholder, headerMain.searchPlaceholder, "Tim kiem San pham & Dich vu ?"),
+        searchPlaceholder: firstValue(headerMain.search_placeholder, headerMain.searchPlaceholder, "Tìm kiếm Sản phẩm & Dịch vụ ?"),
         items: normalizeList(headerMain.item_list || headerMain.itemList)
       },
       news: {
@@ -743,7 +744,7 @@
 
   function renderRealImageCard(item, index) {
     var image = safeImageUrl(firstValue(item.image, item.img, item.thumbnail, item.thumb, item.image_url, item.imageUrl), "");
-    var title = firstValue(item.title, item.name, "Du an thuc te");
+    var title = firstValue(item.title, item.name, "Dự án thực tế");
     var desc = firstValue(item.description, item.desc, item.summary);
     var href = bodyItemUrl(firstValue(item.url, item.link, item.href));
     var bgColor = firstValue(item.bg_color, item.bgColor, item.background_color, item.backgroundColor, "#ffffff");
@@ -809,7 +810,7 @@
               "</div>"
             : "") +
           itemsHtml +
-          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thÃªm</a></div>' : "") +
+          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thêm</a></div>' : "") +
         "</div>" +
       "</section>"
     );
@@ -826,7 +827,7 @@
     var descColor = firstValue(data.description_color, data.descriptionColor, data.desc_color, data.descColor, "#344054");
     var button = data.button || {};
     var rawButtonUrl = firstValue(button.url, button.link, button.href, data.button_url, data.buttonUrl);
-    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, rawButtonUrl ? "Xem thÃªm" : "");
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, rawButtonUrl ? "Xem thêm" : "");
     var buttonUrl = bodyItemUrl(rawButtonUrl);
     var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#4154f1");
     var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
@@ -914,10 +915,10 @@
     color = firstValue(button.text_color, button.textColor, "#ffffff");
 
     if (url === "#") {
-      return '<span class="' + className + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiep") + "</span>";
+      return '<span class="' + className + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiếp") + "</span>";
     }
 
-    return '<a class="' + className + '" href="' + escapeHtml(url) + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiep") + "</a>";
+    return '<a class="' + className + '" href="' + escapeHtml(url) + '" style="--fe-news-button-bg:' + escapeHtml(bg) + ';--fe-news-button-color:' + escapeHtml(color) + '">' + escapeHtml(text || fallbackText || "Xem tiếp") + "</a>";
   }
 
   function renderImageNewsSection(section) {
@@ -926,7 +927,7 @@
     var content = firstValue(data.content, data.body, data.html, data.description, data.desc);
     var image = safeImageUrl(firstValue(data.image, data.image_url, data.imageUrl, data.img, data.thumbnail), "");
     var videoUrl = firstValue(data.video_url, data.videoUrl, data.video, data.youtube_url, data.youtubeUrl);
-    var mediaTitle = firstValue(data.media_title, data.mediaTitle, title, section.section_name, section.name, "Tin anh");
+    var mediaTitle = firstValue(data.media_title, data.mediaTitle, title, section.section_name, section.name, "Tin ảnh");
     var mediaClass = normalizeBootstrapColClass(firstValue(data.bootstrap_class, data.bootstrapClass, data.image_class, data.imageClass), "col-12 col-lg-6");
     var contentClass = normalizeBootstrapColClass(firstValue(data.content_class, data.contentClass), "col-12 col-lg-6");
     var position = firstValue(data.image_position, data.imagePosition, data.media_position, data.mediaPosition, "left");
@@ -936,8 +937,8 @@
     var rightButton = data.right_button || data.rightButton || {};
     var mediaHtml = "";
     var buttonsHtml = [
-      renderNewsButton(leftButton, "fe-image-news-button", firstValue(leftButton.text, "Xem Tiep")),
-      renderNewsButton(rightButton, "fe-image-news-button fe-image-news-button-secondary", firstValue(rightButton.text, "Dang ky"))
+      renderNewsButton(leftButton, "fe-image-news-button", firstValue(leftButton.text, "Xem Tiếp")),
+      renderNewsButton(rightButton, "fe-image-news-button fe-image-news-button-secondary", firstValue(rightButton.text, "Đăng ký"))
     ].filter(Boolean).join("");
 
     if (videoUrl) {
@@ -993,7 +994,7 @@
     }
 
     if (image) {
-      return '<div class="fe-consult-media fe-consult-image"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title || "Dat lich tu van") + '" loading="lazy" decoding="async"></div>';
+      return '<div class="fe-consult-media fe-consult-image"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title || "Đặt lịch tư vấn") + '" loading="lazy" decoding="async"></div>';
     }
 
     return "";
@@ -1005,7 +1006,7 @@
     var desc = firstValue(data.description, data.desc, data.summary);
     var bg = firstValue(data.bg_color, data.bgColor, "#fff3b0");
     var button = data.button || {};
-    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, "Nhan bao gia ngay");
+    var buttonText = firstValue(button.text, button.name, button.label, data.button_text, data.buttonText, "Nhận báo giá ngay");
     var buttonBg = firstValue(button.bg_color, button.bgColor, data.button_bg_color, data.buttonBgColor, "#008eb8");
     var buttonColor = firstValue(button.text_color, button.textColor, data.button_text_color, data.buttonTextColor, "#ffffff");
     var icon = normalizeIconClass(firstValue(data.icon));
@@ -1029,9 +1030,9 @@
                     (desc ? '<div class="fe-consult-desc">' + desc + '</div>' : "") +
                   '</div>' +
                   '<div class="fe-consult-fields">' +
-                    '<input type="text" name="name" autocomplete="name" placeholder="Ho ten (Bat buoc)" required>' +
-                    '<input type="tel" name="phone" autocomplete="tel" placeholder="Dien thoai (Bat buoc)" required>' +
-                    '<textarea name="content" rows="4" placeholder="Noi dung"></textarea>' +
+                    '<input type="text" name="name" autocomplete="name" placeholder="Họ tên (Bắt buộc)" required>' +
+                    '<input type="tel" name="phone" autocomplete="tel" placeholder="Điện thoại (Bắt buộc)" required>' +
+                    '<textarea name="content" rows="4" placeholder="Nội dung"></textarea>' +
                   '</div>' +
                   '<button type="submit" class="fe-consult-button">' + (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "") + '<span>' + escapeHtml(buttonText) + '</span></button>' +
                 '</form>' +
@@ -1105,6 +1106,83 @@
     );
   }
 
+  function categoryItemId(item) {
+    return String(firstValue(item && item.category_id, item && item.id, item && item.categoryId));
+  }
+
+  function categoryItemTitle(item) {
+    return firstValue(item && item.category_title, item && item.title, item && item.name, "Danh mục");
+  }
+
+  function productItemTitle(item) {
+    return firstValue(item && item.product_name, item && item.name, item && item.title, "Sản phẩm");
+  }
+
+  function productItemImage(item) {
+    return safeImageUrl(firstValue(item && item.product_image, item && item.image, item && item.thumbnail, item && item.thumb, item && item.avatar), "assets/img/not-found.svg");
+  }
+
+  function productItemCategoryId(item) {
+    return String(firstValue(item && item.category_id, item && item.product_category_id, item && item.categoryId, item && item.menu_id));
+  }
+
+  function moneyText(value) {
+    var number = Number(value);
+    if (!Number.isFinite(number) || number <= 0) return "";
+    try { return number.toLocaleString("vi-VN") + "đ"; } catch (e) { return String(number) + "đ"; }
+  }
+
+  function renderMenuCategoryProductCard(item, index) {
+    var title = productItemTitle(item);
+    var image = productItemImage(item);
+    var price = moneyText(firstValue(item.product_price_sale, item.sale_price, item.salePrice, item.product_price, item.price));
+    var oldPrice = moneyText(firstValue(item.product_price, item.price));
+    var phone = firstValue(item.phone, item.hotline, item.contact_phone, "0847 865 568");
+    var href = bodyItemUrl(firstValue(item.product_alias, item.alias, item.slug, item.url, item.link));
+
+    return '<article class="fe-menu-cat-card">' +
+      '<a class="fe-menu-cat-thumb" href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></a>' +
+      '<div class="fe-menu-cat-card-body">' +
+        '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
+        '<div class="fe-menu-cat-stars" aria-hidden="true">★★★★★</div>' +
+        '<div class="fe-menu-cat-price-row">' + (price ? '<span class="fe-menu-cat-price">' + escapeHtml(price) + '</span>' : "") + (oldPrice && oldPrice !== price ? '<span class="fe-menu-cat-old-price">' + escapeHtml(oldPrice) + '</span>' : "") + '</div>' +
+        (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
+        '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function renderMenuCategorySection(section) {
+    var data = sectionData(section);
+    var selectedId = String(firstValue(data.menu_id, data.selected_category && data.selected_category.id));
+    var selectedTitle = firstValue(data.menu_title, data.selected_category && data.selected_category.title, section.section_name, section.name, "Danh mục");
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var textColor = firstValue(data.text_color, data.textColor, "#333333");
+    var columns = clampColumns(firstValue(data.items_per_row, data.itemsPerRow, 4));
+    var rows = Math.max(1, numberValue(firstValue(data.num_rows, data.rows), 1));
+    var limit = columns * rows;
+    var categoryPool = bodyCatalogCache.categories.filter(function (item) {
+      var parentId = String(firstValue(item.category_parent_id, item.parent_id, item.parentId));
+      return selectedId ? (categoryItemId(item) === selectedId || parentId === selectedId) : true;
+    });
+    var activeTabs = categoryPool.length ? categoryPool : (selectedId ? [{ category_id: selectedId, category_title: selectedTitle }] : bodyCatalogCache.categories.slice(0, 8));
+    var activeIds = activeTabs.map(categoryItemId).filter(Boolean);
+    var products = bodyCatalogCache.products.filter(function (item) {
+      var cid = productItemCategoryId(item);
+      return !activeIds.length || activeIds.indexOf(cid) !== -1 || (!cid && !selectedId);
+    }).slice(0, limit);
+    var tabHtml = activeTabs.slice(0, 10).map(function (item, index) {
+      return '<button type="button" class="fe-menu-cat-tab' + (index === 0 ? ' is-active' : '') + '">' + escapeHtml(categoryItemTitle(item)) + '</button>';
+    }).join("");
+
+    if (!activeTabs.length && !products.length) return "";
+
+    return '<section class="fe-body-section fe-menu-cat-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-menu-cat-text:' + escapeHtml(textColor) + ';--fe-menu-cat-columns:' + columns + '">' +
+      '<div class="container"><div class="fe-menu-cat-head"><h2>' + escapeHtml(selectedTitle) + '</h2>' +
+      (tabHtml ? '<div class="fe-menu-cat-tabs">' + tabHtml + '</div>' : "") + '</div>' +
+      (products.length ? '<div class="fe-menu-cat-grid">' + products.map(renderMenuCategoryProductCard).join("") + '</div>' : '<div class="fe-menu-cat-empty">Chưa có dữ liệu sản phẩm.</div>') +
+      '</div></section>';
+  }
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -1114,6 +1192,10 @@
 
     if (type === "article" || type === "articles") {
       return renderArticleSection(section);
+    }
+
+    if (type === "menu_category" || type === "menu-category") {
+      return renderMenuCategorySection(section);
     }
 
     if (type === "image_news" || type === "image-news") {
@@ -1187,7 +1269,7 @@
     }
 
     if (address) {
-      rows.push('<li><i class="fa-solid fa-location-dot"></i><p><strong>Äá»‹a chá»‰: </strong>' + escapeHtml(address) + "</p></li>");
+      rows.push('<li><i class="fa-solid fa-location-dot"></i><p><strong>Địa chỉ: </strong>' + escapeHtml(address) + "</p></li>");
     }
 
 
@@ -1220,10 +1302,10 @@
     if (!items.length) {
       items = normalizeList(fallbackCol.social_list || fallbackCol.socialList || fallbackCol.socials);
     }
-    var title = firstValue(col.social_title, col.socialTitle, "Máº¡ng xÃ£ há»™i");
+    var title = firstValue(col.social_title, col.socialTitle, "Mạng xã hội");
 
     if (!items.length) {
-      items = [{ text: "Tin tuc dang cap nhat", link: "" }];
+      items = [{ text: "Tin tức đang cập nhật", link: "" }];
     }
     return (
       '<div class="fe-footer-social-block">' +
@@ -1238,7 +1320,7 @@
     var fallbackCol = footer.col_1 || {};
     var bct = col.bct_notice || col.bctNotice || fallbackCol.bct_notice || fallbackCol.bctNotice || {};
     var image = safeImageUrl(firstValue(bct.image, bct.file, bct.icon_file, bct.iconFile), "https://we1.io.vn/public/assets/images/bct.png");
-    var title = firstValue(bct.title, "Bá»™ cÃ´ng thÆ°Æ¡ng");
+    var title = firstValue(bct.title, "Bộ công thương");
     var href = safeUrl(firstValue(bct.link, bct.url), "#");
 
     if (!isEnabled(firstValue(bct.show, bct.visible, bct.enabled), false)) return "";
@@ -1289,7 +1371,7 @@
 
     blocks.push('<div class="col-12">' + renderFooterSocial(footer) + "</div>");
     if (isEnabled(payment.show, false) && normalizeList(payment.payment_list).length) {
-      blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>HÃ¬nh thá»©c thanh toÃ¡n</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
+      blocks.push('<div class="col-12 col-md-12 max-sm:order-9 fe-footer-payment-block"><h4 class="ttl-f fe-footer-title text-16"><span>Hình thức thanh toán</span></h4><div class="payment-accept gap-2 mt-8px fe-footer-payment">' + renderFooterImageList(payment.payment_list) + "</div></div>");
     }
     var bctBlock = renderFooterBct(footer);
     if (bctBlock) {
@@ -1304,7 +1386,7 @@
     if (isEnabled(map.show, false) && map.iframe) {
       blocks.push(
         '<div class="col-12 fe-footer-map-block"><div class="map-wrapper">' +
-          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "TÃ¬m ChÃºng TÃ´i TrÃªn Báº£n Äá»“")) + "</span></h4>" +
+          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + "</span></h4>" +
           renderFooterEmbed(map.iframe) +
           ((mapAddressTitle || mapAddressText) ? '<div class="map-address">' + (mapAddressTitle ? '<h5>' + escapeHtml(mapAddressTitle) + "</h5>" : "") + (mapAddressText ? '<p>' + escapeHtml(mapAddressText) + "</p>" : "") + "</div>" : "") +
         "</div></div>"
@@ -1339,7 +1421,7 @@
     if (!access || (!isEnabled(access.show_time, false) && !isEnabled(access.show_visitor_count, false) && !firstValue(access.text))) return "";
     if (firstValue(access.text)) parts.push(escapeHtml(firstValue(access.text)));
     if (isEnabled(access.show_time, false)) parts.push('<span><i class="fa-regular fa-clock"></i> ' + escapeHtml(now.toLocaleString("vi-VN")) + "</span>");
-    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lÆ°á»£t truy cáº­p</span>");
+    if (isEnabled(access.show_visitor_count, false)) parts.push('<span><i class="fa-solid fa-eye"></i> ' + visitorCount() + " lượt truy cập</span>");
 
     return '<div class="fe-footer-access" style="background:' + escapeHtml(firstValue(access.bg_color, access.bgColor, "#111827")) + ';color:' + escapeHtml(firstValue(access.text_color, access.textColor, "#ffffff")) + '"><div class="container d-flex flex-wrap justify-content-center gap-3">' + parts.join("") + "</div></div>";
   }
@@ -1388,7 +1470,7 @@
     var image = safeUrl(firstValue(footer.col_1 && footer.col_1.footer_image), "");
     var copyrightStyle = (colors.copyrightBg ? "background:" + escapeHtml(colors.copyrightBg) + ";" : "") + (colors.copyrightText ? "color:" + escapeHtml(colors.copyrightText) + ";" : "");
     var copyrightOwner = firstValue(footer.copyright && footer.copyright.text, col1.company_name, "");
-    var copyrightHtml = copyrightOwner ? 'Báº£n quyá»n thuá»™c vá» "' + escapeHtml(copyrightOwner) + '" | Cung cáº¥p bá»Ÿi <a href="https://Thietkeweb365.vn" target="_blank" rel="noopener">Thietkeweb365.vn</a>' : "";
+    var copyrightHtml = copyrightOwner ? 'Bản quyền thuộc về "' + escapeHtml(copyrightOwner) + '" | Cung cấp bởi <a href="https://Thietkeweb365.vn" target="_blank" rel="noopener">Thietkeweb365.vn</a>' : "";
     var styleVars = "--fe-footer-bg:" + bg + ";--fe-footer-text:" + escapeHtml(colors.text) + ";--fe-footer-short-border:" + escapeHtml(colors.shortBorder) + ";--fe-footer-long-border:" + escapeHtml(colors.longBorder) + ";--fe-footer-social-bg:" + escapeHtml(colors.socialBg) + ";--fe-footer-social-icon:" + escapeHtml(colors.socialIcon) + ";--fe-footer-image:" + (image ? "url('" + escapeHtml(image) + "')" : "none") + ";";
 
     if (visibleColumns.indexOf(2) !== -1) {
@@ -1454,7 +1536,7 @@
   }
 
   function renderHeaderTop(top) {
-    var left = top.leftLinks.length ? top.leftLinks.map(renderTopLink).join("") : '<a style="color:inherit" href="#">Chao mung quy khach</a>';
+    var left = top.leftLinks.length ? top.leftLinks.map(renderTopLink).join("") : '<a style="color:inherit" href="#">Chào mừng quý khách</a>';
     var right = top.rightLinks.length ? top.rightLinks.map(renderTopLink).join("") : "";
     var leftGapClass = topLinksGapClass(top.leftLinks);
     var rightGapClass = topLinksGapClass(top.rightLinks);
@@ -1503,7 +1585,7 @@
             '<div class="d-none d-md-block d-lg-none col-2 px-0 mt-2"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
             '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
-          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
+          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
           '<div class="header-actions-list col d-flex align-items-center justify-content-end px-1">' +
             items.map(renderMainItem).join("") +
           "</div>" +
@@ -1589,8 +1671,8 @@
             '<div class="header-bottom-inner fe-style5-main-menu"><div class="fe-sticky-menu-list">' + menuHtml + "</div></div>" +
             '<aside class="fe-header-vertical-panel" id="fe-header-vertical-menu" aria-hidden="true">' +
               '<div class="fe-header-vertical-head">' +
-                '<strong>Danh muc</strong>' +
-                '<button class="fe-header-vertical-close" type="button" data-fe-vertical-close aria-label="Dong menu"><i class="fa-solid fa-xmark"></i></button>' +
+                '<strong>Danh mục</strong>' +
+                '<button class="fe-header-vertical-close" type="button" data-fe-vertical-close aria-label="Đóng menu"><i class="fa-solid fa-xmark"></i></button>' +
               "</div>" +
               '<nav class="fe-header-vertical-nav">' + menuHtml + "</nav>" +
             "</aside>" +
@@ -1690,7 +1772,7 @@
           '<h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250" src="' + escapeHtml(logo) + '" alt="logo" loading="lazy" decoding="async"></h5>' +
           '<button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>' +
         "</div>" +
-        '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tim kiem San pham & Dich vu ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tim kiem"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
+        '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tìm kiếm Sản phẩm & Dịch vụ ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
         '<div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column"><ul class="mobile-category-menu border-top" id="mobile-category-menu"></ul></div>' +
       "</div>"
     );
@@ -1801,6 +1883,46 @@
     return unwrapConfigPayload(json);
   }
 
+  function normalizeApiList(json) {
+    if (Array.isArray(json && json.data && json.data.data)) return json.data.data;
+    if (Array.isArray(json && json.data && json.data.items)) return json.data.items;
+    if (Array.isArray(json && json.data)) return json.data;
+    if (Array.isArray(json && json.items)) return json.items;
+    return [];
+  }
+
+  async function loadBodyCatalogData() {
+    var categoryParams = new URLSearchParams();
+    var productParams = new URLSearchParams();
+    var categoryResponse;
+    var productResponse;
+    var categoryJson;
+    var productJson;
+
+    categoryParams.set("page", "1");
+    categoryParams.set("limit", "200");
+    categoryParams.set("category_status", "1");
+    categoryParams.set("sort_order", "asc");
+    productParams.set("page", "1");
+    productParams.set("limit", "120");
+    productParams.set("product_status", "1");
+
+    try {
+      categoryResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/category?" + categoryParams.toString(), { method: "GET", headers: getAuthHeaders() });
+      if (categoryResponse.ok) {
+        categoryJson = await categoryResponse.json();
+        bodyCatalogCache.categories = flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(categoryJson)));
+      }
+    } catch (e) { bodyCatalogCache.categories = []; }
+
+    try {
+      productResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/product?" + productParams.toString(), { method: "GET", headers: getAuthHeaders() });
+      if (productResponse.ok) {
+        productJson = await productResponse.json();
+        bodyCatalogCache.products = normalizeApiList(productJson);
+      }
+    } catch (e) { bodyCatalogCache.products = []; }
+  }
   async function loadBodySections() {
     var params = new URLSearchParams();
     var response;
@@ -1965,6 +2087,7 @@
     }
 
     try {
+      await loadBodyCatalogData();
       renderPageBody(await loadBodySections());
     } catch (bodyErr) {
       var bodyRoot = document.querySelector('[data-page-region="body"]');

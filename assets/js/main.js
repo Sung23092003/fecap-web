@@ -510,7 +510,7 @@
     const searchInput = searchBar.querySelector('input');
     if (searchInput) {
       searchInput.setAttribute('autocomplete', 'off');
-      searchInput.placeholder = 'Tim kiem trang...';
+      searchInput.placeholder = 'Tìm kiếm trang...';
     }
 
     let selectedIndex = -1;
