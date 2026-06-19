@@ -1299,6 +1299,113 @@
     );
   }
 
+  function renderFaqVisual(visual, title) {
+    var type;
+    var text;
+    var videoUrl;
+    var image;
+
+    if (!visual || visual.visible === false) return "";
+
+    type = firstValue(visual.type, "image");
+
+    if (type === "text") {
+      text = firstValue(visual.text, "");
+      if (!text) return "";
+      return '<div class="fe-faq-visual fe-faq-text">' + text + "</div>";
+    }
+
+    if (type === "video") {
+      videoUrl = firstValue(visual.video_url, visual.videoUrl, visual.video_file, visual.videoFile);
+      if (!videoUrl) return "";
+      if (/\.(mp4|webm|ogg)(\?|#|$)/i.test(String(videoUrl))) {
+        return '<div class="fe-faq-visual fe-faq-video"><video controls src="' + escapeHtml(safeUrl(videoUrl, "")) + '"></video></div>';
+      }
+      return '<div class="fe-faq-visual fe-faq-video">' + renderResponsiveVideo(videoUrl, title || "Video") + "</div>";
+    }
+
+    image = safeImageUrl(firstValue(visual.image, visual.image_url, visual.imageUrl), "");
+    if (!image) return "";
+    return '<div class="fe-faq-visual fe-faq-image"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title || "FAQ") + '" loading="lazy" decoding="async"></div>';
+  }
+
+  function normalizeFaqQuestions(data) {
+    return normalizeList(firstValue(data.questions, data.items, data.faq_list)).map(function (item) {
+      return {
+        question: firstValue(item.question, item.title, item.name, ""),
+        answer: firstValue(item.answer, item.content, item.description, item.desc, "")
+      };
+    }).filter(function (item) {
+      return item.question || item.answer;
+    });
+  }
+
+  function renderFaqSection(section) {
+    var data = sectionData(section);
+    var title = firstValue(data.title, sectionTitle(section, data));
+    var desc = firstValue(data.description, data.desc);
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var visual = data.visual || {};
+    var visualHtml = renderFaqVisual(visual, title);
+    var questionWidth = normalizeBootstrapColClass(firstValue(data.question_width, data.questionWidth), "col-lg-7");
+    var visualCol = complementBootstrapColClass(questionWidth, "col-lg-5");
+    var questions = normalizeFaqQuestions(data);
+    var sectionUid = "fe-faq-" + String(firstValue(section.id, section.section_id, Math.random().toString(36).slice(2, 8))).replace(/[^a-zA-Z0-9_-]/g, "");
+    var questionsHtml;
+    var rowHtml;
+
+    questionsHtml = questions.map(function (item, index) {
+      var itemId = sectionUid + "-q" + index;
+      return (
+        '<div class="accordion-item">' +
+          '<h2 class="accordion-header">' +
+            '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' + itemId + '">' +
+              escapeHtml(item.question) +
+            "</button>" +
+          "</h2>" +
+          '<div id="' + itemId + '" class="accordion-collapse collapse" data-bs-parent="#' + sectionUid + '">' +
+            '<div class="accordion-body">' +
+              (/<[a-z][\s\S]*>/i.test(String(item.answer)) ? item.answer : escapeHtml(item.answer)) +
+            "</div>" +
+          "</div>" +
+        "</div>"
+      );
+    }).join("");
+
+    if (!title && !desc && !questionsHtml && !visualHtml) return "";
+
+    if (visualHtml) {
+      rowHtml =
+        '<div class="row g-4 align-items-start">' +
+          '<div class="col-12 ' + escapeHtml(visualCol) + '">' + visualHtml + "</div>" +
+          '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
+            (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
+          "</div>" +
+        "</div>";
+    } else {
+      rowHtml =
+        '<div class="row g-4 justify-content-center">' +
+          '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
+            (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
+          "</div>" +
+        "</div>";
+    }
+
+    return (
+      '<section class="fe-body-section fe-faq-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
+        '<div class="container">' +
+          ((title || desc)
+            ? '<div class="fe-section-heading">' +
+                renderSectionTitle(title) +
+                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+              "</div>"
+            : "") +
+          rowHtml +
+        "</div>" +
+      "</section>"
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -1325,6 +1432,11 @@
     if (type === "consultation" || type === "consultation_booking" || type === "consultation-booking") {
       return renderConsultationSection(section);
     }
+
+    if (type === "faq") {
+      return renderFaqSection(section);
+    }
+
     if (type === "video_news" || type === "video-news") {
       return renderVideoNewsSection(section);
     }
