@@ -352,17 +352,19 @@
         rightLinks: normalizeList(headerTop.right_links || headerTop.rightLinks)
       },
       main: {
-        bgColor: firstValue(headerMain.bg_color, headerMain.bgColor, "#0282a5"),
-        textColor: firstValue(headerMain.text_color, headerMain.textColor, "#ffffff"),
+        bgColor: firstValue(headerMain.bg_color, headerMain.bgColor, "#ffffff"),
+        textColor: firstValue(headerMain.text_color, headerMain.textColor, "#202124"),
         hoverTextColor: firstValue(headerMain.hover_text_color, headerMain.hoverTextColor, headerMain.text_hover_color, headerMain.textHoverColor, headerMain.text_color_hover, headerMain.textColorHover, headerMain.hover_color, headerMain.hoverColor, headerMain.hover_text, headerMain.hoverText, headerMain.text_color, headerMain.textColor, "#ffffff"),
         hoverBgColor: firstValue(headerMain.hover_bg_color, headerMain.hoverBgColor, headerMain.bg_hover_color, headerMain.bgHoverColor, headerMain.background_hover_color, headerMain.backgroundHoverColor, headerMain.hover_background_color, headerMain.hoverBackgroundColor, headerMain.background_color_hover, headerMain.backgroundColorHover, headerMain.hover_background, headerMain.hoverBackground, "transparent"),
         borderColor: firstValue(headerMain.border_color, headerMain.borderColor, "transparent"),
         borderWidth: numberValue(firstValue(headerMain.border_thickness, headerMain.borderThickness), 0),
         logo: firstValue(headerMain.logo, logo.logo_main, logo.logoMain, FALLBACKS.logo),
-        logoCol: normalizeBootstrapColClass(firstValue(headerMain.logo_col, headerMain.logoCol, headerMain.logo_column, headerMain.logoColumn), "col-7 col-md-3 col-lg-3 col-xl-2"),
+        logoCol: normalizeBootstrapColClass(firstValue(headerMain.logo_col, headerMain.logoCol, headerMain.logo_column, headerMain.logoColumn), "col-7 col-md-3 col-lg-3 col-xl-3"),
         searchShow: isEnabled(firstValue(headerMain.search_show, headerMain.searchShow), true),
-        searchCol: normalizeBootstrapColClass(firstValue(headerMain.search_col, headerMain.searchCol, headerMain.search_column, headerMain.searchColumn), "col-12 col-sm-4 col-md-5 col-lg-6 col-xl-4"),
+        searchCol: normalizeBootstrapColClass(firstValue(headerMain.search_col, headerMain.searchCol, headerMain.search_column, headerMain.searchColumn), "col-12 col-sm-5 col-md-5 col-lg-4 col-xl-3"),
         searchPlaceholder: firstValue(headerMain.search_placeholder, headerMain.searchPlaceholder, "Tìm kiếm Sản phẩm & Dịch vụ ?"),
+        loginShow: isEnabled(firstValue(headerMain.login_show, headerMain.loginShow, headerMain.show_login, headerMain.showLogin), true),
+        registerShow: isEnabled(firstValue(headerMain.register_show, headerMain.registerShow, headerMain.show_register, headerMain.showRegister), true),
         items: normalizeList(headerMain.item_list || headerMain.itemList)
       },
       news: {
@@ -557,10 +559,10 @@
 
   function getMenuAppearance() {
     var defaults = {
-      bgColor: "",
-      hoverBgColor: "",
-      textColor: "",
-      bold: false
+      bgColor: "#020878",
+      hoverBgColor: "#0712b8",
+      textColor: "#ffffff",
+      bold: true
     };
     var data = null;
 
@@ -577,10 +579,12 @@
     if (!data || typeof data !== "object") return defaults;
 
     return {
-      bgColor: firstValue(data.menu_bg_color, data.bg_color, data.bgColor),
-      hoverBgColor: firstValue(data.menu_hover_bg_color, data.hover_bg_color, data.hoverBgColor),
-      textColor: firstValue(data.menu_text_color, data.text_color, data.textColor),
-      bold: data.menu_bold === true || data.menu_bold === "true" || data.bold === true || data.bold === "true"
+      bgColor: firstValue(data.menu_bg_color, data.bg_color, data.bgColor, defaults.bgColor),
+      hoverBgColor: firstValue(data.menu_hover_bg_color, data.hover_bg_color, data.hoverBgColor, defaults.hoverBgColor),
+      textColor: firstValue(data.menu_text_color, data.text_color, data.textColor, defaults.textColor),
+      bold: (data.menu_bold === undefined && data.bold === undefined)
+        ? defaults.bold
+        : (data.menu_bold === true || data.menu_bold === "true" || data.bold === true || data.bold === "true")
     };
   }
 
@@ -1678,7 +1682,7 @@
     var content = firstValue(item.content, item.description);
     return (
       '<a class="header-action' + visibleClass + '" style="color:inherit;--header-action-columns:' + columns + '" href="' + escapeHtml(href) + '">' +
-        '<div class="d-flex justify-content-center align-items-center gap-1">' +
+        '<div class="header-action-inner d-flex justify-content-center align-items-center gap-1">' +
           renderMainItemMedia(item) +
           '<div class="text text-left d-none d-xl-block"><small>' + escapeHtml(title) + (content ? '<b class="d-block text-left">' + escapeHtml(content) + "</b>" : "") + "</small></div>" +
         "</div>" +
@@ -1686,8 +1690,32 @@
     );
   }
 
+  function defaultHeaderMainItems() {
+    return [
+      { name: "Hotline", content: "0847 865 568", icon: "fa-solid fa-phone", link: "tel:0847865568", columns: 1, position: 1, show_desktop: true, show_mobile: true },
+      { name: "Email", content: "mrquan.thietkeweb365.vn@gmail.com", icon: "fa-solid fa-envelope", link: "mailto:mrquan.thietkeweb365.vn@gmail.com", columns: 2, position: 2, show_desktop: true, show_mobile: true }
+    ];
+  }
+
+  function renderAccountAction(main) {
+    var links = [];
+    if (main.loginShow) links.push('<a href="./login.html">Đăng nhập</a>');
+    if (main.registerShow) links.push('<a class="account-register" href="./register.html">Đăng ký</a>');
+    if (!links.length) return "";
+
+    return (
+      '<div class="header-account-action d-none d-lg-flex align-items-center" style="color:inherit">' +
+        '<i class="fa-solid fa-user"></i>' +
+        '<div class="text text-left">' +
+          '<small>Tài Khoản</small>' +
+          '<div class="header-account-links">' + links.join("") + "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
   function renderHeaderMain(main, extraClass) {
-    var items = main.items
+    var items = (main.items.length ? main.items : defaultHeaderMainItems())
       .filter(function (item) {
         return isEnabled(firstValue(item.show_desktop, item.showDesktop), true) || isEnabled(firstValue(item.show_mobile, item.showMobile), true);
       })
@@ -1695,15 +1723,15 @@
     var logo = safeUrl(main.logo, FALLBACKS.logo);
     return (
       '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-hover-text:' + escapeHtml(main.hoverTextColor) + '">' +
-        '<div class="container"><div class="row align-items-center w-100 wrap-menu">' +
-          '<div class="d-md-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
-          '<div class="wrap-header-logo ' + escapeHtml(main.logoCol) + ' px-0 d-flex align-content-center justify-content-center justify-content-md-start">' +
-            '<div class="d-none d-md-block d-lg-none col-2 px-0 mt-2"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars text-light fs-5 mt-1"></i></button></div></div></div></div>' +
+        '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
+          '<div class="d-lg-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars fs-5 mt-1"></i></button></div></div></div></div>' +
+          '<div class="wrap-header-logo ' + escapeHtml(main.logoCol) + ' px-0 d-flex align-content-center justify-content-center justify-content-lg-start">' +
             '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
           "</div>" +
-          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
-          '<div class="header-actions-list col d-flex align-items-center justify-content-end px-1">' +
+          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Search"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
+          '<div class="header-actions-list col d-none d-lg-flex align-items-center justify-content-end px-1">' +
             items.map(renderMainItem).join("") +
+            renderAccountAction(main) +
           "</div>" +
         "</div></div>" +
       "</div>"
@@ -1723,10 +1751,19 @@
       '<div id="header-sticky" style="' + menuAppearanceStyle() + '">' +
         '<div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
           '<div class="header-bottom-inner">' +
-            renderStickyMenuLogo(logo) +
             '<div class="fe-sticky-menu-list">' + fallbackMenuHtml + "</div>" +
           "</div>" +
         "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderLanguageFlags() {
+    return (
+      '<div class="fe-header-language-flags" aria-label="Language">' +
+        '<a href="#" aria-label="Tieng Viet"><img src="assets/img/header/vi.jpg" alt="VI"></a>' +
+        '<a href="#" aria-label="English"><img src="assets/img/header/en.jpg" alt="EN"></a>' +
+        '<a href="#" aria-label="Japanese"><img src="assets/img/header/ja.jpg" alt="JA"></a>' +
       "</div>"
     );
   }
@@ -1880,6 +1917,90 @@
     };
   }
 
+  function bindMobileCategoryMenu(root) {
+    var sourceMenu = root.querySelector(".header-bottom .menu");
+    var mobileMenu = root.querySelector("#mobile-category-menu");
+
+    if (!sourceMenu || !mobileMenu) return;
+
+    mobileMenu.innerHTML = sourceMenu.innerHTML;
+    mobileMenu.querySelectorAll(".menu-item").forEach(function (item) {
+      item.classList.remove("py-1", "px-2");
+      item.classList.add("mobile-category-item");
+      if (item.querySelector(":scope > .sub-menu")) item.classList.add("mobile-has-submenu");
+    });
+    mobileMenu.querySelectorAll(".mega").forEach(function (item) { item.classList.remove("mega"); });
+    mobileMenu.querySelectorAll(".sub-menu").forEach(function (item) { item.classList.add("mobile-sub-menu"); });
+    mobileMenu.querySelectorAll(".menu-link").forEach(function (item) {
+      item.classList.remove("py-1", "px-2");
+      item.classList.add("mobile-category-link");
+    });
+    mobileMenu.querySelectorAll(".fa-caret-down").forEach(function (item) {
+      item.classList.add("mobile-category-caret");
+    });
+
+    if (mobileMenu.dataset.bound === "true") return;
+    mobileMenu.dataset.bound = "true";
+    mobileMenu.addEventListener("click", function (event) {
+      var trigger = event.target.closest(".mobile-has-submenu > .mobile-category-link, .mobile-has-submenu > .mobile-category-caret");
+      var item;
+
+      if (!trigger || !mobileMenu.contains(trigger)) return;
+      event.preventDefault();
+      item = trigger.closest(".mobile-has-submenu");
+      if (item) item.classList.toggle("active");
+    });
+  }
+
+  function renderMobileSidebarInfo(header) {
+    var loginLinks = "";
+
+    if (header.main.loginShow || header.main.registerShow) {
+      loginLinks =
+        '<div class="border-top d-flex py-2 gap-2">' +
+          (header.main.loginShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./login.html"><img src="assets/img/header/icon-login.png" alt="" width="20" height="20"><span>Đăng nhập</span></a>' : "") +
+          (header.main.registerShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./register.html"><img src="assets/img/header/icon-register.png" alt="" width="20" height="20"><span>Đăng ký</span></a>' : "") +
+        "</div>";
+    }
+
+    return (
+      '<div class="foo_mid border-top text-dark">' +
+        '<a class="btn-hotline d-flex gap-2 align-items-center" href="tel:0847865568">' +
+          '<img src="assets/img/header/icon-hotline.png" alt="" width="36">' +
+          '<div class="d-flex flex-column fw-bold"><span class="text-sub">Hotline & Zalo</span><span class="fs-5">0847 865 568</span></div>' +
+        "</a>" +
+        loginLinks +
+        '<div class="py-2 border-top">' +
+          '<p class="mb-2 position-relative fw-bold">Kết nối mạng xã hội</p>' +
+          '<div class="d-flex position-relative social mb-1 mx-0 gap-1">' +
+            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>' +
+            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Shopee"><img src="https://we1.io.vn/admin/public/images/footer/1773280802172%20Shopee.png" alt="Shopee" width="32" height="32"></a>' +
+            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Twitter"><i class="fa-brands fa-twitter"></i></a>' +
+            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Youtube"><i class="fa-brands fa-youtube"></i></a>' +
+          "</div>" +
+        "</div>" +
+        '<div class="mb-2 border-top">' +
+          '<address class="my-2">' +
+            '<h5 class="mb-2"><strong>THIẾT KẾ WEB 365 .VN</strong></h5>' +
+            '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
+            '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
+            '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:mrquan.thietkeweb365.vn@gmail.com" title="mrquan.thietkeweb365.vn@gmail.com">mrquan.thietkeweb365.vn@gmail.com</a></p>' +
+            '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:youmail@gmail.com" title="youmail@gmail.com">youmail@gmail.com</a></p>' +
+            '<p class="mb-1"><b>Hà Nội: </b>Trần Khát Chân, Hai Bà Trưng, Hà Nội</p>' +
+            '<p class="mb-1"><b>TP. HCM: </b>Bùi Đình Túy, Bình Thạnh, TP. HCM</p>' +
+          "</address>" +
+        "</div>" +
+        '<div class="border-top text-dark">' +
+          '<p class="mt-2 position-relative fw-bold">Phương thức thanh toán</p>' +
+          '<div class="d-flex py-2 gap-4"><div class="footer-column-1"><div class="payment-accept gap-1 mx-0">' +
+            '<img class="first lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414842AC.webp" alt="American Express">' +
+            '<img class="lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414848MC.webp" alt="MasterCard">' +
+          "</div></div></div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
   function renderOffcanvas(header) {
     var logo = safeUrl(header.main.logo || header.logo.main, FALLBACKS.logo);
     return (
@@ -1889,7 +2010,7 @@
           '<button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>' +
         "</div>" +
         '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tìm kiếm Sản phẩm & Dịch vụ ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
-        '<div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column"><ul class="mobile-category-menu border-top" id="mobile-category-menu"></ul></div>' +
+        '<div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column"><ul class="mobile-category-menu border-top" id="mobile-category-menu"></ul>' + renderMobileSidebarInfo(header) + '</div>' +
       "</div>"
     );
   }
@@ -2169,6 +2290,7 @@
     root.dataset.headerStyle = String(header.style);
     root.dataset.renderState = "ready";
     bindHeaderStyle5(root);
+    bindMobileCategoryMenu(root);
     bindHeaderScrollState(root);
     applyMeta(header);
     window.dispatchEvent(new CustomEvent("fe:page-rendered", { detail: { region: "header", data: header, menuFromApi: Boolean(apiMenuHtml) } }));
