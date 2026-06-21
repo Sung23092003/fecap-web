@@ -21,10 +21,10 @@
 
   var AUTO_LOGIN = (typeof ENV !== "undefined" && ENV.AUTO_LOGIN) ||
     (window.ENV && window.ENV.AUTO_LOGIN) ||
-    {
-      username: "admin",
-      password: "123987"
-    };
+  {
+    username: "admin",
+    password: "123987"
+  };
   var authPromise = null;
   var bodyCatalogCache = { categories: [], products: [] };
 
@@ -331,7 +331,7 @@
       window.FE_MENU_APPEARANCE_SOURCE = "header";
       try {
         localStorage.setItem("menu_appearance", JSON.stringify(categoryThemeSetting));
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return {
@@ -550,8 +550,8 @@
       var children = sortCategories(item._children);
       return (
         '<li class="menu-item d-flex align-items-center py-1 px-2' + (children.length ? " has-sub-menu" : "") + '">' +
-          renderCategoryLink(item, "menu-link py-1 px-2 d-flex align-items-center gap-1") +
-          (children.length ? '<i class="fa-solid fa-caret-down"></i>' + renderCategorySubMenu(children) : "") +
+        renderCategoryLink(item, "menu-link py-1 px-2 d-flex align-items-center gap-1") +
+        (children.length ? '<i class="fa-solid fa-caret-down"></i>' + renderCategorySubMenu(children) : "") +
         "</li>"
       );
     }).join("") + "</ul>";
@@ -616,7 +616,7 @@
       window.FE_MENU_APPEARANCE = themeSetting;
       try {
         localStorage.setItem("menu_appearance", JSON.stringify(themeSetting));
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -664,12 +664,12 @@
 
     return (
       '<div>' +
-        '<a class="d-block w-100 rounded-10" href="' + escapeHtml(href) + '" title="' + escapeHtml(title) + '">' +
-          '<picture class="block">' +
-            (desktop ? '<source class="img-cover block" media="(min-width:768px)" srcset="' + escapeHtml(desktop) + '">' : "") +
-            '<img class="img-cover block banner-auto-width" src="' + escapeHtml(mobile || desktop) + '" alt="' + escapeHtml(title) + '" loading="' + loading + '" decoding="async">' +
-          "</picture>" +
-        "</a>" +
+      '<a class="d-block w-100 rounded-10" href="' + escapeHtml(href) + '" title="' + escapeHtml(title) + '">' +
+      '<picture class="block">' +
+      (desktop ? '<source class="img-cover block" media="(min-width:768px)" srcset="' + escapeHtml(desktop) + '">' : "") +
+      '<img class="img-cover block banner-auto-width" src="' + escapeHtml(mobile || desktop) + '" alt="' + escapeHtml(title) + '" loading="' + loading + '" decoding="async">' +
+      "</picture>" +
+      "</a>" +
       "</div>"
     );
   }
@@ -797,15 +797,15 @@
 
     return (
       open +
-        '<div class="fe-real-media">' +
-          (image
-            ? '<img class="fe-real-modal-trigger" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async" data-fe-full-image="' + escapeHtml(image) + '" data-fe-image-title="' + escapeHtml(title) + '" data-fe-image-desc="' + escapeHtml(desc) + '">'
-            : '<div class="fe-real-media-placeholder">No image</div>') +
-        "</div>" +
-        '<div class="fe-real-content">' +
-          '<h3 class="fe-real-title">' + escapeHtml(title) + "</h3>" +
-          (desc ? '<p class="fe-real-desc">' + escapeHtml(desc) + "</p>" : "") +
-        "</div>" +
+      '<div class="fe-real-media">' +
+      (image
+        ? '<img class="fe-real-modal-trigger" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async" data-fe-full-image="' + escapeHtml(image) + '" data-fe-image-title="' + escapeHtml(title) + '" data-fe-image-desc="' + escapeHtml(desc) + '">'
+        : '<div class="fe-real-media-placeholder">No image</div>') +
+      "</div>" +
+      '<div class="fe-real-content">' +
+      '<h3 class="fe-real-title">' + escapeHtml(title) + "</h3>" +
+      (desc ? '<p class="fe-real-desc">' + escapeHtml(desc) + "</p>" : "") +
+      "</div>" +
       close
     );
   }
@@ -833,7 +833,7 @@
         pages.map(function (page) {
           return '<div class="fe-real-images-page"><div class="fe-real-images-page-grid">' + page.map(renderRealImageCard).join("") + "</div></div>";
         }).join("") +
-      "</div>";
+        "</div>";
     } else if (items.length) {
       itemsHtml = '<div class="fe-real-images-grid">' + items.map(renderRealImageCard).join("") + "</div>";
     } else {
@@ -842,16 +842,16 @@
 
     return (
       '<section class="fe-body-section fe-real-images-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-real-columns:' + columns + ';--fe-real-title-color:' + escapeHtml(titleColor) + ';--fe-real-desc-color:' + escapeHtml(descColor) + '">' +
-        '<div class="container">' +
-          ((title || desc)
-            ? '<div class="fe-section-heading">' +
-                renderSectionTitle(title) +
-                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
-              "</div>"
-            : "") +
-          itemsHtml +
-          (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thêm</a></div>' : "") +
-        "</div>" +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      itemsHtml +
+      (!isDetail && moreHref ? '<div class="fe-section-more-wrap"><a class="fe-section-more" href="' + escapeHtml(moreHref) + '">Xem thêm</a></div>' : "") +
+      "</div>" +
       "</section>"
     );
   }
@@ -884,20 +884,20 @@
 
     return (
       '<section class="fe-body-section fe-article-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-article-title-color:' + escapeHtml(titleColor) + ';--fe-article-desc-color:' + escapeHtml(descColor) + ';--fe-article-button-bg:' + escapeHtml(buttonBg) + ';--fe-article-button-color:' + escapeHtml(buttonColor) + '">' +
-        '<div class="container">' +
-          '<div class="row justify-content-center">' +
-            '<div class="' + escapeHtml(columnClass) + '">' +
-              ((title || desc)
-                ? '<div class="fe-section-heading">' +
-                    renderSectionTitle(title) +
-                    (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
-                  "</div>"
-                : "") +
-              (content ? '<div class="fe-article-content">' + content + "</div>" : "") +
-              (hasButton ? '<div class="fe-article-actions">' + buttonHtml + "</div>" : "") +
-            "</div>" +
-          "</div>" +
-        "</div>" +
+      '<div class="container">' +
+      '<div class="row justify-content-center">' +
+      '<div class="' + escapeHtml(columnClass) + '">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      (content ? '<div class="fe-article-content">' + content + "</div>" : "") +
+      (hasButton ? '<div class="fe-article-actions">' + buttonHtml + "</div>" : "") +
+      "</div>" +
+      "</div>" +
+      "</div>" +
       "</section>"
     );
   }
@@ -960,7 +960,7 @@
     if (!embedUrl) return "";
     return (
       '<div class="fe-news-video-frame">' +
-        '<iframe src="' + escapeHtml(embedUrl) + '" title="' + escapeHtml(title || "Video") + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
+      '<iframe src="' + escapeHtml(embedUrl) + '" title="' + escapeHtml(title || "Video") + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
       "</div>"
     );
   }
@@ -1020,20 +1020,20 @@
 
     return (
       '<section class="fe-body-section fe-image-news-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-image-news-radius:' + escapeHtml(imageRadius || "8px") + '">' +
-        '<div class="container">' +
-          '<div class="row align-items-center g-4 g-lg-5' + (position === "right" ? " flex-lg-row-reverse" : "") + '">' +
-            '<div class="' + escapeHtml(mediaClass) + '">' +
-              (mediaHtml ? '<div class="fe-image-news-media">' + mediaHtml + "</div>" : "") +
-            "</div>" +
-            '<div class="' + escapeHtml(contentClass) + '">' +
-              '<div class="fe-image-news-content">' +
-                (title ? '<div class="fe-image-news-title">' + renderSectionTitle(title) + "</div>" : "") +
-                (content ? '<div class="fe-image-news-text">' + content + "</div>" : "") +
-                (buttonsHtml ? '<div class="fe-image-news-actions">' + buttonsHtml + "</div>" : "") +
-              "</div>" +
-            "</div>" +
-          "</div>" +
-        "</div>" +
+      '<div class="container">' +
+      '<div class="row align-items-center g-4 g-lg-5' + (position === "right" ? " flex-lg-row-reverse" : "") + '">' +
+      '<div class="' + escapeHtml(mediaClass) + '">' +
+      (mediaHtml ? '<div class="fe-image-news-media">' + mediaHtml + "</div>" : "") +
+      "</div>" +
+      '<div class="' + escapeHtml(contentClass) + '">' +
+      '<div class="fe-image-news-content">' +
+      (title ? '<div class="fe-image-news-title">' + renderSectionTitle(title) + "</div>" : "") +
+      (content ? '<div class="fe-image-news-text">' + content + "</div>" : "") +
+      (buttonsHtml ? '<div class="fe-image-news-actions">' + buttonsHtml + "</div>" : "") +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      "</div>" +
       "</section>"
     );
   }
@@ -1089,27 +1089,27 @@
 
     return (
       '<section class="fe-body-section fe-consult-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-consult-button-bg:' + escapeHtml(buttonBg) + ';--fe-consult-button-color:' + escapeHtml(buttonColor) + '">' +
-        '<div class="container">' +
-          '<div class="fe-consult-box">' +
-            '<div class="row g-0 align-items-stretch' + reverseClass + '">' +
-              '<div class="col-12 col-lg-6">' +
-                '<form class="fe-consult-form" data-fe-consult-form="true" onsubmit="return false;">' +
-                  '<div class="fe-consult-heading">' +
-                    (title ? '<div class="fe-consult-title">' + title + '</div>' : "") +
-                    (desc ? '<div class="fe-consult-desc">' + desc + '</div>' : "") +
-                  '</div>' +
-                  '<div class="fe-consult-fields">' +
-                    '<input type="text" name="name" autocomplete="name" placeholder="Họ tên (Bắt buộc)" required>' +
-                    '<input type="tel" name="phone" autocomplete="tel" placeholder="Điện thoại (Bắt buộc)" required>' +
-                    '<textarea name="content" rows="4" placeholder="Nội dung"></textarea>' +
-                  '</div>' +
-                  '<button type="submit" class="fe-consult-button">' + (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "") + '<span>' + escapeHtml(buttonText) + '</span></button>' +
-                '</form>' +
-              '</div>' +
-              (mediaHtml ? '<div class="col-12 col-lg-6' + hideMobileClass + '">' + mediaHtml + '</div>' : "") +
-            '</div>' +
-          '</div>' +
-        '</div>' +
+      '<div class="container">' +
+      '<div class="fe-consult-box">' +
+      '<div class="row g-0 align-items-stretch' + reverseClass + '">' +
+      '<div class="col-12 col-lg-6">' +
+      '<form class="fe-consult-form" data-fe-consult-form="true" onsubmit="return false;">' +
+      '<div class="fe-consult-heading">' +
+      (title ? '<div class="fe-consult-title">' + title + '</div>' : "") +
+      (desc ? '<div class="fe-consult-desc">' + desc + '</div>' : "") +
+      '</div>' +
+      '<div class="fe-consult-fields">' +
+      '<input type="text" name="name" autocomplete="name" placeholder="Họ tên (Bắt buộc)" required>' +
+      '<input type="tel" name="phone" autocomplete="tel" placeholder="Điện thoại (Bắt buộc)" required>' +
+      '<textarea name="content" rows="4" placeholder="Nội dung"></textarea>' +
+      '</div>' +
+      '<button type="submit" class="fe-consult-button">' + (icon ? '<i class="' + escapeHtml(icon) + '"></i>' : "") + '<span>' + escapeHtml(buttonText) + '</span></button>' +
+      '</form>' +
+      '</div>' +
+      (mediaHtml ? '<div class="col-12 col-lg-6' + hideMobileClass + '">' + mediaHtml + '</div>' : "") +
+      '</div>' +
+      '</div>' +
+      '</div>' +
       '</section>'
     );
   }
@@ -1139,10 +1139,10 @@
     if (thumb) {
       mediaHtml =
         '<button type="button" class="fe-video-news-thumb' + (embedUrl ? " fe-video-news-trigger" : "") + '"' +
-          (embedUrl ? ' data-fe-video-url="' + escapeHtml(embedUrl) + '"' : "") +
-          ' data-fe-video-title="' + escapeHtml(title) + '" aria-label="' + escapeHtml(title) + '">' +
-          '<img src="' + escapeHtml(thumb) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async">' +
-          (embedUrl ? '<span class="fe-video-news-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>' : "") +
+        (embedUrl ? ' data-fe-video-url="' + escapeHtml(embedUrl) + '"' : "") +
+        ' data-fe-video-title="' + escapeHtml(title) + '" aria-label="' + escapeHtml(title) + '">' +
+        '<img src="' + escapeHtml(thumb) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async">' +
+        (embedUrl ? '<span class="fe-video-news-play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>' : "") +
         "</button>";
     } else if (embedUrl) {
       mediaHtml = renderResponsiveVideo(url, title);
@@ -1152,13 +1152,13 @@
 
     return (
       '<article class="fe-video-news-card' + (isMain ? " fe-video-news-card-main" : "") + '">' +
-        mediaHtml +
-        ((title || desc)
-          ? '<div class="fe-video-news-content">' +
-              (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
-              (desc ? '<p>' + escapeHtml(desc) + "</p>" : "") +
-            "</div>"
-          : "") +
+      mediaHtml +
+      ((title || desc)
+        ? '<div class="fe-video-news-content">' +
+        (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
+        (desc ? '<p>' + escapeHtml(desc) + "</p>" : "") +
+        "</div>"
+        : "") +
       "</article>"
     );
   }
@@ -1173,7 +1173,7 @@
     modal.innerHTML =
       '<button class="fe-video-news-modal-close" type="button" aria-label="Đóng video"><i class="fa-solid fa-xmark"></i></button>' +
       '<div class="fe-video-news-modal-dialog">' +
-        '<div class="fe-video-news-modal-frame"></div>' +
+      '<div class="fe-video-news-modal-frame"></div>' +
       "</div>";
     document.body.appendChild(modal);
     return modal;
@@ -1248,15 +1248,15 @@
 
     return (
       '<section class="fe-body-section fe-video-news-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
-        '<div class="container">' +
-          ((title || desc)
-            ? '<div class="fe-section-heading fe-video-news-heading">' +
-                (title ? '<div class="fe-video-news-heading-title">' + renderSectionTitle(title) + "</div>" : "") +
-                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
-              "</div>"
-            : "") +
-          itemsHtml +
-        "</div>" +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading fe-video-news-heading">' +
+        (title ? '<div class="fe-video-news-heading-title">' + renderSectionTitle(title) + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      itemsHtml +
+      "</div>" +
       "</section>"
     );
   }
@@ -1298,13 +1298,13 @@
     return '<article class="fe-menu-cat-card">' +
       '<a class="fe-menu-cat-thumb" href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></a>' +
       '<div class="fe-menu-cat-card-body">' +
-        '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
-        '<div class="fe-menu-cat-stars" aria-hidden="true">★★★★★</div>' +
-        '<div class="fe-menu-cat-price-row">' + (price ? '<span class="fe-menu-cat-price">' + escapeHtml(price) + '</span>' : "") + (oldPrice && oldPrice !== price ? '<span class="fe-menu-cat-old-price">' + escapeHtml(oldPrice) + '</span>' : "") + '</div>' +
-        (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
-        '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
+      '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
+      '<div class="fe-menu-cat-stars" aria-hidden="true">★★★★★</div>' +
+      '<div class="fe-menu-cat-price-row">' + (price ? '<span class="fe-menu-cat-price">' + escapeHtml(price) + '</span>' : "") + (oldPrice && oldPrice !== price ? '<span class="fe-menu-cat-old-price">' + escapeHtml(oldPrice) + '</span>' : "") + '</div>' +
+      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
+      '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
       '</div>' +
-    '</article>';
+      '</article>';
   }
 
   function renderMenuCategorySection(section) {
@@ -1370,12 +1370,12 @@
 
     return (
       open +
-        (image ? '<div class="' + mediaClass + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></div>' : "") +
-        (displayType === "original" && !title && !desc ? "" :
-          '<div class="fe-service-content">' +
-            (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
-            (desc ? '<div class="fe-service-desc">' + desc + "</div>" : "") +
-          "</div>") +
+      (image ? '<div class="' + mediaClass + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></div>' : "") +
+      (displayType === "original" && !title && !desc ? "" :
+        '<div class="fe-service-content">' +
+        (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
+        (desc ? '<div class="fe-service-desc">' + desc + "</div>" : "") +
+        "</div>") +
       close
     );
   }
@@ -1400,15 +1400,15 @@
 
     return (
       '<section class="fe-body-section fe-service-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-service-columns:' + columns + ';--fe-service-radius:' + escapeHtml(radius) + ';--fe-service-padding:' + escapeHtml(padding) + '">' +
-        '<div class="container">' +
-          ((title || desc)
-            ? '<div class="fe-section-heading">' +
-                renderSectionTitle(title) +
-                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
-              "</div>"
-            : "") +
-          (itemsHtml ? '<div class="fe-service-grid fe-service-' + escapeHtml(displayType) + ' fe-service-' + escapeHtml(layoutType) + (centerContent ? ' is-centered' : '') + '">' + itemsHtml + "</div>" : "") +
-        "</div>" +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      (itemsHtml ? '<div class="fe-service-grid fe-service-' + escapeHtml(displayType) + ' fe-service-' + escapeHtml(layoutType) + (centerContent ? ' is-centered' : '') + '">' + itemsHtml + "</div>" : "") +
+      "</div>" +
       "</section>"
     );
   }
@@ -1472,16 +1472,16 @@
       var itemId = sectionUid + "-q" + index;
       return (
         '<div class="accordion-item">' +
-          '<h2 class="accordion-header">' +
-            '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' + itemId + '">' +
-              escapeHtml(item.question) +
-            "</button>" +
-          "</h2>" +
-          '<div id="' + itemId + '" class="accordion-collapse collapse" data-bs-parent="#' + sectionUid + '">' +
-            '<div class="accordion-body">' +
-              (/<[a-z][\s\S]*>/i.test(String(item.answer)) ? item.answer : escapeHtml(item.answer)) +
-            "</div>" +
-          "</div>" +
+        '<h2 class="accordion-header">' +
+        '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' + itemId + '">' +
+        escapeHtml(item.question) +
+        "</button>" +
+        "</h2>" +
+        '<div id="' + itemId + '" class="accordion-collapse collapse" data-bs-parent="#' + sectionUid + '">' +
+        '<div class="accordion-body">' +
+        (/<[a-z][\s\S]*>/i.test(String(item.answer)) ? item.answer : escapeHtml(item.answer)) +
+        "</div>" +
+        "</div>" +
         "</div>"
       );
     }).join("");
@@ -1491,31 +1491,112 @@
     if (visualHtml) {
       rowHtml =
         '<div class="row g-4 align-items-start">' +
-          '<div class="col-12 ' + escapeHtml(visualCol) + '">' + visualHtml + "</div>" +
-          '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
-            (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
-          "</div>" +
+        '<div class="col-12 ' + escapeHtml(visualCol) + '">' + visualHtml + "</div>" +
+        '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
+        (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
+        "</div>" +
         "</div>";
     } else {
       rowHtml =
         '<div class="row g-4 justify-content-center">' +
-          '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
-            (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
-          "</div>" +
+        '<div class="col-12 ' + escapeHtml(questionWidth) + '">' +
+        (questionsHtml ? '<div class="accordion accordion-flush fe-faq-accordion" id="' + sectionUid + '">' + questionsHtml + "</div>" : "") +
+        "</div>" +
         "</div>";
     }
 
     return (
       '<section class="fe-body-section fe-faq-section" style="--fe-body-bg:' + escapeHtml(bg) + '">' +
-        '<div class="container">' +
-          ((title || desc)
-            ? '<div class="fe-section-heading">' +
-                renderSectionTitle(title) +
-                (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
-              "</div>"
-            : "") +
-          rowHtml +
-        "</div>" +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      rowHtml +
+      "</div>" +
+      "</section>"
+    );
+  }
+
+  function normalizeBodyBanners(data) {
+    return normalizeList(firstValue(data.banners, data.items, data.images)).map(function (item, index) {
+      if (typeof item === "string") {
+        return { image: item, url: "", title: "Banner " + (index + 1) };
+      }
+      return {
+        image: firstValue(item.image, item.file, item.src, item.banner),
+        url: firstValue(item.url, item.link, item.href, ""),
+        title: firstValue(item.title, item.name, "Banner " + (index + 1))
+      };
+    }).filter(function (item) {
+      return item.image;
+    });
+  }
+
+  function renderBodyBannerCard(banner, index) {
+    var image = safeImageUrl(banner.image, "");
+    var href = safeUrl(banner.url, "");
+    var title = firstValue(banner.title, "Banner " + (index + 1));
+    var media = '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index === 0 ? "eager" : "lazy") + '" decoding="async">';
+
+    if (!image) return "";
+    if (href && href !== "#") {
+      return '<div class="fe-body-banner-card"><a href="' + escapeHtml(href) + '">' + media + "</a></div>";
+    }
+    return '<div class="fe-body-banner-card">' + media + "</div>";
+  }
+
+  function renderBodyBannerSection(section) {
+    var data = sectionData(section);
+    var title = firstValue(data.title, sectionTitle(section, data));
+    var desc = firstValue(data.description, data.desc);
+    var perRow = Math.max(1, numberValue(firstValue(data.banners_per_row, data.bannersPerRow), 1));
+    var banners = normalizeBodyBanners(data);
+    var button = data.button || {};
+    var buttonText = firstValue(button.text, button.name, data.button_text, data.buttonText, "");
+    var buttonUrl = bodyItemUrl(firstValue(button.url, button.link, data.button_url, data.buttonUrl, ""));
+    var isSlider = banners.length > perRow;
+    var itemsHtml;
+    var buttonHtml = "";
+
+    if (!banners.length && !title && !desc && !buttonText) return "";
+
+    if (isSlider) {
+      itemsHtml =
+        '<div class="fe-body-banner-slider" data-banner-columns="' + perRow + '">' +
+        banners.map(function (banner, index) {
+          return '<div class="fe-body-banner-slide">' + renderBodyBannerCard(banner, index) + "</div>";
+        }).join("") +
+        "</div>";
+    } else {
+      itemsHtml =
+        '<div class="fe-body-banner-grid" style="--fe-body-banner-columns:' + perRow + '">' +
+        banners.map(function (banner, index) { return renderBodyBannerCard(banner, index); }).join("") +
+        "</div>";
+    }
+
+    if (buttonText) {
+      buttonHtml = buttonUrl !== "#"
+        ? '<div class="container"><div class="fe-body-banner-actions"><a class="fe-body-banner-button" href="' + escapeHtml(buttonUrl) + '">' + escapeHtml(buttonText) + "</a></div></div>"
+        : '<div class="container"><div class="fe-body-banner-actions"><span class="fe-body-banner-button" role="button" aria-disabled="true">' + escapeHtml(buttonText) + "</span></div></div>";
+    }
+
+    var bgColor = firstValue(data.bg_color, data.bgColor, "#ffffff");
+
+    return (
+      '<section class="fe-body-section fe-body-banner-section p-0" style="background-color: ' + escapeHtml(bgColor) + ';">' +
+      ((title || desc)
+        ? '<div class="container"><div class="fe-section-heading mt-4">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div></div>"
+        : "") +
+      '<div class="container-fluid p-0 overflow-hidden">' +
+      itemsHtml +
+      '</div>' +
+      buttonHtml +
       "</section>"
     );
   }
@@ -1555,6 +1636,10 @@
       return renderVideoNewsSection(section);
     }
 
+    if (type === "body_banner" || type === "banner") {
+      return renderBodyBannerSection(section);
+    }
+
     return "";
   }
 
@@ -1582,8 +1667,8 @@
     if (!title && !links.length) return "";
     return (
       '<div class="fe-footer-block">' +
-        (title ? '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" : "") +
-        '<ul class="menu-f fe-footer-links">' + links.map(function (item) { return renderFooterLink(item, iconClass); }).join("") + "</ul>" +
+      (title ? '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" : "") +
+      '<ul class="menu-f fe-footer-links">' + links.map(function (item) { return renderFooterLink(item, iconClass); }).join("") + "</ul>" +
       "</div>"
     );
   }
@@ -1609,7 +1694,7 @@
       rows.push('<li><i class="fa-solid fa-envelope"></i><p><strong>Email: </strong><a href="mailto:' + escapeHtml(email) + '">' + escapeHtml(email) + "</a></p></li>");
     });
 
-    
+
     if (taxCode) {
       rows.push('<li><i class="fa-solid fa-file-invoice"></i><p><strong>MST: </strong>' + escapeHtml(taxCode) + "</p></li>");
     }
@@ -1655,8 +1740,8 @@
     }
     return (
       '<div class="fe-footer-social-block">' +
-        '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
-        '<ul class="list-social fe-footer-social-list">' + items.map(renderFooterSocialItem).join("") + "</ul>" +
+      '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
+      '<ul class="list-social fe-footer-social-list">' + items.map(renderFooterSocialItem).join("") + "</ul>" +
       "</div>"
     );
   }
@@ -1672,8 +1757,8 @@
     if (!isEnabled(firstValue(bct.show, bct.visible, bct.enabled), false)) return "";
     return (
       '<div class="fe-footer-bct-block">' +
-        '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
-        '<a class="images-bct" href="' + escapeHtml(href) + '"><img class="w-full" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="lazy" decoding="async"></a>' +
+      '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(title) + "</span></h4>" +
+      '<a class="images-bct" href="' + escapeHtml(href) + '"><img class="w-full" src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="lazy" decoding="async"></a>' +
       "</div>"
     );
   }
@@ -1687,10 +1772,10 @@
 
     return (
       '<div class="' + escapeHtml(firstValue(bootstrap.col_1_class, "col-12 col-xl-4")) + ' fe-footer-col-one">' +
-        (company ? '<h4 class="ttl-f fe-footer-title text-16">' + escapeHtml(company) + "</h4>" : "") +
-        (logo ? '<div class="logo-f fe-footer-logo-wrap"><img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async"></div>' : "") +
-        (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
-        renderFooterContact(footer) +
+      (company ? '<h4 class="ttl-f fe-footer-title text-16">' + escapeHtml(company) + "</h4>" : "") +
+      (logo ? '<div class="logo-f fe-footer-logo-wrap"><img class="fe-footer-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "Logo") + '" loading="lazy" decoding="async"></div>' : "") +
+      (desc ? '<div class="fe-footer-desc">' + escapeHtml(desc) + "</div>" : "") +
+      renderFooterContact(footer) +
       "</div>"
     );
   }
@@ -1732,9 +1817,9 @@
     if (isEnabled(map.show, false) && map.iframe) {
       blocks.push(
         '<div class="col-12 fe-footer-map-block"><div class="map-wrapper">' +
-          '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + "</span></h4>" +
-          renderFooterEmbed(map.iframe) +
-          ((mapAddressTitle || mapAddressText) ? '<div class="map-address">' + (mapAddressTitle ? '<h5>' + escapeHtml(mapAddressTitle) + "</h5>" : "") + (mapAddressText ? '<p>' + escapeHtml(mapAddressText) + "</p>" : "") + "</div>" : "") +
+        '<h4 class="ttl-f fe-footer-title text-16"><span>' + escapeHtml(firstValue(map.title, "Tìm Chúng Tôi Trên Bản Đồ")) + "</span></h4>" +
+        renderFooterEmbed(map.iframe) +
+        ((mapAddressTitle || mapAddressText) ? '<div class="map-address">' + (mapAddressTitle ? '<h5>' + escapeHtml(mapAddressTitle) + "</h5>" : "") + (mapAddressText ? '<p>' + escapeHtml(mapAddressText) + "</p>" : "") + "</div>" : "") +
         "</div></div>"
       );
     }
@@ -1756,7 +1841,7 @@
     var count = numberValue(localStorage.getItem(key), 0) + 1;
     try {
       localStorage.setItem(key, String(count));
-    } catch (e) {}
+    } catch (e) { }
     return count;
   }
 
@@ -1831,12 +1916,12 @@
 
     return (
       '<div class="fe-footer-shell footer-style-' + escapeHtml(style) + '" style="' + styleVars + '">' +
-        '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
-          renderFooterColumnOne(footer) +
-          rightColumns.join("") +
-        "</div></div></div>" +
-        renderFooterAccess(footer.access_time || footer.accessTime) +
-        '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + copyrightHtml + "</div></div>" +
+      '<div class="fe-footer-inner"><div class="container"><div class="row g-4">' +
+      renderFooterColumnOne(footer) +
+      rightColumns.join("") +
+      "</div></div></div>" +
+      renderFooterAccess(footer.access_time || footer.accessTime) +
+      '<div class="fe-footer-copyright" style="' + copyrightStyle + '"><div class="container">' + copyrightHtml + "</div></div>" +
       "</div>"
     );
   }
@@ -1888,12 +1973,12 @@
     var rightGapClass = topLinksGapClass(top.rightLinks);
     return (
       '<div class="header-top d-none d-md-block" style="background:' + escapeHtml(top.bgColor) + ';color:' + escapeHtml(top.textColor) + ';border-bottom:' + Number(top.borderWidth || 0) + 'px solid ' + escapeHtml(top.borderColor) + ';--header-top-hover-bg:' + escapeHtml(top.hoverBgColor) + ';--header-top-hover-text:' + escapeHtml(top.hoverTextColor) + '">' +
-        '<div class="container-fluid px-3 px-sm-5 py-2">' +
-          '<div class="infomation d-flex flex-nowrap justify-content-between gap-2">' +
-            '<div class="d-flex flex-wrap ' + leftGapClass + ' infomation-left">' + left + "</div>" +
-            '<div class="social-icons d-flex align-items-center ' + rightGapClass + '">' + right + "</div>" +
-          "</div>" +
-        "</div>" +
+      '<div class="container-fluid px-3 px-sm-5 py-2">' +
+      '<div class="infomation d-flex flex-nowrap justify-content-between gap-2">' +
+      '<div class="d-flex flex-wrap ' + leftGapClass + ' infomation-left">' + left + "</div>" +
+      '<div class="social-icons d-flex align-items-center ' + rightGapClass + '">' + right + "</div>" +
+      "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -1908,10 +1993,10 @@
     var content = firstValue(item.content, item.description);
     return (
       '<a class="header-action' + visibleClass + '" style="color:inherit;--header-action-columns:' + columns + '" href="' + escapeHtml(href) + '">' +
-        '<div class="header-action-inner d-flex justify-content-center align-items-center gap-1">' +
-          renderMainItemMedia(item) +
-          '<div class="text text-left d-none d-xl-block"><small>' + escapeHtml(title) + (content ? '<b class="d-block text-left">' + escapeHtml(content) + "</b>" : "") + "</small></div>" +
-        "</div>" +
+      '<div class="header-action-inner d-flex justify-content-center align-items-center gap-1">' +
+      renderMainItemMedia(item) +
+      '<div class="text text-left d-none d-xl-block"><small>' + escapeHtml(title) + (content ? '<b class="d-block text-left">' + escapeHtml(content) + "</b>" : "") + "</small></div>" +
+      "</div>" +
       "</a>"
     );
   }
@@ -1931,11 +2016,11 @@
 
     return (
       '<div class="header-account-action d-none d-lg-flex align-items-center" style="color:inherit">' +
-        '<i class="fa-solid fa-user"></i>' +
-        '<div class="text text-left">' +
-          '<small>Tài Khoản</small>' +
-          '<div class="header-account-links">' + links.join("") + "</div>" +
-        "</div>" +
+      '<i class="fa-solid fa-user"></i>' +
+      '<div class="text text-left">' +
+      '<small>Tài Khoản</small>' +
+      '<div class="header-account-links">' + links.join("") + "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -1949,17 +2034,17 @@
     var logo = safeUrl(main.logo, FALLBACKS.logo);
     return (
       '<div class="header-main header-main-shell px-3 d-flex align-items-center justify-content-between' + (extraClass || "") + '" id="header-main" style="background:' + escapeHtml(main.bgColor) + ';color:' + escapeHtml(main.textColor) + ';border-bottom:' + Number(main.borderWidth || 0) + 'px solid ' + escapeHtml(main.borderColor) + ';--header-main-hover-bg:' + escapeHtml(main.hoverBgColor) + ';--header-main-hover-text:' + escapeHtml(main.hoverTextColor) + '">' +
-        '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
-          '<div class="d-lg-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars fs-5 mt-1"></i></button></div></div></div></div>' +
-          '<div class="wrap-header-logo ' + escapeHtml(main.logoCol) + ' px-0 d-flex align-content-center justify-content-center justify-content-lg-start">' +
-            '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
-          "</div>" +
-          (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Search"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
-          '<div class="header-actions-list col d-none d-lg-flex align-items-center justify-content-end px-1">' +
-            items.map(renderMainItem).join("") +
-            renderAccountAction(main) +
-          "</div>" +
-        "</div></div>" +
+      '<div class="container"><div class="row align-items-center justify-content-between w-100 wrap-menu">' +
+      '<div class="d-lg-none col-2 px-0"><div class="toggle-menu d-flex gap-1 justify-content-between align-content-center"><div class="box-icon d-flex justify-content-center gap-2"><div class="icon icon-light-border"><button class="btn btn-toggle-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample3" aria-controls="offcanvasExample3"><i class="fa-solid fa-bars fs-5 mt-1"></i></button></div></div></div></div>' +
+      '<div class="wrap-header-logo ' + escapeHtml(main.logoCol) + ' px-0 d-flex align-content-center justify-content-center justify-content-lg-start">' +
+      '<div class="logo d-flex align-items-center justify-content-center justify-content-md-start" id="logo"><a href="./"><img class="w-100" src="' + escapeHtml(logo) + '" alt="logo" loading="eager" decoding="async"></a></div>' +
+      "</div>" +
+      (main.searchShow ? '<div class="d-none d-md-flex align-content-center wrap-header-search px-0 ' + escapeHtml(main.searchCol) + '" id="header-search"><div class="header-search d-block w-100"><form class="form-inline" action="tat-ca-san-pham" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="' + escapeHtml(main.searchPlaceholder) + '"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Search"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' : "") +
+      '<div class="header-actions-list col d-none d-lg-flex align-items-center justify-content-end px-1">' +
+      items.map(renderMainItem).join("") +
+      renderAccountAction(main) +
+      "</div>" +
+      "</div></div>" +
       "</div>"
     );
   }
@@ -1967,7 +2052,7 @@
   function renderStickyMenuLogo(logo) {
     return (
       '<div class="fe-sticky-menu-logo">' +
-        '<a href="./"><img src="' + escapeHtml(safeUrl(logo, FALLBACKS.logo)) + '" alt="logo" loading="lazy" decoding="async"></a>' +
+      '<a href="./"><img src="' + escapeHtml(safeUrl(logo, FALLBACKS.logo)) + '" alt="logo" loading="lazy" decoding="async"></a>' +
       "</div>"
     );
   }
@@ -1975,11 +2060,11 @@
   function renderMenu(fallbackMenuHtml, logo) {
     return (
       '<div id="header-sticky" style="' + menuAppearanceStyle() + '">' +
-        '<div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
-          '<div class="header-bottom-inner">' +
-            '<div class="fe-sticky-menu-list">' + fallbackMenuHtml + "</div>" +
-          "</div>" +
-        "</div>" +
+      '<div class="header-bottom-item header-bottom d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
+      '<div class="header-bottom-inner">' +
+      '<div class="fe-sticky-menu-list">' + fallbackMenuHtml + "</div>" +
+      "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -1987,9 +2072,9 @@
   function renderLanguageFlags() {
     return (
       '<div class="fe-header-language-flags" aria-label="Language">' +
-        '<a href="#" aria-label="Tieng Viet"><img src="assets/img/header/vi.jpg" alt="VI"></a>' +
-        '<a href="#" aria-label="English"><img src="assets/img/header/en.jpg" alt="EN"></a>' +
-        '<a href="#" aria-label="Japanese"><img src="assets/img/header/ja.jpg" alt="JA"></a>' +
+      '<a href="#" aria-label="Tieng Viet"><img src="assets/img/header/vi.jpg" alt="VI"></a>' +
+      '<a href="#" aria-label="English"><img src="assets/img/header/en.jpg" alt="EN"></a>' +
+      '<a href="#" aria-label="Japanese"><img src="assets/img/header/ja.jpg" alt="JA"></a>' +
       "</div>"
     );
   }
@@ -2022,18 +2107,18 @@
 
     return (
       '<div class="fe-header-news-marquee" style="' +
-        (news && news.bgColor ? '--fe-news-bg:' + escapeHtml(news.bgColor) + ';' : '') +
-        (news && news.textColor ? '--fe-news-text:' + escapeHtml(news.textColor) + ';' : '') +
-        (news && news.hoverTextColor ? '--fe-news-hover-text:' + escapeHtml(news.hoverTextColor) + ';' : '') +
+      (news && news.bgColor ? '--fe-news-bg:' + escapeHtml(news.bgColor) + ';' : '') +
+      (news && news.textColor ? '--fe-news-text:' + escapeHtml(news.textColor) + ';' : '') +
+      (news && news.hoverTextColor ? '--fe-news-hover-text:' + escapeHtml(news.hoverTextColor) + ';' : '') +
       '">' +
-        '<div class="container px-3 px-sm-5">' +
-          '<div class="fe-header-news-track" aria-label="Tin tá»©c">' +
-            '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tá»©c</span>' +
-            '<div class="fe-header-news-run"><div class="fe-header-news-content">' +
-              '<span class="fe-header-news-group">' + content + "</span>" +
-            "</div></div>" +
-          "</div>" +
-        "</div>" +
+      '<div class="container px-3 px-sm-5">' +
+      '<div class="fe-header-news-track" aria-label="Tin tá»©c">' +
+      '<span class="fe-header-news-badge"><i class="fa-solid fa-bullhorn"></i> Tin tá»©c</span>' +
+      '<div class="fe-header-news-run"><div class="fe-header-news-content">' +
+      '<span class="fe-header-news-group">' + content + "</span>" +
+      "</div></div>" +
+      "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -2041,22 +2126,22 @@
   function renderMenuStyle5(menuHtml, logo) {
     return (
       '<div id="header-sticky" class="header-sticky-style-5" style="' + menuAppearanceStyle() + '">' +
-        '<div class="header-bottom-item header-bottom header-bottom-style-5 d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
-          '<button class="fe-header-vertical-toggle" type="button" data-fe-vertical-toggle aria-expanded="false" aria-controls="fe-header-vertical-menu">' +
-            '<i class="fa-solid fa-bars"></i><span>Menu</span>' +
-          "</button>" +
-          '<div class="header-bottom-layout">' +
-            renderStickyMenuLogo(logo) +
-            '<div class="header-bottom-inner fe-style5-main-menu"><div class="fe-sticky-menu-list">' + menuHtml + "</div></div>" +
-            '<aside class="fe-header-vertical-panel" id="fe-header-vertical-menu" aria-hidden="true">' +
-              '<div class="fe-header-vertical-head">' +
-                '<strong>Danh mục</strong>' +
-                '<button class="fe-header-vertical-close" type="button" data-fe-vertical-close aria-label="Đóng menu"><i class="fa-solid fa-xmark"></i></button>' +
-              "</div>" +
-              '<nav class="fe-header-vertical-nav">' + menuHtml + "</nav>" +
-            "</aside>" +
-          "</div>" +
-        "</div>" +
+      '<div class="header-bottom-item header-bottom header-bottom-style-5 d-none d-lg-block container-fluid px-5 header-bottom-surface">' +
+      '<button class="fe-header-vertical-toggle" type="button" data-fe-vertical-toggle aria-expanded="false" aria-controls="fe-header-vertical-menu">' +
+      '<i class="fa-solid fa-bars"></i><span>Menu</span>' +
+      "</button>" +
+      '<div class="header-bottom-layout">' +
+      renderStickyMenuLogo(logo) +
+      '<div class="header-bottom-inner fe-style5-main-menu"><div class="fe-sticky-menu-list">' + menuHtml + "</div></div>" +
+      '<aside class="fe-header-vertical-panel" id="fe-header-vertical-menu" aria-hidden="true">' +
+      '<div class="fe-header-vertical-head">' +
+      '<strong>Danh mục</strong>' +
+      '<button class="fe-header-vertical-close" type="button" data-fe-vertical-close aria-label="Đóng menu"><i class="fa-solid fa-xmark"></i></button>' +
+      "</div>" +
+      '<nav class="fe-header-vertical-nav">' + menuHtml + "</nav>" +
+      "</aside>" +
+      "</div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -2184,45 +2269,45 @@
     if (header.main.loginShow || header.main.registerShow) {
       loginLinks =
         '<div class="border-top d-flex py-2 gap-2">' +
-          (header.main.loginShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./login.html"><img src="assets/img/header/icon-login.png" alt="" width="20" height="20"><span>Đăng nhập</span></a>' : "") +
-          (header.main.registerShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./register.html"><img src="assets/img/header/icon-register.png" alt="" width="20" height="20"><span>Đăng ký</span></a>' : "") +
+        (header.main.loginShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./login.html"><img src="assets/img/header/icon-login.png" alt="" width="20" height="20"><span>Đăng nhập</span></a>' : "") +
+        (header.main.registerShow ? '<a class="btn-login d-flex gap-2 align-items-center" href="./register.html"><img src="assets/img/header/icon-register.png" alt="" width="20" height="20"><span>Đăng ký</span></a>' : "") +
         "</div>";
     }
 
     return (
       '<div class="foo_mid border-top text-dark">' +
-        '<a class="btn-hotline d-flex gap-2 align-items-center" href="tel:0847865568">' +
-          '<img src="assets/img/header/icon-hotline.png" alt="" width="36">' +
-          '<div class="d-flex flex-column fw-bold"><span class="text-sub">Hotline & Zalo</span><span class="fs-5">0847 865 568</span></div>' +
-        "</a>" +
-        loginLinks +
-        '<div class="py-2 border-top">' +
-          '<p class="mb-2 position-relative fw-bold">Kết nối mạng xã hội</p>' +
-          '<div class="d-flex position-relative social mb-1 mx-0 gap-1">' +
-            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>' +
-            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Shopee"><img src="https://we1.io.vn/admin/public/images/footer/1773280802172%20Shopee.png" alt="Shopee" width="32" height="32"></a>' +
-            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Twitter"><i class="fa-brands fa-twitter"></i></a>' +
-            '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Youtube"><i class="fa-brands fa-youtube"></i></a>' +
-          "</div>" +
-        "</div>" +
-        '<div class="mb-2 border-top">' +
-          '<address class="my-2">' +
-            '<h5 class="mb-2"><strong>THIẾT KẾ WEB 365 .VN</strong></h5>' +
-            '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
-            '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
-            '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:mrquan.thietkeweb365.vn@gmail.com" title="mrquan.thietkeweb365.vn@gmail.com">mrquan.thietkeweb365.vn@gmail.com</a></p>' +
-            '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:youmail@gmail.com" title="youmail@gmail.com">youmail@gmail.com</a></p>' +
-            '<p class="mb-1"><b>Hà Nội: </b>Trần Khát Chân, Hai Bà Trưng, Hà Nội</p>' +
-            '<p class="mb-1"><b>TP. HCM: </b>Bùi Đình Túy, Bình Thạnh, TP. HCM</p>' +
-          "</address>" +
-        "</div>" +
-        '<div class="border-top text-dark">' +
-          '<p class="mt-2 position-relative fw-bold">Phương thức thanh toán</p>' +
-          '<div class="d-flex py-2 gap-4"><div class="footer-column-1"><div class="payment-accept gap-1 mx-0">' +
-            '<img class="first lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414842AC.webp" alt="American Express">' +
-            '<img class="lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414848MC.webp" alt="MasterCard">' +
-          "</div></div></div>" +
-        "</div>" +
+      '<a class="btn-hotline d-flex gap-2 align-items-center" href="tel:0847865568">' +
+      '<img src="assets/img/header/icon-hotline.png" alt="" width="36">' +
+      '<div class="d-flex flex-column fw-bold"><span class="text-sub">Hotline & Zalo</span><span class="fs-5">0847 865 568</span></div>' +
+      "</a>" +
+      loginLinks +
+      '<div class="py-2 border-top">' +
+      '<p class="mb-2 position-relative fw-bold">Kết nối mạng xã hội</p>' +
+      '<div class="d-flex position-relative social mb-1 mx-0 gap-1">' +
+      '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>' +
+      '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Shopee"><img src="https://we1.io.vn/admin/public/images/footer/1773280802172%20Shopee.png" alt="Shopee" width="32" height="32"></a>' +
+      '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Twitter"><i class="fa-brands fa-twitter"></i></a>' +
+      '<a href="#" target="_blank" class="position-relative iso sitdown modal-open d-inline-block mr-1" title="Youtube"><i class="fa-brands fa-youtube"></i></a>' +
+      "</div>" +
+      "</div>" +
+      '<div class="mb-2 border-top">' +
+      '<address class="my-2">' +
+      '<h5 class="mb-2"><strong>THIẾT KẾ WEB 365 .VN</strong></h5>' +
+      '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
+      '<p class="mb-1"><b>SDT: </b><a class="text-dark" href="tel:0847865568" title="0847 865 568">0847 865 568</a></p>' +
+      '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:mrquan.thietkeweb365.vn@gmail.com" title="mrquan.thietkeweb365.vn@gmail.com">mrquan.thietkeweb365.vn@gmail.com</a></p>' +
+      '<p class="m-0"><b>Email: </b><a class="text-dark" href="mailto:youmail@gmail.com" title="youmail@gmail.com">youmail@gmail.com</a></p>' +
+      '<p class="mb-1"><b>Hà Nội: </b>Trần Khát Chân, Hai Bà Trưng, Hà Nội</p>' +
+      '<p class="mb-1"><b>TP. HCM: </b>Bùi Đình Túy, Bình Thạnh, TP. HCM</p>' +
+      "</address>" +
+      "</div>" +
+      '<div class="border-top text-dark">' +
+      '<p class="mt-2 position-relative fw-bold">Phương thức thanh toán</p>' +
+      '<div class="d-flex py-2 gap-4"><div class="footer-column-1"><div class="payment-accept gap-1 mx-0">' +
+      '<img class="first lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414842AC.webp" alt="American Express">' +
+      '<img class="lazy loaded" width="47" src="https://we1.io.vn/admin/public/images/footer/174807414848MC.webp" alt="MasterCard">' +
+      "</div></div></div>" +
+      "</div>" +
       "</div>"
     );
   }
@@ -2231,12 +2316,12 @@
     var logo = safeUrl(header.main.logo || header.logo.main, FALLBACKS.logo);
     return (
       '<div class="offcanvas offcanvas-start offcanvasExample3" id="offcanvasExample3" data-bs-scroll="false" data-bs-backdrop="true" tabindex="-1" aria-labelledby="offcanvasExampleLabel">' +
-        '<div class="offcanvas-header pb-1 position-relative px-1 pt-2 mx-3">' +
-          '<h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250" src="' + escapeHtml(logo) + '" alt="logo" loading="lazy" decoding="async"></h5>' +
-          '<button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>' +
-        "</div>" +
-        '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tìm kiếm Sản phẩm & Dịch vụ ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
-        '<div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column"><ul class="mobile-category-menu border-top" id="mobile-category-menu"></ul>' + renderMobileSidebarInfo(header) + '</div>' +
+      '<div class="offcanvas-header pb-1 position-relative px-1 pt-2 mx-3">' +
+      '<h5 class="offcanvas-title mx-auto" id="offcanvasExampleLabel"><img class="w-100" width="250" src="' + escapeHtml(logo) + '" alt="logo" loading="lazy" decoding="async"></h5>' +
+      '<button class="btn-close position-absolute z-1 end-0" id="btn-close-sidebar" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>' +
+      "</div>" +
+      '<div class="px-3 py-2"><div class="header-search d-block w-100"><form class="form-inline" action="#" method="GET"><div class="input-group flex-nowrap"><input class="form-control" type="text" name="search" placeholder="Tìm kiếm Sản phẩm & Dịch vụ ?"><div class="input-group-append bg-light"><button class="btn" type="submit" aria-label="Tìm kiếm"><i class="fa fa-search" aria-hidden="true"></i></button></div></div></form></div></div>' +
+      '<div class="offcanvas-body pt-1 px-3 d-flex justify-content-between flex-column"><ul class="mobile-category-menu border-top" id="mobile-category-menu"></ul>' + renderMobileSidebarInfo(header) + '</div>' +
       "</div>"
     );
   }

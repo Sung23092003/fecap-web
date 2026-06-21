@@ -588,6 +588,49 @@
         });
       }
 
+      function initBodyBannerSliders() {
+        if (!$.fn.slick) return;
+
+        $('.fe-body-banner-slider').each(function () {
+          var $slider = $(this);
+          var columns = Number($slider.attr('data-banner-columns')) || 2;
+          var totalSlides;
+
+          if ($slider.hasClass('slick-initialized')) {
+            $slider.slick('unslick');
+          }
+
+          totalSlides = $slider.children('.fe-body-banner-slide').length;
+          if (totalSlides <= columns) {
+            return;
+          }
+
+          $slider.slick({
+            dots: true,
+            arrows: true,
+            infinite: true,
+            speed: 450,
+            autoplay: true,
+            autoplaySpeed: 3500,
+            pauseOnHover: true,
+            slidesToShow: columns,
+            slidesToScroll: 1,
+            adaptiveHeight: false,
+            prevArrow: '<button class="fe-body-banner-arrow fe-body-banner-prev" type="button" aria-label="Banner trước"><i class="fa-solid fa-chevron-left"></i></button>',
+            nextArrow: '<button class="fe-body-banner-arrow fe-body-banner-next" type="button" aria-label="Banner sau"><i class="fa-solid fa-chevron-right"></i></button>',
+            responsive: [
+              { breakpoint: 992, settings: { slidesToShow: Math.min(columns, 2) } },
+              { breakpoint: 576, settings: { slidesToShow: 1, arrows: false } }
+            ]
+          });
+        });
+      }
+
+      function scheduleBodyBannerSliders() {
+        window.clearTimeout(window.feBodyBannerSliderTimer);
+        window.feBodyBannerSliderTimer = window.setTimeout(initBodyBannerSliders, 120);
+      }
+
       function initPagedGridSliders(selector) {
         if (!$.fn.slick) return;
 
@@ -720,11 +763,16 @@
       });
       initBannerSlider();
       initPagedGridSliders('.fe-paged-grid-slider');
+      initBodyBannerSliders();
       window.addEventListener('fe:banner-rendered', initBannerSlider);
       window.addEventListener('fe:body-rendered', function () {
         initPagedGridSliders('.fe-paged-grid-slider');
+        scheduleBodyBannerSliders();
       });
-      $(window).on('resize', schedulePagedGridSliders);
+      $(window).on('resize', function () {
+        schedulePagedGridSliders();
+        scheduleBodyBannerSliders();
+      });
     });
   </script>
 </body>
