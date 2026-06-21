@@ -1601,6 +1601,38 @@
     );
   }
 
+  function renderGallerySection(section) {
+    var data = sectionData(section);
+    var title = sectionTitle(section, data);
+    var desc = firstValue(data.description, data.desc, data.summary);
+    var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var columns = clampColumns(firstValue(data.images_per_row, data.imagesPerRow, 4));
+    var borderStyle = firstValue(data.border, data.border_style, data.borderStyle, "");
+    var images = normalizeList(data.images);
+    var itemsHtml = images.map(function (src, index) {
+      if (!src) return "";
+      var imageUrl = escapeHtml(safeImageUrl(src, ""));
+      var imageTitle = escapeHtml("Gallery Image " + (index + 1));
+      return '<div class="fe-gallery-item" style="' + escapeHtml(borderStyle) + '"><img class="fe-real-modal-trigger w-100 h-100 object-fit-cover" style="cursor: pointer" src="' + imageUrl + '" alt="' + imageTitle + '" loading="lazy" decoding="async" data-fe-full-image="' + imageUrl + '" data-fe-image-title="' + imageTitle + '"></div>';
+    }).join("");
+
+    if (!images.length && !title && !desc) return "";
+
+    return (
+      '<section class="fe-body-section fe-gallery-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-gallery-columns:' + columns + ';">' +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+        renderSectionTitle(title) +
+        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        "</div>"
+        : "") +
+      (itemsHtml ? '<div class="fe-gallery-grid">' + itemsHtml + "</div>" : "") +
+      "</div>" +
+      "</section>"
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -1638,6 +1670,10 @@
 
     if (type === "body_banner" || type === "banner") {
       return renderBodyBannerSection(section);
+    }
+
+    if (type === "gallery") {
+      return renderGallerySection(section);
     }
 
     return "";
