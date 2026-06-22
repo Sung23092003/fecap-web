@@ -3088,6 +3088,16 @@ a {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.fe-menu-cat-card:hover {
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+    transform: translateY(-2px);
+}
+
+.fe-menu-cat-media {
+    position: relative;
 }
 
 .fe-menu-cat-thumb {
@@ -3102,6 +3112,59 @@ a {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.fe-menu-cat-hover-tools {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+    z-index: 2;
+}
+
+.fe-menu-cat-card:hover .fe-menu-cat-hover-tools {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(-50%);
+}
+
+.fe-menu-cat-tool {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 10px;
+    background: #0b4ea2;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(11, 78, 162, 0.24);
+    transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.fe-menu-cat-tool:hover {
+    background: #083c7c;
+    color: #ffffff;
+    transform: scale(1.06);
+}
+
+.fe-menu-cat-tool:focus {
+    color: #ffffff;
+    outline: none;
+}
+
+.fe-menu-cat-tool i {
+    font-size: 18px;
+    line-height: 1;
 }
 
 .fe-menu-cat-card-body {
@@ -3190,6 +3253,28 @@ a {
 
     .fe-menu-cat-tabs {
         width: 100%;
+    }
+
+    .fe-menu-cat-hover-tools {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        top: auto;
+        right: 8px;
+        bottom: 8px;
+        transform: none;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .fe-menu-cat-card:hover .fe-menu-cat-hover-tools {
+        transform: none;
+    }
+
+    .fe-menu-cat-tool {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
     }
 }
 

@@ -1295,13 +1295,20 @@
     var href = bodyItemUrl(firstValue(item.product_alias, item.alias, item.slug, item.url, item.link));
 
     return '<article class="fe-menu-cat-card">' +
+      '<div class="fe-menu-cat-media">' +
       '<a class="fe-menu-cat-thumb" href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></a>' +
+      '<div class="fe-menu-cat-hover-tools">' +
+      '<button type="button" class="fe-menu-cat-tool" title="Thêm vào giỏ"><i class="fa-solid fa-cart-shopping"></i></button>' +
+      '<button type="button" class="fe-menu-cat-tool" title="So sánh"><i class="fa-solid fa-right-left"></i></button>' +
+      '<a class="fe-menu-cat-tool" href="' + escapeHtml(href) + '" title="Xem chi tiết"><i class="fa-solid fa-eye"></i></a>' +
+      '</div>' +
+      '</div>' +
       '<div class="fe-menu-cat-card-body">' +
       '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
       '<div class="fe-menu-cat-stars" aria-hidden="true">★★★★★</div>' +
       '<div class="fe-menu-cat-price-row">' + (price ? '<span class="fe-menu-cat-price">' + escapeHtml(price) + '</span>' : "") + (oldPrice && oldPrice !== price ? '<span class="fe-menu-cat-old-price">' + escapeHtml(oldPrice) + '</span>' : "") + '</div>' +
-      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
-      '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
+      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="fa-solid fa-phone"></i>' + escapeHtml(phone) + '</a>' : "") +
+      '<button type="button" class="fe-menu-cat-consult"><i class="fa-solid fa-headset"></i>Yêu cầu tư vấn</button>' +
       '</div>' +
       '</article>';
   }
@@ -1320,7 +1327,14 @@
     }
 
     return '<article class="fe-menu-cat-card">' +
+      '<div class="fe-menu-cat-media">' +
       '<a class="fe-menu-cat-thumb" href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></a>' +
+      '<div class="fe-menu-cat-hover-tools">' +
+      '<button type="button" class="fe-menu-cat-tool" title="Thêm vào giỏ"><i class="fa-solid fa-cart-shopping"></i></button>' +
+      '<button type="button" class="fe-menu-cat-tool" title="So sánh"><i class="fa-solid fa-right-left"></i></button>' +
+      '<a class="fe-menu-cat-tool" href="' + escapeHtml(href) + '" title="Xem chi tiết"><i class="fa-solid fa-eye"></i></a>' +
+      '</div>' +
+      '</div>' +
       '<div class="fe-menu-cat-card-body">' +
       '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
       '<div class="fe-menu-cat-stars" aria-hidden="true">' + stars + '</div>' +
@@ -1328,8 +1342,8 @@
       (priceNew ? '<span class="fe-menu-cat-price">' + escapeHtml(priceNew) + '</span>' : "") +
       (priceOld && priceOld !== priceNew ? '<span class="fe-menu-cat-old-price">' + escapeHtml(priceOld) + '</span>' : "") +
       '</div>' +
-      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
-      '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
+      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="fa-solid fa-phone"></i>' + escapeHtml(phone) + '</a>' : "") +
+      '<button type="button" class="fe-menu-cat-consult"><i class="fa-solid fa-headset"></i>Yêu cầu tư vấn</button>' +
       '</div>' +
       '</article>';
   }
