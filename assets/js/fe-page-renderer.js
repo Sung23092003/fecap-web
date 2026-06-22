@@ -1334,10 +1334,50 @@
       '</article>';
   }
 
+  function renderMenuCategoryMarquee(items) {
+    var labels = normalizeList(items)
+      .map(function (item) {
+        if (typeof item === "string" || typeof item === "number") return String(item).trim();
+        return String(firstValue(item.category_title, item.title, item.name, item.text, "")).trim();
+      })
+      .filter(Boolean);
+
+    if (!labels.length) return "";
+
+    return (
+      '<div class="fe-menu-cat-marquee-wrap">' +
+      '<marquee class="fe-menu-cat-marquee" behavior="scroll" direction="left" scrollamount="5" onmouseover="this.stop()" onmouseout="this.start()">' +
+      labels.map(function (label) {
+        return '<span class="fe-menu-cat-marquee-item">' + escapeHtml(label) + "</span>";
+      }).join('<span class="fe-menu-cat-marquee-separator">|</span>') +
+      "</marquee>" +
+      "</div>"
+    );
+  }
+
   function renderMenuCategorySection(section) {
     var data = sectionData(section);
-    var selectedId = String(firstValue(data.menu_id, data.selected_category && data.selected_category.id));
-    var selectedTitle = firstValue(data.menu_name, data.menu_title, data.selected_category && data.selected_category.title, section.section_name, section.name, "Danh mục");
+    var selectedIds = normalizeList(firstValue(data.menu_ids, data.category_ids, data.selected_categories))
+      .map(function (item) {
+        if (typeof item === "object" && item) return String(firstValue(item.id, item.category_id, item.value, "")).trim();
+        return String(item || "").trim();
+      })
+      .filter(Boolean);
+    var selectedId = String(firstValue(data.menu_id, data.selected_category && data.selected_category.id, selectedIds[0]));
+    if (!selectedIds.length && selectedId) selectedIds = [selectedId];
+    var selectedMenuNames = normalizeList(firstValue(data.menu_names, data.selected_menu_names))
+      .map(function (item) {
+        if (typeof item === "object" && item) return String(firstValue(item.title, item.name, item.category_title, item.text, "")).trim();
+        return String(item || "").trim();
+      })
+      .filter(Boolean);
+    if (!selectedMenuNames.length) {
+      selectedMenuNames = String(firstValue(data.menu_name, data.menu_title, ""))
+        .split(",")
+        .map(function (item) { return String(item || "").trim(); })
+        .filter(Boolean);
+    }
+    var selectedTitle = firstValue(data.article_title, data.title, data.menu_title, data.selected_category && data.selected_category.title, section.section_name, section.name, "Danh mục");
     var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
     var textColor = firstValue(data.text_color, data.textColor, "#333333");
     var columns = clampColumns(firstValue(data.items_per_row, data.itemsPerRow, 4));
@@ -1353,23 +1393,35 @@
     if (manualItems) {
       // Dùng items nhập tay, không cần tabs từ danh mục
       products = manualItems.slice(0, limit);
-      activeTabs = selectedTitle ? [{ category_id: selectedId || "manual", category_title: selectedTitle }] : [];
+      activeTabs = selectedMenuNames.length
+        ? selectedMenuNames.map(function (name, index) {
+          return { category_id: selectedIds[index] || ("manual-" + index), category_title: name };
+        })
+        : (selectedTitle ? [{ category_id: selectedId || "manual", category_title: selectedTitle }] : []);
     } else {
       var categoryPool = bodyCatalogCache.categories.filter(function (item) {
         var parentId = String(firstValue(item.category_parent_id, item.parent_id, item.parentId));
-        return selectedId ? (categoryItemId(item) === selectedId || parentId === selectedId) : true;
+        return selectedIds.length ? (selectedIds.indexOf(categoryItemId(item)) !== -1 || selectedIds.indexOf(parentId) !== -1) : true;
       });
-      activeTabs = categoryPool.length ? categoryPool : (selectedId ? [{ category_id: selectedId, category_title: selectedTitle }] : bodyCatalogCache.categories.slice(0, 8));
+      activeTabs = categoryPool.length
+        ? categoryPool
+        : (selectedIds.length
+          ? selectedIds.map(function (id, index) {
+            return {
+              category_id: id,
+              category_title: selectedMenuNames[index] || (selectedTitle + " " + (index + 1))
+            };
+          })
+          : bodyCatalogCache.categories.slice(0, 8));
       var activeIds = activeTabs.map(categoryItemId).filter(Boolean);
       products = bodyCatalogCache.products.filter(function (item) {
         var cid = productItemCategoryId(item);
-        return !activeIds.length || activeIds.indexOf(cid) !== -1 || (!cid && !selectedId);
+        return !activeIds.length || activeIds.indexOf(cid) !== -1 || (!cid && !selectedIds.length);
       }).slice(0, limit);
     }
 
-    var tabHtml = activeTabs.slice(0, 10).map(function (item, index) {
-      return '<button type="button" class="fe-menu-cat-tab' + (index === 0 ? ' is-active' : '') + '">' + escapeHtml(categoryItemTitle(item)) + '</button>';
-    }).join("");
+    var marqueeSource = selectedMenuNames.length ? selectedMenuNames : activeTabs.slice(0, 20);
+    var marqueeHtml = renderMenuCategoryMarquee(marqueeSource);
 
     if (!activeTabs.length && !products.length) return "";
 
@@ -1378,8 +1430,10 @@
       : products.map(renderMenuCategoryProductCard).join("");
 
     return '<section class="fe-body-section fe-menu-cat-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-menu-cat-text:' + escapeHtml(textColor) + ';--fe-menu-cat-columns:' + columns + '">' +
-      '<div class="container"><div class="fe-menu-cat-head"><h2>' + escapeHtml(selectedTitle) + '</h2>' +
-      (tabHtml ? '<div class="fe-menu-cat-tabs">' + tabHtml + '</div>' : "") + '</div>' +
+      '<div class="container"><div class="fe-menu-cat-head">' +
+      (selectedTitle ? renderSectionTitle(selectedTitle) : "") +
+      (marqueeHtml || "") +
+      '</div>' +
       (products.length ? '<div class="fe-menu-cat-grid">' + cardsHtml + '</div>' : '<div class="fe-menu-cat-empty">Chưa có dữ liệu sản phẩm.</div>') +
       '</div></section>';
   }
