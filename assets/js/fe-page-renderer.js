@@ -1260,7 +1260,6 @@
       "</section>"
     );
   }
-
   function categoryItemId(item) {
     return String(firstValue(item && item.category_id, item && item.id, item && item.categoryId));
   }
@@ -1307,35 +1306,81 @@
       '</article>';
   }
 
+  function renderMenuCategoryManualCard(item, index) {
+    var title = firstValue(item.title, item.name, "");
+    var image = safeImageUrl(firstValue(item.image, item.img, item.thumbnail, ""), "");
+    var priceNew = firstValue(item.price_new, item.price, "");
+    var priceOld = firstValue(item.price_old, "");
+    var phone = firstValue(item.phone, item.hotline, "0847 865 568");
+    var href = bodyItemUrl(firstValue(item.link, item.url, ""));
+    var ratingCount = Math.min(5, Math.max(0, parseInt(item.rating || 5, 10)));
+    var stars = "";
+    for (var i = 0; i < 5; i++) {
+      stars += i < ratingCount ? "★" : "☆";
+    }
+
+    return '<article class="fe-menu-cat-card">' +
+      '<a class="fe-menu-cat-thumb" href="' + escapeHtml(href) + '"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" loading="' + (index < 4 ? "eager" : "lazy") + '" decoding="async"></a>' +
+      '<div class="fe-menu-cat-card-body">' +
+      '<a class="fe-menu-cat-card-title" href="' + escapeHtml(href) + '">' + escapeHtml(title) + '</a>' +
+      '<div class="fe-menu-cat-stars" aria-hidden="true">' + stars + '</div>' +
+      '<div class="fe-menu-cat-price-row">' +
+      (priceNew ? '<span class="fe-menu-cat-price">' + escapeHtml(priceNew) + '</span>' : "") +
+      (priceOld && priceOld !== priceNew ? '<span class="fe-menu-cat-old-price">' + escapeHtml(priceOld) + '</span>' : "") +
+      '</div>' +
+      (phone ? '<a class="fe-menu-cat-phone" href="tel:' + escapeHtml(String(phone).replace(/\s+/g, "")) + '"><i class="bi bi-telephone-fill"></i>' + escapeHtml(phone) + '</a>' : "") +
+      '<button type="button" class="fe-menu-cat-consult"><i class="bi bi-headset"></i>Yêu cầu tư vấn</button>' +
+      '</div>' +
+      '</article>';
+  }
+
   function renderMenuCategorySection(section) {
     var data = sectionData(section);
     var selectedId = String(firstValue(data.menu_id, data.selected_category && data.selected_category.id));
-    var selectedTitle = firstValue(data.menu_title, data.selected_category && data.selected_category.title, section.section_name, section.name, "Danh mục");
+    var selectedTitle = firstValue(data.menu_name, data.menu_title, data.selected_category && data.selected_category.title, section.section_name, section.name, "Danh mục");
     var bg = firstValue(data.bg_color, data.bgColor, "#ffffff");
     var textColor = firstValue(data.text_color, data.textColor, "#333333");
     var columns = clampColumns(firstValue(data.items_per_row, data.itemsPerRow, 4));
     var rows = Math.max(1, numberValue(firstValue(data.num_rows, data.rows), 1));
     var limit = columns * rows;
-    var categoryPool = bodyCatalogCache.categories.filter(function (item) {
-      var parentId = String(firstValue(item.category_parent_id, item.parent_id, item.parentId));
-      return selectedId ? (categoryItemId(item) === selectedId || parentId === selectedId) : true;
-    });
-    var activeTabs = categoryPool.length ? categoryPool : (selectedId ? [{ category_id: selectedId, category_title: selectedTitle }] : bodyCatalogCache.categories.slice(0, 8));
-    var activeIds = activeTabs.map(categoryItemId).filter(Boolean);
-    var products = bodyCatalogCache.products.filter(function (item) {
-      var cid = productItemCategoryId(item);
-      return !activeIds.length || activeIds.indexOf(cid) !== -1 || (!cid && !selectedId);
-    }).slice(0, limit);
+
+    // Nếu admin nhập tay items, ưu tiên dùng
+    var manualItems = Array.isArray(data.items) && data.items.length > 0 ? data.items : null;
+
+    var activeTabs = [];
+    var products = [];
+
+    if (manualItems) {
+      // Dùng items nhập tay, không cần tabs từ danh mục
+      products = manualItems.slice(0, limit);
+      activeTabs = selectedTitle ? [{ category_id: selectedId || "manual", category_title: selectedTitle }] : [];
+    } else {
+      var categoryPool = bodyCatalogCache.categories.filter(function (item) {
+        var parentId = String(firstValue(item.category_parent_id, item.parent_id, item.parentId));
+        return selectedId ? (categoryItemId(item) === selectedId || parentId === selectedId) : true;
+      });
+      activeTabs = categoryPool.length ? categoryPool : (selectedId ? [{ category_id: selectedId, category_title: selectedTitle }] : bodyCatalogCache.categories.slice(0, 8));
+      var activeIds = activeTabs.map(categoryItemId).filter(Boolean);
+      products = bodyCatalogCache.products.filter(function (item) {
+        var cid = productItemCategoryId(item);
+        return !activeIds.length || activeIds.indexOf(cid) !== -1 || (!cid && !selectedId);
+      }).slice(0, limit);
+    }
+
     var tabHtml = activeTabs.slice(0, 10).map(function (item, index) {
       return '<button type="button" class="fe-menu-cat-tab' + (index === 0 ? ' is-active' : '') + '">' + escapeHtml(categoryItemTitle(item)) + '</button>';
     }).join("");
 
     if (!activeTabs.length && !products.length) return "";
 
+    var cardsHtml = manualItems
+      ? products.map(renderMenuCategoryManualCard).join("")
+      : products.map(renderMenuCategoryProductCard).join("");
+
     return '<section class="fe-body-section fe-menu-cat-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-menu-cat-text:' + escapeHtml(textColor) + ';--fe-menu-cat-columns:' + columns + '">' +
       '<div class="container"><div class="fe-menu-cat-head"><h2>' + escapeHtml(selectedTitle) + '</h2>' +
       (tabHtml ? '<div class="fe-menu-cat-tabs">' + tabHtml + '</div>' : "") + '</div>' +
-      (products.length ? '<div class="fe-menu-cat-grid">' + products.map(renderMenuCategoryProductCard).join("") + '</div>' : '<div class="fe-menu-cat-empty">Chưa có dữ liệu sản phẩm.</div>') +
+      (products.length ? '<div class="fe-menu-cat-grid">' + cardsHtml + '</div>' : '<div class="fe-menu-cat-empty">Chưa có dữ liệu sản phẩm.</div>') +
       '</div></section>';
   }
 
