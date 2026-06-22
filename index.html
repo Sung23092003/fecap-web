@@ -15,6 +15,7 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
   <link href="assets/css/fe-header.css" rel="stylesheet" type="text/css">
+  <link href="assets/css/fe-running-news.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -761,13 +762,43 @@
         if (event.key === 'ArrowRight') $('.fe-real-image-modal-next').trigger('click');
         if (event.key === 'ArrowLeft') $('.fe-real-image-modal-prev').trigger('click');
       });
+      function initRunningNewsCarousels() {
+        if (!$.fn.slick) return;
+        $('.fe-running-news-carousel').each(function () {
+          var $carousel = $(this);
+          if ($carousel.hasClass('slick-initialized')) {
+            $carousel.slick('unslick');
+          }
+          $carousel.slick({
+            dots: true,
+            arrows: true,
+            infinite: true,
+            speed: 500,
+            autoplay: true,
+            autoplaySpeed: 3000,
+            pauseOnHover: true,
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            prevArrow: '<button class="slick-prev" type="button"><i class="fa-solid fa-chevron-left"></i></button>',
+            nextArrow: '<button class="slick-next" type="button"><i class="fa-solid fa-chevron-right"></i></button>',
+            responsive: [
+              { breakpoint: 1024, settings: { slidesToShow: 3 } },
+              { breakpoint: 768, settings: { slidesToShow: 2, arrows: false } },
+              { breakpoint: 480, settings: { slidesToShow: 1, arrows: false } }
+            ]
+          });
+        });
+      }
+
       initBannerSlider();
       initPagedGridSliders('.fe-paged-grid-slider');
       initBodyBannerSliders();
+      initRunningNewsCarousels();
       window.addEventListener('fe:banner-rendered', initBannerSlider);
       window.addEventListener('fe:body-rendered', function () {
         initPagedGridSliders('.fe-paged-grid-slider');
         scheduleBodyBannerSliders();
+        initRunningNewsCarousels();
       });
       $(window).on('resize', function () {
         schedulePagedGridSliders();

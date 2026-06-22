@@ -1746,6 +1746,55 @@
     );
   }
 
+  function renderRunningNewsSection(section) {
+    var data = sectionData(section);
+    var title = sectionTitle(section, data);
+    var desc = firstValue(data.description, data.desc, data.summary);
+    var bgColor = firstValue(data.bg_color, data.bgColor, "#ffffff");
+    var newsItems = normalizeList(data.news);
+    var itemsPerRow = parseInt(data.items_per_row) || 4;
+    var rowCount = parseInt(data.row_count) || 1;
+    var visibleSlots = itemsPerRow * rowCount;
+
+    if (!newsItems.length) return "";
+
+    var totalItems = newsItems.length;
+    var needsCarousel = totalItems > visibleSlots;
+
+    var itemsHtml = newsItems.map(function (item) {
+      if (!item || !item.title) return "";
+
+      var imageUrl = escapeHtml(safeImageUrl(firstValue(item.image, item.img, item.thumbnail), ""));
+      var itemTitle = escapeHtml(item.title);
+      var itemLink = escapeHtml(safeUrl(firstValue(item.link, item.href, item.url), "#"));
+
+      return (
+        '<div class="fe-running-news-item">' +
+        (imageUrl ? '<img src="' + imageUrl + '" alt="' + itemTitle + '" loading="lazy" decoding="async" class="fe-running-news-image" style="object-fit: cover;">' : '<div class="fe-running-news-image" style="background: #eee; display: flex; align-items: center; justify-content: center;">No Image</div>') +
+        '<h3 class="fe-running-news-title">' + itemTitle + '</h3>' +
+        (itemLink && itemLink !== '#' ? '<a href="' + itemLink + '" class="fe-running-news-link" target="_blank" rel="noopener noreferrer"></a>' : '') +
+        '</div>'
+      );
+    }).join("");
+
+    var containerClass = needsCarousel ? 'fe-running-news-carousel' : 'fe-running-news-grid';
+    var gridStyle = !needsCarousel ? ' style="display: grid; grid-template-columns: repeat(' + itemsPerRow + ', 1fr); gap: 20px;"' : '';
+
+    return (
+      '<section class="fe-body-section fe-running-news-section" style="background-color: ' + escapeHtml(bgColor) + ';">' +
+      '<div class="container">' +
+      ((title || desc)
+        ? '<div class="fe-section-heading">' +
+            (title ? renderSectionTitle(title) : '') +
+            (desc ? '<div class="fe-section-desc">' + desc + '</div>' : '') +
+          '</div>'
+        : '') +
+      '<div class="' + containerClass + '"' + gridStyle + '>' + itemsHtml + '</div>' +
+      '</div>' +
+      '</section>'
+    );
+  }
+
   function renderBodySection(section) {
     var type = sectionType(section);
 
@@ -1787,6 +1836,10 @@
 
     if (type === "gallery") {
       return renderGallerySection(section);
+    }
+
+    if (type === "running_news" || type === "running-news") {
+      return renderRunningNewsSection(section);
     }
 
     return "";
