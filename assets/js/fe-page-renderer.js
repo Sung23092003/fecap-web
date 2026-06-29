@@ -621,6 +621,14 @@
     }
   }
 
+  function hexToRgba(hex, alpha) {
+    hex = hex.replace("#", "");
+    var r = parseInt(hex.substring(0, 2), 16);
+    var g = parseInt(hex.substring(2, 4), 16);
+    var b = parseInt(hex.substring(4, 6), 16);
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+  }
+
   function menuAppearanceStyle() {
     var appearance = getMenuAppearance();
     var parts = [];
@@ -629,6 +637,13 @@
     if (appearance.hoverBgColor) parts.push("--fe-menu-hover-bg:" + escapeHtml(appearance.hoverBgColor));
     if (appearance.textColor) parts.push("--fe-menu-text:" + escapeHtml(appearance.textColor));
     parts.push("--fe-menu-font-weight:" + (appearance.bold ? "700" : "500"));
+
+    var hoverColor = appearance.hoverBgColor;
+    if (hoverColor && hoverColor.indexOf("#") === 0 && hoverColor.length === 7) {
+      parts.push("--fe-menu-column-bg:" + hexToRgba(hoverColor, 0.08));
+    } else {
+      parts.push("--fe-menu-column-bg:" + escapeHtml(hoverColor || "rgba(0,0,0,0.04)"));
+    }
 
     return parts.join(";") + ";";
   }
