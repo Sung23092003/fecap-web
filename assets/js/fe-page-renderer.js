@@ -401,15 +401,16 @@
     } else if (data && typeof data === "object") {
       Object.keys(data).forEach(function (key) {
         var entry = data[key];
-        var parent = entry && (entry.parent || entry);
+        var parent = entry && entry.parent;
         var parentItem;
-        if (!parent || parent.category_id == null) return;
 
-        parentItem = cloneItem(parent);
-        items.push(parentItem);
+        if (parent && parent.category_id != null) {
+          parentItem = cloneItem(parent);
+          items.push(parentItem);
+        }
 
         normalizeList(entry.sub).forEach(function (sub) {
-          items.push(cloneItem(sub, parentItem.category_title));
+          items.push(cloneItem(sub, parentItem ? parentItem.category_title : ""));
         });
       });
     }
@@ -507,7 +508,7 @@
   function renderCategoryIcon(item) {
     var image = firstValue(item.category_image, item.image, item.icon_image);
     var icon = normalizeIconClass(firstValue(item.category_icon, item.icon));
-    if (image) return '<img src="' + escapeHtml(safeUrl(image, "")) + '" alt="" loading="lazy" decoding="async">';
+    if (image) return '<img class="item-img" src="' + escapeHtml(safeUrl(image, "")) + '" alt="alt" loading="lazy" decoding="async">';
     if (icon) return '<i class="' + escapeHtml(icon) + '"></i>';
     return "";
   }
@@ -528,15 +529,15 @@
 
     if (!hasGrandChildren && visibleChildren.length <= 8) {
       return '<ul class="sub-menu">' + visibleChildren.map(function (item) {
-        return '<li>' + renderCategoryLink(item, "menu-link py-2 px-3 d-flex align-items-center gap-2") + "</li>";
+        return '<li class="px-3 py-2 text-dark">' + renderCategoryLink(item, "menu-link d-flex align-items-center gap-2") + "</li>";
       }).join("") + "</ul>";
     }
 
-    return '<ul class="sub-menu sub-menu-list">' + visibleChildren.map(function (item) {
+    return '<ul class="sub-menu sub-menu-list mega">' + visibleChildren.map(function (item) {
       var grandChildren = sortCategories(item._children);
-      var rows = '<li>' + renderCategoryLink(item, "menu-link d-flex align-items-center gap-2") + "</li>";
+      var rows = '<li class="px-3 py-2 text-dark">' + renderCategoryLink(item, "menu-link d-flex align-items-center gap-2") + "</li>";
       rows += grandChildren.map(function (child) {
-        return '<li>' + renderCategoryLink(child, "menu-link d-flex align-items-center gap-2") + "</li>";
+        return '<li class="px-3 py-2 text-dark">' + renderCategoryLink(child, "menu-link d-flex align-items-center gap-2") + "</li>";
       }).join("");
       return '<li class="sub-menu-item"><ul class="menu-list">' + rows + "</ul></li>";
     }).join("") + "</ul>";
