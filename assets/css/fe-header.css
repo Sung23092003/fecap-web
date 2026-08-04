@@ -69,8 +69,8 @@ body {
 
 .fe-header .logo img {
     object-fit: contain;
-    max-width: 300px;
-    max-height: 50px;
+    max-width: 340px;
+    max-height: 70px;
 }
 
 .fe-header .header-top a:hover {
@@ -431,8 +431,13 @@ body {
 
 .fe-header .header-action .text,
 .fe-header .header-action .text * {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.2;
+}
+
+.fe-header .header-main .wrap-menu > a .text small {
+    font-size: 14px;
+    line-height: 1.25;
 }
 
 .fe-header .header-action .text small {
@@ -1760,7 +1765,7 @@ a {
 
 .fe-header .header-bottom .menu a {
     color: var(--fe-menu-text, #fff);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: var(--fe-menu-font-weight, 700);
 }
 
@@ -1865,7 +1870,7 @@ a {
 
 .fe-header .header-bottom .menu {
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 20px;
     width: 100%;
     max-width: 100%;
     overflow: visible;
@@ -2262,7 +2267,7 @@ a {
 
 @media (max-width: 1400px) {
     .fe-header .header-bottom .menu {
-        column-gap: 6px;
+        column-gap: 14px;
     }
 }
 
