@@ -502,7 +502,8 @@
 
   function sortCategories(items) {
     return normalizeList(items)
-      .filter(isCategoryVisible);
+      .filter(isCategoryVisible)
+      .sort(function (a, b) { return categoryOrder(a) - categoryOrder(b); });
   }
 
   function renderCategoryIcon(item) {
@@ -2677,7 +2678,7 @@
       categoryResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/category?" + categoryParams.toString(), { method: "GET", headers: getAuthHeaders() });
       if (categoryResponse.ok) {
         categoryJson = await categoryResponse.json();
-        bodyCatalogCache.categories = flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(categoryJson)));
+        bodyCatalogCache.categories = flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(categoryJson))).sort(function (a, b) { return categoryOrder(a) - categoryOrder(b); });
       }
     } catch (e) { bodyCatalogCache.categories = []; }
 
