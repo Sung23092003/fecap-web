@@ -1521,6 +1521,7 @@
     var centerContent = isEnabled(firstValue(data.center_content, data.centerContent), true);
     var radius = cssDeclarationValue(firstValue(data.border_radius, data.borderRadius), "border-radius", "8px");
     var padding = cssDeclarationValue(firstValue(data.item_padding, data.itemPadding), "padding", "0");
+    var boxPadding = (padding && String(padding).trim() !== "0") ? padding : "0 18px 18px";
     var items = normalizeSectionItems(firstValue(data.services, data.items));
     var itemsHtml = items.map(function (item, index) {
       return renderServiceCard(item, index, data);
@@ -1529,7 +1530,7 @@
     if (!items.length && !title && !desc) return "";
 
     return (
-      '<section class="fe-body-section fe-service-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-service-columns:' + columns + ';--fe-service-radius:' + escapeHtml(radius) + ';--fe-service-padding:' + escapeHtml(padding) + '">' +
+      '<section class="fe-body-section fe-service-section" style="--fe-body-bg:' + escapeHtml(bg) + ';--fe-service-columns:' + columns + ';--fe-service-radius:' + escapeHtml(radius) + ';--fe-service-padding:' + escapeHtml(boxPadding) + '">' +
       '<div class="container">' +
       ((title || desc)
         ? '<div class="fe-section-heading">' +
