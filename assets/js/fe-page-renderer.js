@@ -197,6 +197,10 @@
     return "";
   }
 
+  function contentTextAlignStyle(content) {
+    return /text-align/i.test(String(content || "")) ? "" : ' style="text-align: start"';
+  }
+
   function numberValue(value, fallback) {
     var number = Number(value);
     return Number.isFinite(number) ? number : fallback;
@@ -863,7 +867,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
       itemsHtml +
@@ -907,10 +911,10 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
-      (content ? '<div class="fe-article-content">' + content + "</div>" : "") +
+      (content ? '<div class="fe-article-content"' + contentTextAlignStyle(content) + ">" + content + "</div>" : "") +
       (hasButton ? '<div class="fe-article-actions">' + buttonHtml + "</div>" : "") +
       "</div>" +
       "</div>" +
@@ -1045,7 +1049,7 @@
       '<div class="' + escapeHtml(contentClass) + '">' +
       '<div class="fe-image-news-content">' +
       (title ? '<div class="fe-image-news-title">' + renderSectionTitle(title) + "</div>" : "") +
-      (content ? '<div class="fe-image-news-text">' + content + "</div>" : "") +
+      (content ? '<div class="fe-image-news-text"' + contentTextAlignStyle(content) + ">" + content + "</div>" : "") +
       (buttonsHtml ? '<div class="fe-image-news-actions">' + buttonsHtml + "</div>" : "") +
       "</div>" +
       "</div>" +
@@ -1113,7 +1117,7 @@
       '<form class="fe-consult-form" data-fe-consult-form="true" onsubmit="return false;">' +
       '<div class="fe-consult-heading">' +
       (title ? '<div class="fe-consult-title">' + title + '</div>' : "") +
-      (desc ? '<div class="fe-consult-desc">' + desc + '</div>' : "") +
+      (desc ? '<div class="fe-consult-desc"' + contentTextAlignStyle(desc) + ">" + desc + '</div>' : "") +
       '</div>' +
       '<div class="fe-consult-fields">' +
       '<input type="text" name="name" autocomplete="name" placeholder="Họ tên (Bắt buộc)" required>' +
@@ -1269,7 +1273,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading fe-video-news-heading">' +
         (title ? '<div class="fe-video-news-heading-title">' + renderSectionTitle(title) + "</div>" : "") +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
       itemsHtml +
@@ -1504,7 +1508,7 @@
       (displayType === "original" && !title && !desc ? "" :
         '<div class="fe-service-content">' +
         (title ? '<h3>' + escapeHtml(title) + "</h3>" : "") +
-        (desc ? '<div class="fe-service-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-service-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>") +
       close
     );
@@ -1535,7 +1539,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
       (itemsHtml ? '<div class="fe-service-grid fe-service-' + escapeHtml(displayType) + ' fe-service-' + escapeHtml(layoutType) + (centerContent ? ' is-centered' : '') + '">' + itemsHtml + "</div>" : "") +
@@ -1557,7 +1561,7 @@
     if (type === "text") {
       text = firstValue(visual.text, "");
       if (!text) return "";
-      return '<div class="fe-faq-visual fe-faq-text">' + text + "</div>";
+      return '<div class="fe-faq-visual fe-faq-text"' + contentTextAlignStyle(text) + ">" + text + "</div>";
     }
 
     if (type === "video") {
@@ -1609,7 +1613,7 @@
         "</button>" +
         "</h2>" +
         '<div id="' + itemId + '" class="accordion-collapse collapse" data-bs-parent="#' + sectionUid + '">' +
-        '<div class="accordion-body">' +
+        '<div class="accordion-body"' + contentTextAlignStyle(item.answer) + ">" +
         (/<[a-z][\s\S]*>/i.test(String(item.answer)) ? item.answer : escapeHtml(item.answer)) +
         "</div>" +
         "</div>" +
@@ -1642,7 +1646,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
       rowHtml +
@@ -1721,7 +1725,7 @@
       ((title || desc)
         ? '<div class="container"><div class="fe-section-heading mt-4">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div></div>"
         : "") +
       '<div class="container-fluid p-0 overflow-hidden">' +
@@ -1755,7 +1759,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
         renderSectionTitle(title) +
-        (desc ? '<div class="fe-section-desc">' + desc + "</div>" : "") +
+        (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + "</div>" : "") +
         "</div>"
         : "") +
       (itemsHtml ? '<div class="fe-gallery-grid">' + itemsHtml + "</div>" : "") +
@@ -1804,7 +1808,7 @@
       ((title || desc)
         ? '<div class="fe-section-heading">' +
             (title ? renderSectionTitle(title) : '') +
-            (desc ? '<div class="fe-section-desc">' + desc + '</div>' : '') +
+            (desc ? '<div class="fe-section-desc"' + contentTextAlignStyle(desc) + ">" + desc + '</div>' : '') +
           '</div>'
         : '') +
       '<div class="' + containerClass + '"' + gridStyle + '>' + itemsHtml + '</div>' +
