@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Liên hệ</title>
+  <meta name="keywords" content="Liên hệ">
+  <meta name="description" content="Liên hệ">
+  <link rel="icon" type="image/x-icon" href="https://we1.io.vn/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet" type="text/css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="../assets/css/fe-header.css" rel="stylesheet" type="text/css">
+  <link href="../assets/css/fe-contact.css" rel="stylesheet" type="text/css">
+</head>
+
+<body data-page="contact">
+  <header class="fe-header w-100" data-page-region="header" data-render-state="loading"></header>
+  <main>
+    <section class="fe-body-sections" data-page-region="body" data-render-state="loading"></section>
+  </main>
+  <footer class="fe-footer" data-page-region="footer" data-render-state="loading"></footer>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/fe-page-renderer.js"></script>
+  <script>
+    $(document).ready(function () {
+      function setMainPadding() {
+        var headerH = $('.fe-header').outerHeight() || 0;
+        document.documentElement.style.setProperty('--fe-header-height', headerH + 'px');
+        if (window.matchMedia('(max-width: 768px)').matches) {
+          $('main').css('padding-top', headerH + 'px');
+        } else {
+          $('main').css('padding-top', '');
+        }
+      }
+
+      function initHeaderInteractions() {
+        setMainPadding();
+      }
+
+      initHeaderInteractions();
+      $(window).on('resize load', setMainPadding);
+      window.addEventListener('fe:page-rendered', initHeaderInteractions);
+    });
+  </script>
+</body>
+
+</html>

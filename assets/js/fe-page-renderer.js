@@ -2770,6 +2770,157 @@
     window.dispatchEvent(new CustomEvent("fe:footer-rendered", { detail: { region: "footer", data: footer } }));
   }
 
+  function isContactPage() {
+    var path = String(window.location.pathname || "").replace(/\\/g, "/").replace(/\/+$/, "");
+    if (path === "/lien-he" || /\/lien-he$/i.test(path)) return true;
+    return document.body && document.body.getAttribute("data-page") === "contact";
+  }
+
+  function homeHref() {
+    var path = String(window.location.pathname || "").replace(/\\/g, "/");
+    if (/\/lien-he\/?$/i.test(path)) {
+      return path.replace(/\/lien-he\/?$/i, "/") || "/";
+    }
+    return "/";
+  }
+
+  function normalizeContactAddresses(col) {
+    var list = normalizeList(col.address_list || col.addressList);
+    if (list.length) {
+      return list.map(function (item) {
+        return firstValue(item.address, item.content, item.name, item.title);
+      }).filter(Boolean);
+    }
+
+    var address = firstValue(col.address, col.company_address, col.companyAddress);
+    if (!address) return [];
+    return String(address).split(/\r?\n|\||;/).map(function (part) {
+      return part.trim();
+    }).filter(Boolean);
+  }
+
+  function renderContactInfoBlock(iconClass, label, lines, options) {
+    options = options || {};
+    if (!lines.length) return "";
+
+    var valuesHtml = lines.map(function (line) {
+      var valueClass = "fe-contact-info-value" + (options.company ? " is-company" : "");
+      if (options.linkPrefix) {
+        return '<p class="' + valueClass + '"><a href="' + escapeHtml(options.linkPrefix + line) + '">' + escapeHtml(line) + "</a></p>";
+      }
+      return '<p class="' + valueClass + '">' + escapeHtml(line) + "</p>";
+    }).join("");
+
+    return (
+      '<div class="fe-contact-info-item">' +
+      '<div class="fe-contact-info-icon"><i class="' + escapeHtml(iconClass) + '"></i></div>' +
+      '<div class="fe-contact-info-content">' +
+      '<p class="fe-contact-info-label">' + escapeHtml(label) + "</p>" +
+      valuesHtml +
+      "</div></div>"
+    );
+  }
+
+  function renderContactInfo(footer) {
+    var col = footer.col_1 || {};
+    var phones = normalizeList(col.phone_list).map(function (item) {
+      return firstValue(item.phone, item.content);
+    }).filter(Boolean);
+    var emails = normalizeList(col.email_list).map(function (item) {
+      return firstValue(item.email, item.content);
+    }).filter(Boolean);
+    var addresses = normalizeContactAddresses(col);
+    var company = firstValue(col.company_name);
+    var blocks = [];
+
+    if (company) {
+      blocks.push(renderContactInfoBlock("fa-solid fa-house", "Tên công ty", [company], { company: true }));
+    }
+    if (phones.length) {
+      blocks.push(renderContactInfoBlock("fa-solid fa-phone", "Điện thoại", phones, { linkPrefix: "tel:" }));
+    }
+    if (emails.length) {
+      blocks.push(renderContactInfoBlock("fa-solid fa-envelope", "Email", emails, { linkPrefix: "mailto:" }));
+    }
+    if (addresses.length) {
+      blocks.push(renderContactInfoBlock("fa-solid fa-location-dot", "Địa chỉ", addresses));
+    }
+
+    return blocks.join("");
+  }
+
+  function renderContactForm() {
+    return (
+      '<div class="fe-contact-form-card">' +
+      '<form class="fe-contact-form" novalidate>' +
+      '<div class="fe-contact-form-grid">' +
+      '<div class="fe-contact-field"><input type="text" name="name" placeholder="Họ tên *" required autocomplete="name"></div>' +
+      '<div class="fe-contact-field"><input type="tel" name="phone" placeholder="Số điện thoại *" required autocomplete="tel"></div>' +
+      '<div class="fe-contact-field"><input type="email" name="email" placeholder="Email" autocomplete="email"></div>' +
+      '<div class="fe-contact-field"><input type="text" name="address" placeholder="Địa chỉ" autocomplete="street-address"></div>' +
+      '<div class="fe-contact-field fe-contact-field-full"><textarea name="message" placeholder="Nội dung"></textarea></div>' +
+      "</div>" +
+      '<div class="fe-contact-form-actions"><button type="submit">Gửi yêu cầu</button></div>' +
+      '<p class="fe-contact-form-message" role="status" aria-live="polite"></p>' +
+      "</form></div>"
+    );
+  }
+
+  function renderContactMap(footer) {
+    var map = (footer.col_4 || {}).map || {};
+    var iframe = firstValue(map.iframe);
+    if (!iframe) return "";
+    return '<section class="fe-contact-map">' + renderFooterEmbed(iframe) + "</section>";
+  }
+
+  function bindContactForm() {
+    var form = document.querySelector(".fe-contact-form");
+    var message;
+    if (!form || form.dataset.bound === "1") return;
+    form.dataset.bound = "1";
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      message = form.querySelector(".fe-contact-form-message");
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      if (message) {
+        message.className = "fe-contact-form-message is-success";
+        message.textContent = "Cảm ơn bạn! Yêu cầu đã được ghi nhận, chúng tôi sẽ liên hệ sớm nhất.";
+      }
+      form.reset();
+    });
+  }
+
+  function renderContactPage(footer) {
+    var root = document.querySelector('[data-page-region="body"]');
+    var html;
+
+    if (!root) return;
+
+    html =
+      '<section class="fe-contact-page">' +
+      '<div class="container">' +
+      '<nav class="fe-contact-breadcrumb" aria-label="breadcrumb">' +
+      '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; Liên hệ' +
+      "</nav>" +
+      '<div class="fe-contact-layout">' +
+      '<div class="fe-contact-info">' + renderContactInfo(footer) + "</div>" +
+      renderContactForm() +
+      "</div></div>" +
+      renderContactMap(footer) +
+      "</section>";
+
+    root.innerHTML = html;
+    root.dataset.renderState = "ready";
+    bindContactForm();
+    document.title = "Liên hệ";
+    window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "contact", data: footer } }));
+  }
+
   function renderPageBody(sections) {
     var root = document.querySelector('[data-page-region="body"]');
     var html;
@@ -2857,6 +3008,7 @@
   async function init() {
     var header;
     var menuHtml = "";
+    var contactPage = isContactPage();
 
     try {
       header = await loadHeader();
@@ -2873,27 +3025,33 @@
       if (window.console) console.warn("Use static header fallback:", err.message || err);
     }
 
-    try {
-      renderPageBanners(await loadBanners());
-    } catch (bannerErr) {
-      var bannerRoot = document.querySelector(".banner_slide");
-      if (bannerRoot) bannerRoot.dataset.renderState = "fallback";
-      window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
-      if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
+    if (!contactPage) {
+      try {
+        renderPageBanners(await loadBanners());
+      } catch (bannerErr) {
+        var bannerRoot = document.querySelector(".banner_slide");
+        if (bannerRoot) bannerRoot.dataset.renderState = "fallback";
+        window.dispatchEvent(new CustomEvent("fe:banner-rendered", { detail: { region: "banner", fallback: true } }));
+        if (window.console) console.warn("Use static banner fallback:", bannerErr.message || bannerErr);
+      }
+
+      try {
+        await loadBodyCatalogData();
+        renderPageBody(await loadBodySections());
+      } catch (bodyErr) {
+        var bodyRoot = document.querySelector('[data-page-region="body"]');
+        if (bodyRoot) bodyRoot.dataset.renderState = "fallback";
+        window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", fallback: true } }));
+        if (window.console) console.warn("Use empty body fallback:", bodyErr.message || bodyErr);
+      }
     }
 
     try {
-      await loadBodyCatalogData();
-      renderPageBody(await loadBodySections());
-    } catch (bodyErr) {
-      var bodyRoot = document.querySelector('[data-page-region="body"]');
-      if (bodyRoot) bodyRoot.dataset.renderState = "fallback";
-      window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", fallback: true } }));
-      if (window.console) console.warn("Use empty body fallback:", bodyErr.message || bodyErr);
-    }
-
-    try {
-      renderPageFooter(await loadFooter());
+      var footer = await loadFooter();
+      if (contactPage) {
+        renderContactPage(footer);
+      }
+      renderPageFooter(footer);
     } catch (footerErr) {
       var footerRoot = document.querySelector('[data-page-region="footer"]');
       if (footerRoot) footerRoot.dataset.renderState = "fallback";
