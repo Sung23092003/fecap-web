@@ -2804,6 +2804,28 @@
     root.innerHTML = html;
     root.dataset.renderState = "ready";
     bindVideoNewsModal();
+
+    var scrollKey = "fe-scroll-" + (window.location.pathname || "/");
+    if (window.location.hash) {
+      var target = root.querySelector(window.location.hash);
+      if (target) {
+        setTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 100);
+      }
+    } else {
+      var savedY = parseInt(localStorage.getItem(scrollKey), 10) || 0;
+      if (savedY > 0) {
+        setTimeout(function () { window.scrollTo(0, savedY); }, 50);
+      }
+    }
+
+    var scrollTimer;
+    window.addEventListener("scroll", function () {
+      if (scrollTimer) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        try { localStorage.setItem(scrollKey, String(window.scrollY || 0)); } catch (e) {}
+      }, 300);
+    }, { passive: true });
+
     window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", data: sections } }));
   }
 
