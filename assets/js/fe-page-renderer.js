@@ -2903,6 +2903,24 @@
     });
   }
 
+  function renderContactHeader(footer) {
+    var col = footer.col_1 || {};
+    var logo = firstValue(col.logo, col.logo_url);
+    var company = firstValue(col.company_name, col.companyName);
+    var desc = firstValue(col.short_description, col.shortDescription, col.description);
+    var parts = [];
+    if (logo) {
+      parts.push('<img class="fe-contact-brand-logo" src="' + escapeHtml(logo) + '" alt="' + escapeHtml(company || "") + '">');
+    }
+    if (company) {
+      parts.push('<h2 class="fe-contact-brand-name">' + escapeHtml(company) + "</h2>");
+    }
+    if (desc) {
+      parts.push('<p class="fe-contact-brand-desc">' + escapeHtml(desc) + "</p>");
+    }
+    return parts.length ? '<div class="fe-contact-header">' + parts.join("") + "</div>" : "";
+  }
+
   function renderContactPage(footer) {
     var root = document.querySelector('[data-page-region="body"]');
     var html;
@@ -2915,12 +2933,17 @@
       '<nav class="fe-contact-breadcrumb" aria-label="breadcrumb">' +
       '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; Liên hệ' +
       "</nav>" +
-      '<div class="fe-contact-layout">' +
+      renderContactHeader(footer) +
+      '<div class="fe-contact-two-col">' +
+      '<div class="fe-contact-col-left">' +
       '<div class="fe-contact-info">' + renderContactInfo(footer) + "</div>" +
       renderContactForm() +
-      "</div></div>" +
+      "</div>" +
+      '<div class="fe-contact-col-right">' +
       renderContactMap(footer) +
-      "</section>";
+      "</div>" +
+      "</div>" +
+      "</div></section>";
 
     root.innerHTML = html;
     root.dataset.renderState = "ready";
