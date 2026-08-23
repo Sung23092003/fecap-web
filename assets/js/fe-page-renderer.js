@@ -2666,26 +2666,17 @@
   }
 
   async function loadBanners() {
-    var params = new URLSearchParams();
-    var response;
-    var json;
-
-    params.set("limit", "20");
-    params.set("page", "1");
-    params.set("banner_status", "1");
-    params.set("banner_type", "-1");
-    params.set("sort_order", "asc");
-
-    response = await fetchWithAuth(getBaseUrl() + "/admin/banner?" + params.toString(), {
+    var response = await fetch(getBaseUrl() + "/web/home", {
       method: "GET",
-      headers: getAuthHeaders()
+      headers: { "Content-Type": "application/json" }
     });
+    var json;
 
     if (!response.ok) throw new Error("Banner API " + response.status);
     json = await response.json();
     if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Banner API error");
 
-    return unwrapListPayload(json);
+    return normalizeList(json.data && json.data.banners);
   }
 
   async function loadFooter() {
