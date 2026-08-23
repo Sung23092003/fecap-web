@@ -27,6 +27,7 @@
   };
   var authPromise = null;
   var webInitPromise = null;
+  var webHomePromise = null;
   var bodyCatalogCache = { categories: [], products: [] };
 
   function getStoredAuth() {
@@ -2665,18 +2666,31 @@
     return renderCategoryMenu(normalizeCategoryItems(allCategories));
   }
 
+  async function loadWebHome() {
+    if (!webHomePromise) {
+      webHomePromise = fetch(getBaseUrl() + "/web/home", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(function (response) {
+          if (!response.ok) throw new Error("Home API " + response.status);
+          return response.json();
+        })
+        .then(function (json) {
+          if (!json || json.success === false) throw new Error((json && json.message) || "Home API error");
+          return json.data || {};
+        })
+        .catch(function (err) {
+          webHomePromise = null;
+          throw err;
+        });
+    }
+    return webHomePromise;
+  }
+
   async function loadBanners() {
-    var response = await fetch(getBaseUrl() + "/web/home", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
-    var json;
-
-    if (!response.ok) throw new Error("Banner API " + response.status);
-    json = await response.json();
-    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Banner API error");
-
-    return normalizeList(json.data && json.data.banners);
+    var homeData = await loadWebHome();
+    return normalizeList(homeData.banners);
   }
 
   async function loadFooter() {
@@ -2725,42 +2739,8 @@
     } catch (e) { bodyCatalogCache.products = []; }
   }
   async function loadBodySections() {
-    var params = new URLSearchParams();
-    var response;
-    var json;
-    var endpoints;
-    var i;
-    var list;
-    var lastError;
-
-    params.set("page", "1");
-    params.set("limit", "100");
-    params.set("section_status", "1");
-    params.set("sort_order", "asc");
-
-    endpoints = [
-      getBaseUrl().replace(/\/$/, "") + "/admin/page-section?" + params.toString()
-    ];
-
-    for (i = 0; i < endpoints.length; i += 1) {
-      try {
-        response = await fetchWithAuth(endpoints[i], {
-          method: "GET",
-          headers: getAuthHeaders()
-        });
-
-        if (!response.ok) throw new Error("Body section API " + response.status);
-        json = await response.json();
-        if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Body section API error");
-
-        list = unwrapListPayload(json);
-        if (list.length || i === endpoints.length - 1) return list;
-      } catch (e) {
-        lastError = e;
-      }
-    }
-
-    throw lastError || new Error("Body section API error");
+    var homeData = await loadWebHome();
+    return normalizeList(homeData.sections);
   }
 
   function renderPageBanners(banners) {
