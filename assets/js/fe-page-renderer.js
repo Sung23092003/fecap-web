@@ -2720,7 +2720,6 @@
     categoryParams.set("sort_order", "asc");
     productParams.set("page", "1");
     productParams.set("limit", "120");
-    productParams.set("product_status", "1");
 
     try {
       categoryResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/category?" + categoryParams.toString(), { method: "GET", headers: getAuthHeaders() });
@@ -2731,7 +2730,7 @@
     } catch (e) { bodyCatalogCache.categories = []; }
 
     try {
-      productResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/product?" + productParams.toString(), { method: "GET", headers: getAuthHeaders() });
+      productResponse = await fetch(getBaseUrl().replace(/\/$/, "") + "/web/product?" + productParams.toString(), { method: "GET", headers: { "Content-Type": "application/json" } });
       if (productResponse.ok) {
         productJson = await productResponse.json();
         bodyCatalogCache.products = normalizeApiList(productJson);
