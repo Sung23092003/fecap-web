@@ -2959,9 +2959,9 @@
   }
 
   async function loadAboutPage() {
-    var response = await fetchWithAuth(getBaseUrl() + "/admin/static-page/gioi-thieu-chung", {
+    var response = await fetch(getBaseUrl() + "/web/gioi-thieu-chung", {
       method: "GET",
-      headers: getAuthHeaders()
+      headers: { "Content-Type": "application/json" }
     });
     if (!response.ok) throw new Error("Static page API " + response.status);
     var json = await response.json();
