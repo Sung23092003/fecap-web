@@ -414,7 +414,7 @@ body {
 }
 
 .fe-header .header-action {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     max-width: 260px;
     min-width: 0;
 }
@@ -426,13 +426,18 @@ body {
     max-width: 100%;
     column-gap: 18px !important;
     row-gap: 8px !important;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .fe-header .header-action .text,
 .fe-header .header-action .text * {
     font-size: 14px;
     line-height: 1.2;
+}
+
+.fe-header .header-action .text {
+    min-width: 0;
+    flex: 0 1 auto;
 }
 
 .fe-header .header-main .wrap-menu > a .text small {
@@ -448,6 +453,11 @@ body {
 .fe-header .header-action .text b {
     color: #4b5563;
     font-weight: 400;
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .fe-header .header-action-inner {
