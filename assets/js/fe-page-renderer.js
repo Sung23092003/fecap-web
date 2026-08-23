@@ -26,6 +26,7 @@
     password: "123987"
   };
   var authPromise = null;
+  var webInitPromise = null;
   var bodyCatalogCache = { categories: [], products: [] };
 
   function getStoredAuth() {
@@ -2573,18 +2574,56 @@
     }
   }
 
-  async function loadHeader() {
-    var response = await fetchWithAuth(getBaseUrl() + "/admin/config/header", {
-      method: "GET",
-      headers: getAuthHeaders()
+  async function loadWebInit() {
+    if (!webInitPromise) {
+      webInitPromise = fetch(getBaseUrl() + "/web/init", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      })
+        .then(function (response) {
+          if (!response.ok) throw new Error("Init API " + response.status);
+          return response.json();
+        })
+        .then(function (json) {
+          if (!json || json.success === false) throw new Error((json && json.message) || "Init API error");
+          return json.data || {};
+        })
+        .catch(function (err) {
+          webInitPromise = null;
+          throw err;
+        });
+    }
+    return webInitPromise;
+  }
+
+  function initMenuToCategoryItems(items) {
+    return normalizeList(items).map(function (item) {
+      var converted = Object.assign({}, item || {});
+      converted.category_id = firstValue(converted.category_id, converted.id);
+      converted.category_title = firstValue(converted.category_title, converted.title, converted.name);
+      converted.category_alias = firstValue(converted.category_alias, converted.url, converted.link, converted.href);
+      converted._children = initMenuToCategoryItems(firstValue(converted.children, converted.sub, converted.items));
+      return converted;
     });
-    if (!response.ok) throw new Error("Header API " + response.status);
-    var json = await response.json();
-    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Header API error");
-    return normalizeHeader(json);
+  }
+
+  async function loadHeader() {
+    var initData = await loadWebInit();
+    return normalizeHeader(initData.header || {});
   }
 
   async function loadCategoryMenu() {
+    var initData = await loadWebInit();
+    var menuItems = normalizeList(initData.menu);
+
+    if (menuItems.length) {
+      return renderCategoryMenu(initMenuToCategoryItems(menuItems));
+    }
+
+    return loadAdminCategoryMenu();
+  }
+
+  async function loadAdminCategoryMenu() {
     var params = new URLSearchParams();
     var response;
     var json;
@@ -2650,17 +2689,8 @@
   }
 
   async function loadFooter() {
-    var response = await fetchWithAuth(getBaseUrl() + "/admin/config/footer", {
-      method: "GET",
-      headers: getAuthHeaders()
-    });
-    var json;
-
-    if (!response.ok) throw new Error("Footer API " + response.status);
-    json = await response.json();
-    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Footer API error");
-
-    return unwrapConfigPayload(json);
+    var initData = await loadWebInit();
+    return unwrapConfigPayload(initData.footer || {});
   }
 
   function normalizeApiList(json) {
