@@ -1,0 +1,81 @@
+.fe-about-page {
+  background: #fff;
+  padding: 24px 0 60px;
+}
+
+.fe-about-breadcrumb {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.fe-about-breadcrumb a {
+  color: #666;
+  text-decoration: none;
+}
+
+.fe-about-breadcrumb a:hover {
+  color: #0f2742;
+}
+
+/* ---- Title + intro ---- */
+.fe-about-title {
+  margin: 0 0 12px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #0f2742;
+}
+
+.fe-about-intro {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* ---- Content ---- */
+.fe-about-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #333;
+}
+
+.fe-about-content img,
+.fe-about-content iframe,
+.fe-about-content video {
+  max-width: 100%;
+  height: auto;
+}
+
+.fe-about-content h1,
+.fe-about-content h2,
+.fe-about-content h3 {
+  color: #0f2742;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.fe-about-content p {
+  margin-bottom: 12px;
+}
+
+.fe-about-content a {
+  color: #0282a5;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 575.98px) {
+  .fe-about-page {
+    padding-top: 16px;
+  }
+
+  .fe-about-breadcrumb {
+    margin-bottom: 16px;
+  }
+
+  .fe-about-title {
+    font-size: 20px;
+  }
+}

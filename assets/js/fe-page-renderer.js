@@ -2784,9 +2784,15 @@
     return document.body && document.body.getAttribute("data-page") === "contact";
   }
 
+  function isAboutPage() {
+    var path = String(window.location.pathname || "").replace(/\\/g, "/").replace(/\/+$/, "");
+    if (path === "/gioi-thieu" || /\/gioi-thieu$/i.test(path) || /\/gioi-thieu\/index\.html$/i.test(path)) return true;
+    return document.body && document.body.getAttribute("data-page") === "about";
+  }
+
   function homeHref() {
     var path = String(window.location.pathname || "").replace(/\\/g, "/");
-    if (/\/lien-he\/?$/i.test(path) || /\/tin-tuc\/?$/i.test(path) || /\/tin-tuc\/index\.html$/i.test(path)) {
+    if (/\/lien-he\/?$/i.test(path) || /\/tin-tuc\/?$/i.test(path) || /\/tin-tuc\/index\.html$/i.test(path) || /\/gioi-thieu\/?$/i.test(path) || /\/gioi-thieu\/index\.html$/i.test(path)) {
       return "../index.html";
     }
     return "./index.html";
@@ -2950,6 +2956,44 @@
     bindContactForm();
     document.title = "Liên hệ";
     window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "contact", data: footer } }));
+  }
+
+  async function loadAboutPage() {
+    var response = await fetchWithAuth(getBaseUrl() + "/admin/static-page/gioi-thieu-chung", {
+      method: "GET",
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error("Static page API " + response.status);
+    var json = await response.json();
+    if (!json || json.success === false) throw new Error((json && json.message) || "Static page API error");
+    return (json.data && json.data.data) || json.data || {};
+  }
+
+  function renderAboutPage(pageData) {
+    var root = document.querySelector('[data-page-region="body"]');
+    var data = pageData && typeof pageData === "object" ? pageData : {};
+    var title = firstValue(data.title, data.static_page_title);
+    var intro = firstValue(data.intro, data.short_description);
+    var content = decodeHtmlContent(firstValue(data.content, data.body, data.html));
+    var html;
+
+    if (!root) return;
+
+    html =
+      '<section class="fe-about-page">' +
+      '<div class="container">' +
+      '<nav class="fe-about-breadcrumb" aria-label="breadcrumb">' +
+      '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; Giới thiệu' +
+      "</nav>" +
+      (title ? '<h1 class="fe-about-title">' + escapeHtml(title) + "</h1>" : "") +
+      (intro ? '<p class="fe-about-intro"' + contentTextAlignStyle(intro) + ">" + escapeHtml(intro) + "</p>" : "") +
+      '<div class="fe-about-content"' + contentTextAlignStyle(content) + ">" + content + "</div>" +
+      "</div></section>";
+
+    root.innerHTML = html;
+    root.dataset.renderState = "ready";
+    document.title = title ? title + " - Giới thiệu" : "Giới thiệu";
+    window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "about", data: data } }));
   }
 
   function isNewsPage() {
@@ -3395,6 +3439,7 @@
     var menuHtml = "";
     var contactPage = isContactPage();
     var newsPage = isNewsPage();
+    var aboutPage = isAboutPage();
 
     try {
       header = await loadHeader();
@@ -3411,7 +3456,7 @@
       if (window.console) console.warn("Use static header fallback:", err.message || err);
     }
 
-    if (!contactPage && !newsPage) {
+    if (!contactPage && !newsPage && !aboutPage) {
       try {
         renderPageBanners(await loadBanners());
       } catch (bannerErr) {
@@ -3438,6 +3483,17 @@
         renderContactPage(footer);
       } else if (newsPage) {
         await renderNewsPageContent(1);
+      } else if (aboutPage) {
+        try {
+          renderAboutPage(await loadAboutPage());
+        } catch (aboutErr) {
+          var aboutRoot = document.querySelector('[data-page-region="body"]');
+          if (aboutRoot) {
+            aboutRoot.innerHTML = '<div class="container py-5 text-center text-danger">Không thể tải nội dung trang Giới thiệu. Vui lòng thử lại sau.</div>';
+            aboutRoot.dataset.renderState = "fallback";
+          }
+          if (window.console) console.warn("About page load error:", aboutErr.message || aboutErr);
+        }
       }
       renderPageFooter(footer);
     } catch (footerErr) {
