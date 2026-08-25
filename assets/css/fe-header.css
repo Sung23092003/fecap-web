@@ -1381,7 +1381,7 @@ a {
     width: 18px;
     min-width: 18px;
     margin-top: 4px;
-    color: var(--fe-footer-short-border, #9ee7e8);
+    color: inherit;
 }
 
 .fe-footer-contact-v2 {

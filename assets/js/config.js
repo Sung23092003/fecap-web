@@ -5,7 +5,6 @@
  *     -> dùng BASE_URL_LOCAL khai báo tay bên dưới.
  * - Chạy trên SERVER (miền thật):
  *     -> tự động suy ra API theo miền hiện tại, ví dụ:
- *        https://dienlanhnguyengia.com  ->  https://api.dienlanhnguyengia.com
  *        http://www.abc.vn              ->  http://api.abc.vn
  */
 (function () {
