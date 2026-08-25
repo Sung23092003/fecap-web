@@ -3,5 +3,5 @@
  */
 
 const ENV = {
-  BASE_URL: "https://capi.id.vn"
+  BASE_URL: "https://api.capi.id.vn"
 };

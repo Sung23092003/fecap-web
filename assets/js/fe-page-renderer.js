@@ -19,105 +19,9 @@
     return (window.ENV && window.ENV.BASE_URL) || "https://capi.id.vn";
   }
 
-  var AUTO_LOGIN = (typeof ENV !== "undefined" && ENV.AUTO_LOGIN) ||
-    (window.ENV && window.ENV.AUTO_LOGIN) ||
-  {
-    username: "admin",
-    password: "123987"
-  };
-  var authPromise = null;
   var webInitPromise = null;
   var webHomePromise = null;
   var bodyCatalogCache = { categories: [], products: [] };
-
-  function getStoredAuth() {
-    try {
-      var raw = localStorage.getItem("cms_auth");
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      localStorage.removeItem("cms_auth");
-      return null;
-    }
-  }
-
-  function setStoredAuth(token, user) {
-    localStorage.setItem("cms_auth", JSON.stringify({
-      token: token,
-      user: user || { name: AUTO_LOGIN.username },
-      saved_at: Date.now()
-    }));
-  }
-
-  function getStoredToken() {
-    var auth = getStoredAuth();
-    return auth && auth.token ? auth.token : "";
-  }
-
-  function extractToken(result) {
-    if (!result) return "";
-    if (result.token) return result.token;
-    if (result.access_token) return result.access_token;
-    if (result.data && result.data.token) return result.data.token;
-    if (result.data && result.data.access_token) return result.data.access_token;
-    return "";
-  }
-
-  async function autoLogin(force) {
-    var existingToken = getStoredToken();
-    if (!force && existingToken) return existingToken;
-    if (authPromise && !force) return authPromise;
-
-    authPromise = fetch(getBaseUrl() + "/cms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: AUTO_LOGIN.username,
-        password: AUTO_LOGIN.password
-      })
-    })
-      .then(function (response) {
-        if (!response.ok && response.status !== 400) {
-          throw new Error("Login API " + response.status);
-        }
-        return response.json();
-      })
-      .then(function (result) {
-        var token = extractToken(result);
-        if (!result || result.success === false || !token) {
-          throw new Error(result && result.message ? result.message : "Login API error");
-        }
-        setStoredAuth(token, result.data && result.data.user);
-        return token;
-      })
-      .finally(function () {
-        authPromise = null;
-      });
-
-    return authPromise;
-  }
-
-  function getAuthHeaders() {
-    var headers = { "Content-Type": "application/json" };
-    var token = getStoredToken();
-    if (token) headers.Authorization = "Bearer " + token;
-    return headers;
-  }
-
-  async function fetchWithAuth(url, options, didRetry) {
-    options = options || {};
-    await autoLogin(false);
-    options.headers = Object.assign({}, options.headers || {}, getAuthHeaders());
-
-    var response = await fetch(url, options);
-    if (response.status === 401 && !didRetry) {
-      localStorage.removeItem("cms_auth");
-      await autoLogin(true);
-      options.headers = Object.assign({}, options.headers || {}, getAuthHeaders());
-      response = await fetchWithAuth(url, options, true);
-    }
-
-    return response;
-  }
 
   function escapeHtml(value) {
     return String(value == null ? "" : value)
@@ -602,38 +506,6 @@
         ? defaults.bold
         : (data.menu_bold === true || data.menu_bold === "true" || data.bold === true || data.bold === "true")
     };
-  }
-
-  function setMenuAppearanceFromApi(raw) {
-    if (window.FE_MENU_APPEARANCE_SOURCE === "header") return;
-
-    var payload = raw && raw.data ? raw.data : raw;
-    var categoryPayload = unwrapCategoryPayload(raw);
-    var normalized;
-    var flattened;
-    var firstItem;
-    var themeSetting =
-      (payload && payload.themeSetting) ||
-      (payload && payload.theme_setting) ||
-      (payload && payload.data && payload.data.themeSetting) ||
-      (payload && payload.data && payload.data.theme_setting);
-
-    if (!themeSetting && categoryPayload) {
-      normalized = normalizeCategoryItems(categoryPayload);
-      flattened = flattenCategories(normalized);
-      firstItem = flattened && flattened.length ? flattened[0] : null;
-      themeSetting = firstValue(
-        firstItem && firstItem.themeSetting,
-        firstItem && firstItem.theme_setting
-      );
-    }
-
-    if (themeSetting && typeof themeSetting === "object") {
-      window.FE_MENU_APPEARANCE = themeSetting;
-      try {
-        localStorage.setItem("menu_appearance", JSON.stringify(themeSetting));
-      } catch (e) { }
-    }
   }
 
   function hexToRgba(hex, alpha) {
@@ -2624,46 +2496,44 @@
     return loadAdminCategoryMenu();
   }
 
-  async function loadAdminCategoryMenu() {
+  async function fetchPagedCategories(path) {
     var params = new URLSearchParams();
+    var base = getBaseUrl().replace(/\/$/, "");
+    var allCategories = [];
     var response;
     var json;
-    var pageCategories;
-    var allCategories = [];
     var totalPage;
     var page;
 
     params.set("page", "1");
-    params.set("category_status", "1");
+    params.set("limit", "100");
 
-    response = await fetchWithAuth(getBaseUrl() + "/admin/category?" + params.toString(), {
-      method: "GET",
-      headers: getAuthHeaders()
-    });
-
+    response = await fetch(base + path + "?" + params.toString(), { method: "GET", headers: { "Content-Type": "application/json" } });
     if (!response.ok) throw new Error("Category API " + response.status);
-
     json = await response.json();
     if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Category API error");
-    setMenuAppearanceFromApi(json);
 
-    pageCategories = normalizeCategoryItems(unwrapCategoryPayload(json));
-    allCategories = allCategories.concat(flattenCategories(pageCategories));
+    allCategories = allCategories.concat(flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json))));
     totalPage = Math.min(categoryTotalPage(json), 20);
 
     for (page = 2; page <= totalPage; page += 1) {
       params.set("page", String(page));
-      response = await fetchWithAuth(getBaseUrl() + "/admin/category?" + params.toString(), {
-        method: "GET",
-        headers: getAuthHeaders()
-      });
+      response = await fetch(base + path + "?" + params.toString(), { method: "GET", headers: { "Content-Type": "application/json" } });
       if (!response.ok) break;
       json = await response.json();
       if (!json || json.success === false) break;
       allCategories = allCategories.concat(flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json))));
     }
 
-    return renderCategoryMenu(normalizeCategoryItems(allCategories));
+    return allCategories;
+  }
+
+  async function loadAllCategories() {
+    return fetchPagedCategories("/web/category");
+  }
+
+  async function loadAdminCategoryMenu() {
+    return renderCategoryMenu(normalizeCategoryItems(await loadAllCategories()));
   }
 
   async function loadWebHome() {
@@ -2707,26 +2577,16 @@
   }
 
   async function loadBodyCatalogData() {
-    var categoryParams = new URLSearchParams();
     var productParams = new URLSearchParams();
-    var categoryResponse;
     var productResponse;
-    var categoryJson;
     var productJson;
 
-    categoryParams.set("page", "1");
-    categoryParams.set("limit", "200");
-    categoryParams.set("category_status", "1");
-    categoryParams.set("sort_order", "asc");
     productParams.set("page", "1");
     productParams.set("limit", "120");
 
     try {
-      categoryResponse = await fetchWithAuth(getBaseUrl().replace(/\/$/, "") + "/admin/category?" + categoryParams.toString(), { method: "GET", headers: getAuthHeaders() });
-      if (categoryResponse.ok) {
-        categoryJson = await categoryResponse.json();
-        bodyCatalogCache.categories = flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(categoryJson))).sort(function (a, b) { return categoryOrder(a) - categoryOrder(b); });
-      }
+      bodyCatalogCache.categories = flattenCategories(normalizeCategoryItems(await loadAllCategories()))
+        .sort(function (a, b) { return categoryOrder(a) - categoryOrder(b); });
     } catch (e) { bodyCatalogCache.categories = []; }
 
     try {
@@ -3002,352 +2862,26 @@
     return document.body && (document.body.getAttribute("data-page") === "news" || document.body.getAttribute("data-page") === "tin-tuc");
   }
 
-  function stripHtmlText(html) {
-    if (!html) return "";
-    var tmp = document.createElement("DIV");
-    tmp.innerHTML = decodeHtmlContent(html);
-    return (tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
-  }
-
-  function shuffleArray(arr) {
-    var list = arr.slice();
-    for (var i = list.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = list[i];
-      list[i] = list[j];
-      list[j] = temp;
-    }
-    return list;
-  }
-
-  var newsPoolCache = null;
-
-  async function fetchAllNewsPool() {
-    if (newsPoolCache && newsPoolCache.length) return newsPoolCache;
-    var allItems = [];
-    try {
-      var page1 = await fetchWithAuth(getBaseUrl() + "/admin/statics?page=1", { method: "GET", headers: getAuthHeaders() });
-      if (page1.ok) {
-        var json1 = await page1.json();
-        var items1 = normalizeApiList(json1);
-        allItems = allItems.concat(items1);
-        var totalPage = (json1 && json1.data && json1.data.pagination && json1.data.pagination.total_page) || 1;
-        if (totalPage > 1) {
-          for (var p = 2; p <= Math.min(totalPage, 5); p++) {
-            var resP = await fetchWithAuth(getBaseUrl() + "/admin/statics?page=" + p, { method: "GET", headers: getAuthHeaders() });
-            if (resP.ok) {
-              var jsonP = await resP.json();
-              allItems = allItems.concat(normalizeApiList(jsonP));
-            }
-          }
-        }
-      }
-    } catch (e) {}
-    newsPoolCache = allItems;
-    return allItems;
-  }
-
-  function renderNewsFeaturedCard(item) {
-    if (!item) return "";
-    var title = escapeHtml(item.statics_title || "");
-    var image = safeUrl(item.statics_image || (item.statics_image_other && item.statics_image_other[0]), "assets/img/header/logo.png");
-    var intro = escapeHtml(stripHtmlText(item.statics_intro || item.statics_content || ""));
-    var id = item.statics_id;
-
-    return (
-      '<div class="fe-news-featured" data-news-id="' + id + '">' +
-      '<img class="fe-news-featured-img" src="' + escapeHtml(image) + '" alt="' + title + '" loading="lazy">' +
-      '<div class="fe-news-featured-content">' +
-      '<h3 class="fe-news-featured-title">' + title + '</h3>' +
-      '<p class="fe-news-featured-intro">' + intro + '</p>' +
-      '</div></div>'
-    );
-  }
-
-  function renderNewsListItem(item) {
-    if (!item) return "";
-    var title = escapeHtml(item.statics_title || "");
-    var image = safeUrl(item.statics_image || (item.statics_image_other && item.statics_image_other[0]), "assets/img/header/logo.png");
-    var intro = escapeHtml(stripHtmlText(item.statics_intro || item.statics_content || ""));
-    var id = item.statics_id;
-
-    return (
-      '<div class="fe-news-item" data-news-id="' + id + '">' +
-      '<div class="fe-news-item-img-wrap">' +
-      '<img class="fe-news-item-img" src="' + escapeHtml(image) + '" alt="' + title + '" loading="lazy">' +
-      '</div>' +
-      '<div class="fe-news-item-content">' +
-      '<a class="fe-news-item-title" href="#" data-news-id="' + id + '">' + title + '</a>' +
-      '<p class="fe-news-item-intro">' + intro + '</p>' +
-      '</div></div>'
-    );
-  }
-
-  function renderNewsSidebarItem(item) {
-    if (!item) return "";
-    var title = escapeHtml(item.statics_title || "");
-    var image = safeUrl(item.statics_image || (item.statics_image_other && item.statics_image_other[0]), "assets/img/header/logo.png");
-    var id = item.statics_id;
-
-    return (
-      '<div class="fe-news-sidebar-item" data-news-id="' + id + '">' +
-      '<div class="fe-news-sidebar-title">' + title + '</div>' +
-      '<img class="fe-news-sidebar-img" src="' + escapeHtml(image) + '" alt="' + title + '" loading="lazy">' +
-      '</div>'
-    );
-  }
-
-  function renderNewsPagination(pagination, currentPage) {
-    if (!pagination || pagination.total_page <= 1) return "";
-
-    var totalPage = pagination.total_page;
-    var pagesHtml = "";
-
-    // Prev
-    var prevDisabled = currentPage <= 1 ? " disabled" : "";
-    pagesHtml += '<li class="page-item' + prevDisabled + '"><a class="page-link" href="#" data-page="' + (currentPage - 1) + '" aria-label="Trang trước">&laquo;</a></li>';
-
-    for (var p = 1; p <= totalPage; p++) {
-      var active = p === currentPage ? " active" : "";
-      pagesHtml += '<li class="page-item' + active + '"><a class="page-link" href="#" data-page="' + p + '">' + p + '</a></li>';
-    }
-
-    // Next
-    var nextDisabled = currentPage >= totalPage ? " disabled" : "";
-    pagesHtml += '<li class="page-item' + nextDisabled + '"><a class="page-link" href="#" data-page="' + (currentPage + 1) + '" aria-label="Trang sau">&raquo;</a></li>';
-
-    return (
-      '<div class="fe-news-pagination-wrap">' +
-      '<ul class="fe-news-pagination">' + pagesHtml + '</ul>' +
-      '</div>'
-    );
-  }
-
-  async function loadNewsDetailApi(id) {
-    var response = await fetchWithAuth(getBaseUrl() + "/admin/statics/edit/" + id, {
-      method: "GET",
-      headers: getAuthHeaders()
-    });
-    if (!response.ok) throw new Error("Statics detail API " + response.status);
-    var json = await response.json();
-    if (!json || json.success === false) throw new Error((json && json.message) || "Detail API error");
-    return (json.data && json.data.data) || json.data || {};
-  }
-
-  function updateNewsUrlQuery(id) {
-    if (!window.history || !window.history.pushState) return;
-    var url = new URL(window.location.href);
-    if (id) {
-      url.searchParams.set("id", id);
-    } else {
-      url.searchParams.delete("id");
-    }
-    window.history.pushState({ newsId: id }, "", url.toString());
-  }
-
-  async function renderNewsDetailPage(id) {
+  function renderNewsPageContent() {
     var root = document.querySelector('[data-page-region="body"]');
+    var html;
+
     if (!root) return;
 
-    root.innerHTML = '<div class="container py-5 text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+    html =
+      '<section class="fe-news-page">' +
+      '<div class="container">' +
+      '<nav class="fe-news-breadcrumb" aria-label="breadcrumb">' +
+      '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; <span>TIN TỨC</span>' +
+      "</nav>" +
+      '<div class="py-5 text-center text-muted">Nội dung tin tức đang được cập nhật.</div>' +
+      "</div>" +
+      "</section>";
 
-    try {
-      var detail = await loadNewsDetailApi(id);
-      var pool = await fetchAllNewsPool();
-      var randomSidebarItems = shuffleArray(pool.filter(function (item) {
-        return item && String(item.statics_id) !== String(id);
-      })).slice(0, 10);
-
-      var sidebarHtml = randomSidebarItems.map(renderNewsSidebarItem).join("");
-
-      var title = escapeHtml(detail.statics_title || "");
-      var createdDate = detail.statics_created ? new Date(detail.statics_created * 1000).toLocaleDateString("vi-VN") : "";
-      var intro = detail.statics_intro ? escapeHtml(stripHtmlText(detail.statics_intro)) : "";
-      var contentHtml = decodeHtmlContent(detail.statics_content) || (detail.statics_intro ? '<p>' + escapeHtml(detail.statics_intro) + '</p>' : '');
-      var coverImage = detail.statics_image ? safeUrl(detail.statics_image, "") : "";
-
-      var html =
-        '<section class="fe-news-page">' +
-        '<div class="container">' +
-        '<nav class="fe-news-breadcrumb" aria-label="breadcrumb">' +
-        '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; ' +
-        '<a href="#" class="fe-news-back-link">TIN TỨC</a> &gt; ' +
-        '<span>' + title + '</span>' +
-        '</nav>' +
-        '<div class="row g-4">' +
-        // Left Column (Full Article Detail View)
-        '<div class="col-12 col-lg-8">' +
-        '<div class="fe-news-detail-card">' +
-        '<h1 class="fe-news-detail-title">' + title + '</h1>' +
-        '<div class="fe-news-detail-meta">' +
-        (createdDate ? '<span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(createdDate) + '</span>' : '') +
-        '<span><i class="fa-regular fa-eye"></i> ' + (detail.statics_view_num || 0) + ' lượt xem</span>' +
-        '</div>' +
-        (intro ? '<div class="fe-news-detail-intro">' + intro + '</div>' : '') +
-        (coverImage ? '<div class="mb-4"><img src="' + escapeHtml(coverImage) + '" alt="' + title + '" class="w-100 rounded-3"></div>' : '') +
-        '<div class="fe-news-detail-body">' + contentHtml + '</div>' +
-        '<div class="fe-news-detail-actions">' +
-        '<a href="#" class="fe-news-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách tin tức</a>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        // Right Column (Sidebar 10 random articles)
-        '<div class="col-12 col-lg-4">' +
-        '<div class="fe-news-sidebar-card">' +
-        '<div class="fe-news-sidebar-list">' + sidebarHtml + '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</section>';
-
-      root.innerHTML = html;
-      root.dataset.renderState = "ready";
-      document.title = detail.statics_title || "Chi tiết tin tức";
-
-      // Bind click on sidebar items to switch to another article detail
-      root.querySelectorAll(".fe-news-sidebar-item").forEach(function (el) {
-        el.addEventListener("click", function (e) {
-          e.preventDefault();
-          var sidebarId = el.getAttribute("data-news-id");
-          if (sidebarId) {
-            updateNewsUrlQuery(sidebarId);
-            renderNewsDetailPage(sidebarId);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        });
-      });
-
-      // Bind back button and breadcrumb link
-      root.querySelectorAll(".fe-news-back-btn, .fe-news-back-link").forEach(function (el) {
-        el.addEventListener("click", function (e) {
-          e.preventDefault();
-          updateNewsUrlQuery(null);
-          renderNewsPageContent(1);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-      });
-
-      window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "news-detail", data: detail } }));
-    } catch (err) {
-      root.innerHTML = '<div class="container py-5 text-center text-danger">Có lỗi khi tải nội dung bài viết. <a href="#" class="fe-news-back-link">Quay lại danh sách</a></div>';
-      root.dataset.renderState = "fallback";
-      if (window.console) console.warn("News detail load error:", err);
-    }
-  }
-
-  async function renderNewsPageContent(page, detailId) {
-    var urlParams = new URLSearchParams(window.location.search);
-    var targetId = detailId || urlParams.get("id");
-
-    if (targetId) {
-      return renderNewsDetailPage(targetId);
-    }
-
-    var root = document.querySelector('[data-page-region="body"]');
-    if (!root) return;
-
-    var currentPage = page || parseInt(urlParams.get("page"), 10) || 1;
-    root.innerHTML = '<div class="container py-5 text-center"><div class="spinner-border text-primary" role="status"></div></div>';
-
-    try {
-      var newsResponse = await fetchWithAuth(getBaseUrl() + "/admin/statics?page=" + currentPage, {
-        method: "GET",
-        headers: getAuthHeaders()
-      });
-      if (!newsResponse.ok) throw new Error("Statics API " + newsResponse.status);
-      var newsJson = await newsResponse.json();
-      if (!newsJson || newsJson.success === false) throw new Error(newsJson && newsJson.message ? newsJson.message : "API Error");
-
-      var mainData = newsJson.data || {};
-      var mainItems = normalizeApiList(newsJson);
-      var pagination = mainData.pagination || { total_page: 1, page: currentPage };
-
-      // Sidebar random items pool
-      var pool = await fetchAllNewsPool();
-      if (!pool.length) pool = mainItems;
-      var randomSidebarItems = shuffleArray(pool).slice(0, 10);
-
-      var featuredItem = mainItems[0] || null;
-      var listItems = mainItems.slice(1);
-
-      var featuredHtml = renderNewsFeaturedCard(featuredItem);
-      var listHtml = listItems.map(renderNewsListItem).join("");
-      var sidebarHtml = randomSidebarItems.map(renderNewsSidebarItem).join("");
-      var paginationHtml = renderNewsPagination(pagination, currentPage);
-
-      var html =
-        '<section class="fe-news-page">' +
-        '<div class="container">' +
-        '<nav class="fe-news-breadcrumb" aria-label="breadcrumb">' +
-        '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; <span>TIN TỨC</span>' +
-        '</nav>' +
-        '<div class="row g-4">' +
-        // Left Column (Main News)
-        '<div class="col-12 col-lg-8">' +
-        featuredHtml +
-        '<div class="fe-news-list">' + listHtml + '</div>' +
-        paginationHtml +
-        '</div>' +
-        // Right Column (Sidebar 10 random articles)
-        '<div class="col-12 col-lg-4">' +
-        '<div class="fe-news-sidebar-card">' +
-        '<div class="fe-news-sidebar-list">' + sidebarHtml + '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</section>';
-
-      root.innerHTML = html;
-      root.dataset.renderState = "ready";
-      document.title = "Tin tức";
-
-      // Bind click on news items to show full-screen detail view
-      root.querySelectorAll("[data-news-id]").forEach(function (el) {
-        el.addEventListener("click", function (e) {
-          e.preventDefault();
-          var id = el.getAttribute("data-news-id");
-          if (id) {
-            updateNewsUrlQuery(id);
-            renderNewsDetailPage(id);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        });
-      });
-
-      // Bind pagination clicks
-      root.querySelectorAll(".fe-news-pagination .page-link").forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          e.preventDefault();
-          var targetPage = parseInt(link.getAttribute("data-page"), 10);
-          if (targetPage && targetPage !== currentPage && targetPage >= 1 && targetPage <= pagination.total_page) {
-            renderNewsPageContent(targetPage);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }
-        });
-      });
-
-      // Popstate handler for back/forward navigation
-      if (!window._feNewsPopstateBound) {
-        window._feNewsPopstateBound = true;
-        window.addEventListener("popstate", function () {
-          var p = new URLSearchParams(window.location.search);
-          var nid = p.get("id");
-          if (nid) {
-            renderNewsDetailPage(nid);
-          } else {
-            renderNewsPageContent(parseInt(p.get("page"), 10) || 1);
-          }
-        });
-      }
-
-      window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "news", data: newsJson } }));
-    } catch (err) {
-      root.innerHTML = '<div class="container py-5 text-center text-danger">Có lỗi khi tải tin tức. Vui lòng thử lại sau.</div>';
-      root.dataset.renderState = "fallback";
-      if (window.console) console.warn("News load error:", err);
-    }
+    root.innerHTML = html;
+    root.dataset.renderState = "ready";
+    document.title = "Tin tức";
+    window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "news" } }));
   }
 
   function renderPageBody(sections) {
@@ -3482,7 +3016,7 @@
       if (contactPage) {
         renderContactPage(footer);
       } else if (newsPage) {
-        await renderNewsPageContent(1);
+        await renderNewsPageContent();
       } else if (aboutPage) {
         try {
           renderAboutPage(await loadAboutPage());
