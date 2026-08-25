@@ -2497,35 +2497,16 @@
   }
 
   async function fetchPagedCategories(path) {
-    var params = new URLSearchParams();
     var base = getBaseUrl().replace(/\/$/, "");
-    var allCategories = [];
     var response;
     var json;
-    var totalPage;
-    var page;
 
-    params.set("page", "1");
-    params.set("limit", "100");
-
-    response = await fetch(base + path + "?" + params.toString(), { method: "GET", headers: { "Content-Type": "application/json" } });
+    response = await fetch(base + path, { method: "GET", headers: { "Content-Type": "application/json" } });
     if (!response.ok) throw new Error("Category API " + response.status);
     json = await response.json();
     if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Category API error");
 
-    allCategories = allCategories.concat(flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json))));
-    totalPage = Math.min(categoryTotalPage(json), 20);
-
-    for (page = 2; page <= totalPage; page += 1) {
-      params.set("page", String(page));
-      response = await fetch(base + path + "?" + params.toString(), { method: "GET", headers: { "Content-Type": "application/json" } });
-      if (!response.ok) break;
-      json = await response.json();
-      if (!json || json.success === false) break;
-      allCategories = allCategories.concat(flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json))));
-    }
-
-    return allCategories;
+    return flattenCategories(normalizeCategoryItems(unwrapCategoryPayload(json)));
   }
 
   async function loadAllCategories() {
@@ -2862,26 +2843,227 @@
     return document.body && (document.body.getAttribute("data-page") === "news" || document.body.getAttribute("data-page") === "tin-tuc");
   }
 
-  function renderNewsPageContent() {
-    var root = document.querySelector('[data-page-region="body"]');
-    var html;
+  function getNewsAlias() {
+    var params = new URLSearchParams(window.location.search);
+    return params.get("alias") || "";
+  }
 
+  function getNewsPageParam() {
+    var params = new URLSearchParams(window.location.search);
+    return parseInt(params.get("p"), 10) || 1;
+  }
+
+  function formatNewsDate(timestamp) {
+    if (!timestamp) return "";
+    var d = new Date(typeof timestamp === "number" ? timestamp * 1000 : timestamp);
+    var day = String(d.getDate()).padStart(2, "0");
+    var month = String(d.getMonth() + 1).padStart(2, "0");
+    var year = d.getFullYear();
+    return day + "/" + month + "/" + year;
+  }
+
+  async function fetchStaticsList(page, limit) {
+    var base = getBaseUrl();
+    var url = base + "/web/statics?page=" + encodeURIComponent(page) + "&limit=" + encodeURIComponent(limit);
+    var response = await fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } });
+    if (!response.ok) throw new Error("Statics API " + response.status);
+    var json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Statics API error");
+    return json;
+  }
+
+  async function fetchStaticsDetail(alias) {
+    var base = getBaseUrl();
+    var url = base + "/web/statics/" + encodeURIComponent(alias);
+    var response = await fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } });
+    if (!response.ok) throw new Error("Statics API " + response.status);
+    var json = await response.json();
+    if (!json || json.success === false) throw new Error(json && json.message ? json.message : "Statics API error");
+    return json;
+  }
+
+  function newsDetailUrl(alias) {
+    var base = window.location.pathname;
+    return base + "?alias=" + encodeURIComponent(alias);
+  }
+
+  function newsPageUrl(page) {
+    var base = window.location.pathname;
+    if (page <= 1) return base;
+    return base + "?p=" + encodeURIComponent(page);
+  }
+
+  function renderNewsListPagination(currentPage, totalPage) {
+    if (totalPage <= 1) return "";
+    var html = '<nav class="fe-news-pagination-wrap" aria-label="Phân trang tin tức"><ul class="fe-news-pagination">';
+
+    if (currentPage > 1) {
+      html += '<li class="page-item"><a class="page-link" href="' + newsPageUrl(currentPage - 1) + '">&laquo;</a></li>';
+    } else {
+      html += '<li class="page-item disabled"><span class="page-link">&laquo;</span></li>';
+    }
+
+    var start = Math.max(1, currentPage - 2);
+    var end = Math.min(totalPage, currentPage + 2);
+    if (start > 1) {
+      html += '<li class="page-item"><a class="page-link" href="' + newsPageUrl(1) + '">1</a></li>';
+      if (start > 2) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+    }
+    for (var i = start; i <= end; i++) {
+      if (i === currentPage) {
+        html += '<li class="page-item active"><span class="page-link">' + i + "</span></li>";
+      } else {
+        html += '<li class="page-item"><a class="page-link" href="' + newsPageUrl(i) + '">' + i + "</a></li>";
+      }
+    }
+    if (end < totalPage) {
+      if (end < totalPage - 1) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+      html += '<li class="page-item"><a class="page-link" href="' + newsPageUrl(totalPage) + '">' + totalPage + "</a></li>";
+    }
+
+    if (currentPage < totalPage) {
+      html += '<li class="page-item"><a class="page-link" href="' + newsPageUrl(currentPage + 1) + '">&raquo;</a></li>';
+    } else {
+      html += '<li class="page-item disabled"><span class="page-link">&raquo;</span></li>';
+    }
+
+    html += "</ul></nav>";
+    return html;
+  }
+
+  function renderNewsListItem(item, index) {
+    var title = escapeHtml(item.statics_title || "");
+    var intro = escapeHtml(item.statics_intro || "");
+    var image = safeImageUrl(item.statics_image, "");
+    var alias = item.statics_alias || "";
+    var link = newsDetailUrl(alias);
+
+    if (index === 0) {
+      var imgHtml = image
+        ? '<img class="fe-news-featured-img" src="' + image + '" alt="' + title + '" loading="lazy">'
+        : '<div class="fe-news-featured-img" style="background:#eee"></div>';
+      return '<article class="fe-news-featured">' + imgHtml +
+        '<div class="fe-news-featured-content">' +
+        '<h2 class="fe-news-featured-title"><a href="' + link + '" style="color:inherit;text-decoration:none">' + title + '</a></h2>' +
+        (intro ? '<p class="fe-news-featured-intro">' + intro + "</p>" : "") +
+        "</div></article>";
+    }
+
+    var itemImgHtml = image
+      ? '<div class="fe-news-item-img-wrap"><img class="fe-news-item-img" src="' + image + '" alt="' + title + '" loading="lazy"></div>'
+      : '<div class="fe-news-item-img-wrap" style="background:#eee"></div>';
+
+    return '<article class="fe-news-item">' + itemImgHtml +
+      '<div class="fe-news-item-content">' +
+      '<a class="fe-news-item-title" href="' + link + '">' + title + "</a>" +
+      (intro ? '<p class="fe-news-item-intro">' + intro + "</p>" : "") +
+      "</div></article>";
+  }
+
+  async function renderNewsListPage() {
+    var root = document.querySelector('[data-page-region="body"]');
     if (!root) return;
 
-    html =
-      '<section class="fe-news-page">' +
-      '<div class="container">' +
+    var page = getNewsPageParam();
+    var limit = 10;
+
+    root.innerHTML =
+      '<section class="fe-news-page"><div class="container">' +
       '<nav class="fe-news-breadcrumb" aria-label="breadcrumb">' +
       '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; <span>TIN TỨC</span>' +
       "</nav>" +
-      '<div class="py-5 text-center text-muted">Nội dung tin tức đang được cập nhật.</div>' +
-      "</div>" +
-      "</section>";
+      '<div id="fe-news-list-container"><div class="py-5 text-center text-muted">Đang tải tin tức...</div></div>' +
+      "</div></section>";
 
-    root.innerHTML = html;
+    try {
+      var result = await fetchStaticsList(page, limit);
+      var wrapper = result.data || {};
+      var items = wrapper.data || [];
+      var paging = wrapper.paging || {};
+      var total = paging.total || 0;
+      var totalPage = Math.ceil(total / limit) || 1;
+
+      if (items.length === 0) {
+        document.getElementById("fe-news-list-container").innerHTML =
+          '<div class="py-5 text-center text-muted">Chưa có tin tức nào.</div>';
+      } else {
+        var featured = renderNewsListItem(items[0], 0);
+        var listItems = items.slice(1).map(function (item, i) { return renderNewsListItem(item, i + 1); }).join("");
+        var listHtml = listItems ? '<div class="fe-news-list">' + listItems + "</div>" : "";
+        var pagination = renderNewsListPagination(page, totalPage);
+
+        document.getElementById("fe-news-list-container").innerHTML = featured + listHtml + pagination;
+      }
+    } catch (err) {
+      document.getElementById("fe-news-list-container").innerHTML =
+        '<div class="py-5 text-center text-danger">Không thể tải tin tức. Vui lòng thử lại sau.</div>';
+      if (window.console) console.warn("News list error:", err.message || err);
+    }
+
     root.dataset.renderState = "ready";
     document.title = "Tin tức";
     window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "news" } }));
+  }
+
+  async function renderNewsDetailPage(alias) {
+    var root = document.querySelector('[data-page-region="body"]');
+    if (!root) return;
+
+    root.innerHTML =
+      '<section class="fe-news-page"><div class="container">' +
+      '<nav class="fe-news-breadcrumb" aria-label="breadcrumb">' +
+      '<a href="' + escapeHtml(homeHref()) + '">Home</a> &gt; ' +
+      '<a href="' + escapeHtml(newsPageUrl(1)) + '">Tin tức</a> &gt; <span>Chi tiết</span>' +
+      "</nav>" +
+      '<div id="fe-news-detail-container"><div class="py-5 text-center text-muted">Đang tải bài viết...</div></div>' +
+      "</div></section>";
+
+    try {
+      var result = await fetchStaticsDetail(alias);
+      var item = result.data;
+
+      if (!item) {
+        document.getElementById("fe-news-detail-container").innerHTML =
+          '<div class="py-5 text-center text-muted">Bài viết không tồn tại.</div>';
+      } else {
+        var title = escapeHtml(item.statics_title || "");
+        var intro = escapeHtml(item.statics_intro || "");
+        var content = decodeHtmlContent(item.statics_content || "");
+        var image = safeImageUrl(item.statics_image, "");
+        var created = formatNewsDate(item.statics_created);
+
+        var metaHtml = "";
+        if (created) metaHtml += '<span><i class="fa-regular fa-calendar"></i> ' + created + "</span>";
+
+        var imgHtml = image ? '<img src="' + image + '" alt="' + title + '" style="width:100%;max-height:400px;object-fit:cover;border-radius:8px;margin-bottom:24px">' : "";
+
+        document.getElementById("fe-news-detail-container").innerHTML =
+          '<article class="fe-news-detail-card">' +
+          "<h1>" + title + "</h1>" +
+          (metaHtml ? '<div class="fe-news-detail-meta">' + metaHtml + "</div>" : "") +
+          imgHtml +
+          (intro ? '<div class="fe-news-detail-intro">' + intro + "</div>" : "") +
+          '<div class="fe-news-detail-body">' + content + "</div>" +
+          '<div class="fe-news-detail-actions"><a href="' + escapeHtml(newsPageUrl(1)) + '" class="fe-news-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách</a></div>' +
+          "</article>";
+      }
+    } catch (err) {
+      document.getElementById("fe-news-detail-container").innerHTML =
+        '<div class="py-5 text-center text-danger">Không thể tải bài viết. Vui lòng thử lại sau.</div>';
+      if (window.console) console.warn("News detail error:", err.message || err);
+    }
+
+    root.dataset.renderState = "ready";
+    window.dispatchEvent(new CustomEvent("fe:body-rendered", { detail: { region: "body", page: "news-detail" } }));
+  }
+
+  async function renderNewsPageContent() {
+    var alias = getNewsAlias();
+    if (alias) {
+      await renderNewsDetailPage(alias);
+    } else {
+      await renderNewsListPage();
+    }
   }
 
   function renderPageBody(sections) {
