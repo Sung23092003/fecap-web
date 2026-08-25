@@ -12,10 +12,10 @@
   "use strict";
 
   /* ====== CHỈNH TAY KHI CHẠY LOCAL ====== */
-  var BASE_URL_LOCAL = "https://capi.id.vn";
+  var BASE_URL_LOCAL = "https://api.capi.id.vn";
 
   /* Giá trị dự phòng khi không xác định được môi trường */
-  var DEFAULT_BASE_URL = "https://capi.id.vn";
+  var DEFAULT_BASE_URL = "https://api.capi.id.vn";
 
   function isLocalHostname(hostname) {
     return (
