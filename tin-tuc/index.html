@@ -14,6 +14,57 @@
   <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="../assets/css/fe-header.css" rel="stylesheet" type="text/css">
   <link href="../assets/css/fe-news.css" rel="stylesheet" type="text/css">
+  <style>
+    /* Loại bỏ giao diện box, hòa vào trang */
+    .fe-news-page {
+      background: transparent !important;
+      padding: 24px 0 60px;
+    }
+    .fe-news-featured {
+      background: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      margin-bottom: 32px;
+    }
+    .fe-news-featured-content {
+      padding: 20px 0 !important;
+    }
+    .fe-news-item {
+      background: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 16px 0 !important;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .fe-news-item:last-child {
+      border-bottom: none;
+    }
+    .fe-news-detail-card {
+      background: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 20px 0 !important;
+    }
+    .fe-news-sidebar-card {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    .fe-news-sidebar-header {
+      background: transparent !important;
+      border-bottom: 2px solid #0f2742 !important;
+      padding: 10px 0 !important;
+      font-size: 16px !important;
+    }
+    .fe-news-sidebar-item {
+      padding: 14px 0 !important;
+      border-bottom: 1px solid #edf2f7 !important;
+    }
+    .fe-news-sidebar-item:hover {
+      background: transparent !important;
+    }
+  </style>
 </head>
 
 <body data-page="news">
@@ -25,12 +76,12 @@
           <a href="/">Home</a> > <span>TIN TỨC</span>
         </div>
         <div class="row" id="news-grid-row">
-          <!-- Cột trái: Bài chính và danh sách bài viết -->
+          <!-- Cột trái: Bài chính, danh sách bài viết HOẶC chi tiết bài viết (Hòa vào trang) -->
           <div class="col-lg-8" id="main-news-container">
             <!-- Sẽ được render bằng JavaScript -->
           </div>
           
-          <!-- Cột phải: Sidebar -->
+          <!-- Cột phải: Sidebar luôn hiển thị -->
           <div class="col-lg-4">
             <div class="fe-news-sidebar-card">
               <div class="fe-news-sidebar-header">Bài viết nổi bật</div>
@@ -39,11 +90,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Chi tiết bài viết (Full màn hình) -->
-        <div id="news-detail-container" style="display: none;">
-          <!-- Sẽ được render chi tiết tin tức bằng JavaScript -->
         </div>
       </div>
     </div>
@@ -101,7 +147,6 @@
               const rawData = res.data || {};
               const data = Array.isArray(rawData) ? rawData : (rawData.data || []);
               const paging = res.paging || rawData.paging || {};
-              // Calculate total pages assuming paging.total is total items
               totalPages = paging.total_page || Math.ceil((paging.total || 0) / ITEMS_PER_PAGE) || 1;
               renderMainNews(data, page);
             }
@@ -116,7 +161,7 @@
         let html = '';
         if (pageItems.length > 0) {
           const featured = pageItems[0];
-          const featuredUrl = '?alias=' + (featured.statics_alias || featured.alias || '');
+          const featuredUrl = '?id=' + featured.statics_id;
           html += `
             <div class="fe-news-featured">
               <a href="${featuredUrl}"><img class="fe-news-featured-img" src="${featured.statics_image}" alt="${featured.statics_title}"></a>
@@ -131,7 +176,7 @@
             html += '<div class="fe-news-list">';
             for (let i = 1; i < pageItems.length; i++) {
               const item = pageItems[i];
-              const itemUrl = '?alias=' + (item.statics_alias || item.alias || '');
+              const itemUrl = '?id=' + item.statics_id;
               html += `
                 <div class="fe-news-item">
                   <a href="${itemUrl}" class="fe-news-item-img-wrap">
@@ -210,7 +255,7 @@
         
         let html = '';
         sidebarItems.forEach(item => {
-          const itemUrl = '?alias=' + (item.statics_alias || item.alias || '');
+          const itemUrl = '?id=' + item.statics_id;
           html += `
             <a href="${itemUrl}" class="fe-news-sidebar-item">
               <h3 class="fe-news-sidebar-title">${item.statics_title}</h3>
@@ -222,26 +267,25 @@
         $('#sidebar-news-container').html(html);
       }
 
-      function showDetail(alias) {
-        $('#news-grid-row').hide();
-        $('#news-detail-container').show().html('<div class="fe-news-detail-card"><p>Đang tải chi tiết bài viết...</p></div>');
+      function showDetail(id) {
+        $('#main-news-container').html('<div class="fe-news-detail-card"><p>Đang tải chi tiết bài viết...</p></div>');
         
         // Update breadcrumb
         $('.fe-news-breadcrumb').html('<a href="/">Home</a> > <a href="#" class="fe-news-back-btn">TIN TỨC</a> > <span>Chi tiết</span>');
 
         $.ajax({
-          url: getApiUrl() + "/" + alias,
+          url: getApiUrl() + "/" + id,
           method: 'GET',
           success: function(res) {
             if (res && res.success && res.data) {
               renderDetail(res.data);
             } else {
-              $('#news-detail-container').html('<div class="fe-news-detail-card"><p>Không tìm thấy bài viết hoặc bài viết đã bị xóa.</p><a href="#" class="fe-news-back-btn btn btn-secondary mt-3">Quay lại danh sách</a></div>');
+              $('#main-news-container').html('<div class="fe-news-detail-card"><p>Không tìm thấy bài viết hoặc bài viết đã bị xóa.</p><a href="#" class="fe-news-back-btn btn btn-secondary mt-3">Quay lại danh sách</a></div>');
             }
           },
           error: function(err) {
             console.error("Lỗi khi tải chi tiết bài viết", err);
-            $('#news-detail-container').html('<div class="fe-news-detail-card"><p>Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại sau.</p><a href="#" class="fe-news-back-btn btn btn-secondary mt-3">Quay lại danh sách</a></div>');
+            $('#main-news-container').html('<div class="fe-news-detail-card"><p>Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại sau.</p><a href="#" class="fe-news-back-btn btn btn-secondary mt-3">Quay lại danh sách</a></div>');
           }
         });
       }
@@ -263,33 +307,31 @@
             </div>
           </div>
         `;
-        $('#news-detail-container').html(html);
+        $('#main-news-container').html(html);
         $('html, body').animate({ scrollTop: 0 }, 300);
       }
 
       function showList() {
-        $('#news-grid-row').show();
-        $('#news-detail-container').hide();
         $('.fe-news-breadcrumb').html('<a href="/">Home</a> > <span>TIN TỨC</span>');
         fetchMainNews(currentPage);
       }
 
       function checkRoute() {
         const params = new URLSearchParams(window.location.search);
-        const alias = params.get('alias');
-        if (alias) {
-          showDetail(alias);
+        const id = params.get('id');
+        if (id) {
+          showDetail(id);
         } else {
           showList();
         }
       }
 
-      // Intercept clicks on links pointing to ?alias=
-      $(document).on('click', 'a[href^="?alias="]', function(e) {
+      // Intercept clicks on links pointing to ?id=
+      $(document).on('click', 'a[href^="?id="]', function(e) {
         e.preventDefault();
-        const alias = $(this).attr('href').split('=')[1];
-        history.pushState(null, '', window.location.pathname + '?alias=' + alias);
-        showDetail(alias);
+        const id = $(this).attr('href').split('=')[1];
+        history.pushState(null, '', window.location.pathname + '?id=' + id);
+        showDetail(id);
       });
 
       // Handle Back Button click
